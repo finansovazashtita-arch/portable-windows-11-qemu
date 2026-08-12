@@ -1,7 +1,9 @@
 """
-OpenBalancer Dashboard & FinansProtect Integration Package.
+Dashboard Package.
 """
 
-from src.dashboard.openbalancer_client import OpenBalancerClient, TelemetryEvent
+from src.dashboard.dashboard_server import DashboardHandler
+from src.dashboard.openbalancer_client import OpenBalancerClient
+from src.dashboard.prometheus_exporter import PrometheusTelemetryExporter
 
-__all__ = ["OpenBalancerClient", "TelemetryEvent"]
+__all__ = ["OpenBalancerClient", "DashboardHandler", "PrometheusTelemetryExporter"]
