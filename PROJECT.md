@@ -5,6 +5,7 @@
 - **Multi-Bank Extraction Architecture**: `src/ocr/multi_bank_extractor.py` supporting auto-detection and specialized parsing for DSK Bank (`STSA`), UniCredit Bulbank (`UNCR`), United Bulgarian Bank / ОББ (`UBBS`), and Postbank / Eurobank Bulgaria (`BPBI`).
 - **Automated Email Intake Layer**: `src/intake/email_parser.py` & `src/intake/cloudflare_worker.js` supporting MIME email parsing, IMAP/Gmail polling, Cloudflare Email Routing stream ingestion, and automatic PDF/ZIP attachment extraction (`POST /email-intake`).
 - **Multi-PDF Batch Queue Engine**: `src/ocr/batch_processor.py` supporting directory scanning, ZIP archive ingestion, fault-tolerant batch processing, and multi-statement transaction aggregation.
+- **Automated Nightly Backup Manager**: `src/backup/nightly_backup.py` & `scripts/schedule_nightly_backup.sh` providing scheduled snapshots of MS SQL database (`SQLEXPRESS`), `C:\TRANSFER.LOG` audit logs, Infisical Vault secrets, and 30-day retention pruning.
 - **FinansProtect Web UI Audit Dashboard**: `src/dashboard/web_ui/` & `src/dashboard/dashboard_server.py` providing real-time visual monitoring of bank statement intake queues, total processed turnover (€), SHA-256 audit integrity logs, and Windows 11 VM VNC control on port `8095`.
 - **Translation & Rules Engine Layer**: Bulgarian double-entry accounting translation engine. Handles account mapping (503, 401, 411, 501, 621, 602, 304, 4531/4532, 702/703), EIK/IBAN checksum validation, SHA-256 deduplication, and Microinvest TransferData XML (`urn:Transfer`) + CSV generation.
 - **Unsloth AI Fine-Tuning & Classifier Layer**: `src/ai/unsloth_classifier.py` & `src/ai/unsloth_finetune.py` with QLoRA instruction dataset generator (1,000+ Bulgarian accounting pairs) and Unsloth FastLanguageModel training parameters.
@@ -30,7 +31,7 @@
 | 9 | Database SQL Verification | Query SQLEXPRESS tables (Partners, Operations, OperationDetails) via sqlcmd | M4 | DONE |
 | 10 | Persistent Audit Log Export | Export validated C:\TRANSFER.LOG on persistent Windows 11 QEMU VM storage | M4 | DONE |
 | 11 | E2E Test Suite Creation | Create requirement-driven opaque-box E2E test infra (Tiers 1-4) and publish TEST_READY.md | E2E Track | DONE |
-| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (169/169 passed) and complete Tier 5 coverage | M5 | DONE |
+| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (173/173 passed) and complete Tier 5 coverage | M5 | DONE |
 | 13 | Self-Hosted Ecosystem Integration | Connect Infisical, n8n, Supabase, Obsidian Vault, Unsloth AI, OpenBalancer Telemetry | M6 | DONE |
 | 14 | Multi-PDF Batch Queue & ZIP Processing | Directory scanner, ZIP archive ingestion, fault-tolerant batch execution (`POST /process-batch`) | M7 | DONE |
 | 15 | Automated Email Intake Pipeline | IMAP/Gmail fetcher, MIME parser, Cloudflare Email Routing Worker (`POST /email-intake`) | M8 | DONE |
@@ -38,6 +39,7 @@
 | 17 | Production Docker Compose Stack | `Dockerfile`, `docker-compose.yml`, health checks, zero-downtime stack deployment | M10 | DONE |
 | 18 | Multi-Bank Extractor Engine | Auto-detection and specialized OCR parsing for DSK, UniCredit, UBB, Postbank | M11 | DONE |
 | 19 | FinansProtect Web UI Dashboard | Real-time visual monitoring dashboard (`src/dashboard/web_ui/`) on port `8095` | M12 | DONE |
+| 20 | Automated Nightly Backup Manager | Daily SQL DB, C:\TRANSFER.LOG, Infisical secrets backups with 30-day retention pruning | M13 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -47,7 +49,7 @@
 | M3 | `m3_vm_vnc_sql_automation` | Delta Pro Chart of Accounts UI setup, VNC & PowerShell Base64 automated import into SQLEXPRESS | M2 | DONE |
 | M4 | `m4_audit_log_export` | 3-way reconciliation (PDF ↔ Journal ↔ SQL DB), persistent C:\TRANSFER.LOG export on Windows 11 VM | M3 | DONE |
 | E2E | `m_e2e_testing` | E2E Test infrastructure, Tiers 1-4 test suite creation, publish TEST_READY.md | none | DONE |
-| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (169/169 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
+| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (173/173 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
 | M6 | `m6_full_ecosystem_integration` | Integrate Infisical Vault, Obsidian Vault Sync, Unsloth AI Classifier, Supabase, OpenBalancer | M5 | DONE |
 | M7 | `m7_multi_pdf_batch_queue` | Batch processing queue for processing multiple bank PDF statements, ZIP archives, and multi-page statements | M6 | DONE |
 | M8 | `m8_automated_email_intake` | IMAP/Gmail/Cloudflare Worker email intake parser to automatically ingest PDF attachments into n8n webhook | M7 | DONE |
@@ -55,8 +57,10 @@
 | M10 | `m10_docker_compose_production` | Production `docker-compose.yml` packaging for single-command stack launch across macmini nodes | M9 | DONE |
 | M11 | `m11_multi_bank_extractors` | Multi-bank statement OCR extraction engine supporting DSK, UniCredit, UBB, Postbank | M10 | DONE |
 | M12 | `m12_finansprotect_web_ui` | FinansProtect Web UI Audit Dashboard (`src/dashboard/web_ui/`) on port `8095` | M11 | DONE |
+| M13 | `m13_automated_nightly_backup` | Scheduled MS SQL DB, audit log, and Infisical secrets backups with 30-day retention pruning | M12 | DONE |
 
 ## Code Layout
+- `src/backup/`: Automated Nightly Backup Manager (`nightly_backup.py`)
 - `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
 - `src/dashboard/`: Dashboard server & OpenBalancer telemetry client (`dashboard_server.py`, `openbalancer_client.py`)
 - `src/ocr/`: PDF OCR, multi-bank extractors & batch processing (`extract_dsk_statement.py`, `multi_bank_extractor.py`, `batch_processor.py`)
@@ -67,5 +71,5 @@
 - `src/integration/`: Obsidian Vault exporter & Supabase logger (`obsidian_exporter.py`, `supabase_logger.py`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `src/audit/`: SQL verification & TRANSFER.LOG exporter (`generate_transfer_log.py`)
-- `scripts/`: Microinvest n8n service, production stack deployer (`microinvest_n8n_service.py`, `deploy_production_stack.sh`, `test_batch_execution.py`)
-- `tests/`: Unit and E2E test suites (169/169 passed)
+- `scripts/`: Microinvest n8n service, nightly backup scheduler (`microinvest_n8n_service.py`, `schedule_nightly_backup.sh`, `deploy_production_stack.sh`)
+- `tests/`: Unit and E2E test suites (173/173 passed)
