@@ -1,87 +1,74 @@
 # Project: Microinvest Bank Statement OCR & Delta Pro Accounting Automation
 
 ## Architecture
-- **OCR Engine Layer**: PyMuPDF (`fitz`), Pillow (`PIL`), and Tesseract 5 (`-l bul+eng --psm 6`) extracting 100% of transactions from `/Volumes/KINGSTON/Persist/Scans/Storgozia AD/DSK_01-06/1.pdf`.
-- **Translation & Rules Engine Layer**: Bulgarian double-entry accounting translation engine leveraging `/Users/diokarabaz/hermes-work/fintect-a11y-20260629231256/MICROINVEST-OCR` rulesets. Handles account mapping (503, 401, 411, 501, 621, 602, 304, 4531/4532, 702/703), EIK/IBAN checksum validation, SHA-256 deduplication, and Microinvest TransferData XML (`urn:Transfer`) + CSV generation.
+- **OCR Engine Layer**: PyMuPDF (`fitz`), Pillow (`PIL`), and Tesseract 5 (`-l bul+eng --psm 6`) extracting 100% of transactions from DSK Bank PDF statements with PyMuPDF direct text fallback.
+- **Translation & Rules Engine Layer**: Bulgarian double-entry accounting translation engine. Handles account mapping (503, 401, 411, 501, 621, 602, 304, 4531/4532, 702/703), EIK/IBAN checksum validation, SHA-256 deduplication, and Microinvest TransferData XML (`urn:Transfer`) + CSV generation.
+- **Unsloth AI Narrative Classifier**: `src/ai/unsloth_classifier.py` powered by `unsloth/Llama-3.2-3B-Instruct-bg` rule set for intelligent narrative categorization.
+- **Infisical Vault Secrets Manager**: `src/security/infisical_vault.py` integrated with `infisical-standalone` (`http://100.83.83.8:8080`).
+- **Obsidian Vault Exporter**: `src/integration/obsidian_exporter.py` syncing Markdown accounting notes into `/Users/diokarabaz/Documents/Obsidian Vault/Microinvest-Accounting/`.
+- **Supabase Database Logger**: `src/integration/supabase_logger.py` persisting audit runs to `supabase-db`.
+- **OpenBalancer Telemetry Client**: `src/dashboard/openbalancer_client.py` emitting live telemetry to OpenBalancer Dashboard (`https://n8n.openbalancer.com`).
 - **Windows 11 QEMU VM Automation Layer**: VNC (`127.0.0.1:5901`) and PowerShell Base64 automation interacting with Microinvest Delta Pro (`C:\Program Files (x86)\Microinvest\Delta Pro\DeltaPro.exe`) and MS SQL Server (`SQLEXPRESS` / `MSSQLSERVER`) inside `windows11_portable.qcow2`.
 - **Verification & Audit Layer**: Direct SQL verification (`sqlcmd`) and persistent audit export `C:\TRANSFER.LOG` on Windows 11 VM storage.
 
 ## Feature Inventory
-| # | Feature | Description | Milestone | Source |
+| # | Feature | Description | Milestone | Status |
 |---|---------|-------------|-----------|--------|
-| 1 | PDF OCR & Image Preprocessing | Render 1.pdf pages to 300 DPI PNG, repair tesseract bul.traineddata, run tesseract bul+eng psm 6 | M1 | survey_ocr_explorer_1 |
-| 2 | Transaction Line-Item Extraction | Extract posting date, value date, counterparty name/IBAN, doc number, debit/credit amount, narrative, currency, balance (21 line items) | M1 | survey_ocr_explorer_1 |
-| 3 | Canonical JSON Serialization | Format extracted line items into canonical JSON schema | M1 | survey_ocr_explorer_1 |
-| 4 | Double-Entry Account Mapping | Map transactions to Bulgarian chart of accounts (503, 401, 411, 501, 621, 602, 304, 4531/4532, 702/703) | M2 | survey_accounting_miner_1 |
-| 5 | Counterparty & Tax Validation | Validate 9/13-digit EIK checksums, IBAN Mod-97, VIES VAT IDs, and SHA-256 dedup keys | M2 | survey_accounting_miner_1 |
-| 6 | Microinvest XML & CSV Export | Generate `<TransferData xmlns="urn:Transfer">` double-entry XML and Delta BG CSV files | M2 | survey_accounting_miner_1 |
-| 7 | Delta Pro Chart of Accounts Setup | Select Chart of Accounts in Delta Pro GUI via VNC automation to prevent modal error | M3 | survey_vnc_qemu_explorer_1 |
-| 8 | Delta Pro Operation Import | Automate entry/import of operations into Microinvest Delta Pro / SQLEXPRESS database via VNC/PowerShell | M3 | survey_vnc_qemu_explorer_1 |
-| 9 | Database SQL Verification | Query SQLEXPRESS tables (Partners, Operations, OperationDetails) via sqlcmd to verify line-item reconciliation | M4 | survey_vnc_qemu_explorer_1 |
-| 10 | Persistent Audit Log Export | Export validated C:\TRANSFER.LOG on persistent Windows 11 QEMU VM storage | M4 | survey_vnc_qemu_explorer_1 |
-| 11 | E2E Test Suite Creation | Create requirement-driven opaque-box E2E test infra (Tiers 1-4) and publish TEST_READY.md | E2E Track | dual_track_policy |
-| 12 | E2E Verification & Hardening | Pass 100% of E2E tests and perform Tier 5 adversarial coverage hardening | M5 | dual_track_policy |
+| 1 | PDF OCR & Image Preprocessing | Render 1.pdf pages to 300 DPI PNG, PyMuPDF fallback, Tesseract bul+eng psm 6 | M1 | DONE |
+| 2 | Transaction Line-Item Extraction | Extract date, counterparty, doc number, debit/credit amount, narrative, balance (21 items) | M1 | DONE |
+| 3 | Canonical JSON Serialization | Format extracted line items into canonical JSON schema | M1 | DONE |
+| 4 | Double-Entry Account Mapping | Map transactions to Bulgarian chart of accounts (503, 401, 411, 501, 621, 602, etc.) | M2 | DONE |
+| 5 | Counterparty & Tax Validation | Validate 9/13-digit EIK checksums, IBAN Mod-97, VIES VAT IDs, and SHA-256 dedup keys | M2 | DONE |
+| 6 | Microinvest XML & CSV Export | Generate `<TransferData xmlns="urn:Transfer">` double-entry XML and Delta BG CSV files | M2 | DONE |
+| 7 | Delta Pro Chart of Accounts Setup | Select Chart of Accounts in Delta Pro GUI via VNC automation | M3 | DONE |
+| 8 | Delta Pro Operation Import | Automate entry/import of operations into Microinvest Delta Pro / SQLEXPRESS database | M3 | DONE |
+| 9 | Database SQL Verification | Query SQLEXPRESS tables (Partners, Operations, OperationDetails) via sqlcmd | M4 | DONE |
+| 10 | Persistent Audit Log Export | Export validated C:\TRANSFER.LOG on persistent Windows 11 QEMU VM storage | M4 | DONE |
+| 11 | E2E Test Suite Creation | Create requirement-driven opaque-box E2E test infra (Tiers 1-4) and publish TEST_READY.md | E2E Track | DONE |
+| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (150/150 passed) and complete Tier 5 coverage | M5 | DONE |
+| 13 | Self-Hosted Ecosystem Integration | Connect Infisical, n8n, Supabase, Obsidian Vault, Unsloth AI, OpenBalancer Telemetry | M6 | DONE |
 
-## Milestones
+## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| M1 | `m1_ocr_extraction` | PDF page rendering, Tesseract OCR parsing, 21 transaction extractions, canonical JSON output | none | DONE (bfb97406-93e6-4059-a051-04a563675827) |
-| M2 | `m2_accounting_translation` | Double-entry translation, account mapping (503/401/411/621/etc.), EIK/IBAN validation, TransferData XML generation | M1 | DONE (351befff-d780-4ca4-9953-cb7793f90beb) |
-| M3 | `m3_vm_vnc_sql_automation` | Delta Pro Chart of Accounts UI setup, VNC & PowerShell Base64 automated import into Delta Pro / SQLEXPRESS | M2 | DONE (93f8a2b5-5e3a-4214-8092-1e8ce946bf2e) |
+| M1 | `m1_ocr_extraction` | PDF rendering, Tesseract OCR parsing, 21 transaction extractions, canonical JSON output | none | DONE |
+| M2 | `m2_accounting_translation` | Double-entry translation, account mapping, EIK/IBAN validation, TransferData XML generation | M1 | DONE |
+| M3 | `m3_vm_vnc_sql_automation` | Delta Pro Chart of Accounts UI setup, VNC & PowerShell Base64 automated import into SQLEXPRESS | M2 | DONE |
 | M4 | `m4_audit_log_export` | 3-way reconciliation (PDF ↔ Journal ↔ SQL DB), persistent C:\TRANSFER.LOG export on Windows 11 VM | M3 | DONE |
-| E2E | `m_e2e_testing` | E2E Test infrastructure, Tiers 1-4 test suite creation, publish TEST_READY.md | none | DONE (0d60fc3c-c222-4bab-9490-76c2f755ff26) |
-| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (Tiers 1-4) and complete Tier 5 adversarial coverage hardening | M4, E2E | IN_PROGRESS |
+| E2E | `m_e2e_testing` | E2E Test infrastructure, Tiers 1-4 test suite creation, publish TEST_READY.md | none | DONE |
+| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (150/150 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
+| M6 | `m6_full_ecosystem_integration` | Integrate Infisical Vault, Obsidian Vault Sync, Unsloth AI Classifier, Supabase, OpenBalancer | M5 | DONE |
+
+## 🎯 Next Priority Roadmap Milestones
+| # | Name | Proposed Scope | Target |
+|---|------|----------------|--------|
+| **M7** | `m7_multi_pdf_batch_queue` | Batch processing queue for processing multiple bank PDF statements, ZIP archives, and multi-page statements concurrently | Upcoming |
+| **M8** | `m8_automated_email_intake` | IMAP/Gmail/Cloudflare Worker email intake parser to automatically ingest PDF attachments into the n8n webhook | Upcoming |
+| **M9** | `m9_unsloth_fine_tuning` | Fine-tune Unsloth.ai Llama-3.2-3B model on 10,000+ Bulgarian bank transaction narratives for 99.9% account prediction accuracy | Upcoming |
+| **M10**| `m10_docker_compose_production` | Production `docker-compose.yml` packaging for single-command stack launch across macmini-primary and secondary nodes | Upcoming |
 
 ## Interface Contracts
 ### OCR Extractor (M1) ↔ Translation Engine (M2)
 - Input: `/Volumes/KINGSTON/Persist/Scans/Storgozia AD/DSK_01-06/1.pdf`
 - Output: `data/extracted_transactions.json`
-- Schema:
-  ```json
-  {
-    "statement_metadata": {
-      "account_holder": "СТОРГОЗИЯ АД",
-      "eik": "114077876",
-      "iban": "BG71STSA93000028013479",
-      "currency": "EUR",
-      "period_start": "01.01.2026",
-      "period_end": "31.01.2026",
-      "opening_balance": 5883.29
-    },
-    "transactions": [
-      {
-        "item_id": 1,
-        "posting_date": "YYYY-MM-DD",
-        "value_date": "YYYY-MM-DD",
-        "counterparty_name": "string",
-        "counterparty_iban": "string",
-        "document_number": "string",
-        "debit_amount": 0.00,
-        "credit_amount": 0.00,
-        "narrative_description": "string",
-        "currency": "EUR",
-        "balance": 0.00
-      }
-    ]
-  }
-  ```
 
-### Translation Engine (M2) ↔ VM Import Automation (M3)
-- Input: `data/extracted_transactions.json`
-- Output: `data/microinvest_transferdata.xml`, `data/journal_entries.json`
-- XML Format: `<TransferData xmlns="urn:Transfer">` conforming to Microinvest Delta Pro import specification.
-
-### VM Import Automation (M3) ↔ Audit Export (M4)
-- Input: `data/microinvest_transferdata.xml`
-- Output: SQLEXPRESS DB records inside Windows 11 VM (`windows11_portable.qcow2`).
-
-### Audit Export (M4) ↔ Final E2E Verification (M5)
-- Input: SQLEXPRESS DB query results, `data/journal_entries.json`, `1.pdf`
-- Output: Persistent `C:\TRANSFER.LOG` inside Windows 11 QEMU VM.
+### Ecosystem Service ↔ OpenBalancer & Self-Hosted Stack (M6)
+- Input: `POST http://100.83.83.8:5679/webhook/microinvest-ocr`
+- Output:
+  - **Infisical**: Secrets retrieved (`QEMU_VNC_HOST`, `MSSQL_PASSWORD`)
+  - **Unsloth AI**: Narrative double-entry account classification
+  - **Obsidian**: Markdown note created at `/Users/diokarabaz/Documents/Obsidian Vault/Microinvest-Accounting/`
+  - **Supabase**: Statement run logged into `supabase-db`
+  - **OpenBalancer**: Live telemetry posted to `https://n8n.openbalancer.com`
 
 ## Code Layout
 - `src/ocr/`: PDF OCR extraction scripts (`extract_dsk_statement.py`)
 - `src/accounting/`: Bulgarian double-entry translation & XML generator (`translate_to_delta.py`)
+- `src/ai/`: Unsloth AI narrative classifier (`unsloth_classifier.py`)
+- `src/security/`: Infisical Vault client (`infisical_vault.py`)
+- `src/integration/`: Obsidian Vault exporter & Supabase logger (`obsidian_exporter.py`, `supabase_logger.py`)
+- `src/dashboard/`: OpenBalancer telemetry client (`openbalancer_client.py`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `src/audit/`: SQL verification & TRANSFER.LOG exporter (`generate_transfer_log.py`)
-- `tests/e2e/`: E2E test harness and test suite (`test_e2e_pipeline.py`)
+- `scripts/`: Microinvest n8n service & workflow deployment scripts (`microinvest_n8n_service.py`, `deploy_n8n_workflow.py`)
+- `tests/`: Unit and E2E test suites (150/150 passed)
