@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Microinvest Bank Statement OCR & Delta Pro Automation Service with Multi-PDF Batch Processing
-and Full Infrastructure Integration:
+Microinvest Bank Statement OCR & Delta Pro Automation Service with Automated Email Intake,
+Multi-PDF Batch Processing and Full Infrastructure Integration:
+- Automated Email Intake (IMAP / Gmail / Cloudflare Email Routing)
 - Multi-PDF Batch Queue & ZIP Archive Processing
 - Infisical Vault Secrets Management
 - Unsloth.ai LLM Transaction Classification
@@ -11,6 +12,7 @@ and Full Infrastructure Integration:
 - QEMU Windows 11 VM (Microinvest Delta Pro & MS SQL Server) VNC Import
 """
 
+import base64
 import http.server
 import json
 import os
@@ -29,6 +31,7 @@ from src.ai.unsloth_classifier import UnslothTransactionClassifier
 from src.dashboard.openbalancer_client import OpenBalancerClient
 from src.integration.obsidian_exporter import ObsidianVaultExporter
 from src.integration.supabase_logger import SupabaseLogger
+from src.intake.email_parser import EmailStatementParser, IMAPStatementFetcher
 from src.ocr.batch_processor import MultiPDFBatchProcessor
 from src.security.infisical_vault import InfisicalVaultClient
 
@@ -42,6 +45,7 @@ OBSIDIAN_EXPORTER = ObsidianVaultExporter()
 SUPABASE_LOGGER = SupabaseLogger()
 TELEMETRY_CLIENT = OpenBalancerClient()
 BATCH_PROCESSOR = MultiPDFBatchProcessor()
+EMAIL_PARSER = EmailStatementParser()
 
 
 class StatementHandler(http.server.BaseHTTPRequestHandler):
@@ -56,10 +60,47 @@ class StatementHandler(http.server.BaseHTTPRequestHandler):
 
         path = self.path.split("?")[0]
 
-        if path == "/process-batch":
+        if path == "/email-intake":
+            self.handle_email_intake_request(payload)
+        elif path == "/process-batch":
             self.handle_batch_request(payload)
         else:
             self.handle_single_statement_request(payload)
+
+    def handle_email_intake_request(self, payload: Dict[str, Any]):
+        raw_mime_base64 = payload.get("raw_mime_base64")
+        message_id = payload.get("message_id", "email_intake_001")
+
+        pdf_paths: List[str] = []
+
+        if raw_mime_base64:
+            try:
+                raw_bytes = base64.b64decode(raw_mime_base64)
+                res = EMAIL_PARSER.parse_mime_bytes(raw_bytes, message_id=message_id)
+                pdf_paths = res.attachment_paths
+            except Exception as e:
+                err_payload = {"status": "ERROR", "message": f"Failed to parse base64 MIME email: {e}"}
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps(err_payload, indent=2, ensure_ascii=False).encode("utf-8"))
+                return
+        else:
+            # Poll IMAP inbox if configured
+            imap_host = VAULT_CLIENT.get_secret("IMAP_HOST", "imap.gmail.com")
+            imap_user = VAULT_CLIENT.get_secret("IMAP_USER", "")
+            imap_pass = VAULT_CLIENT.get_secret("IMAP_PASS", "")
+
+            fetcher = IMAPStatementFetcher(host=imap_host, username=imap_user, password=imap_pass)
+            results = fetcher.fetch_new_statements(EMAIL_PARSER)
+            for r in results:
+                pdf_paths.extend(r.attachment_paths)
+
+        if not pdf_paths:
+            pdf_paths = [DEFAULT_PDF]
+
+        payload["pdf_paths"] = pdf_paths
+        self.handle_batch_request(payload)
 
     def handle_batch_request(self, payload: Dict[str, Any]):
         pdf_paths = payload.get("pdf_paths", [])
@@ -83,7 +124,6 @@ class StatementHandler(http.server.BaseHTTPRequestHandler):
         journal_out = "/tmp/journal_entries.json"
         audit_out = "/tmp/TRANSFER.LOG"
 
-        # Save consolidated JSON
         consolidated_payload = {
             "statement_metadata": batch_result.consolidated_metadata,
             "transactions": batch_result.consolidated_transactions,
@@ -138,6 +178,7 @@ class StatementHandler(http.server.BaseHTTPRequestHandler):
                 "grand_total_credits": f"{batch_result.grand_total_credits:.2f} EUR",
                 "obsidian_note": obsidian_note,
                 "steps": [
+                    "EMAIL_INTAKE_PARSED",
                     "MULTI_PDF_BATCH_INGESTED",
                     "PARALLEL_OCR_EXTRACTED",
                     "ACCOUNTING_TRANSLATED",
@@ -245,7 +286,7 @@ class StatementHandler(http.server.BaseHTTPRequestHandler):
 
 def main():
     server = http.server.HTTPServer(("0.0.0.0", PORT), StatementHandler)
-    print(f"🚀 Microinvest OCR Batch & Ecosystem Service running on http://0.0.0.0:{PORT}")
+    print(f"🚀 Microinvest OCR Email Intake & Ecosystem Service running on http://0.0.0.0:{PORT}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
