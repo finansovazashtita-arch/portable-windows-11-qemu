@@ -6,6 +6,7 @@
 - **Multi-PDF Batch Queue Engine**: `src/ocr/batch_processor.py` supporting directory scanning, ZIP archive ingestion, fault-tolerant batch processing, and multi-statement transaction aggregation.
 - **Translation & Rules Engine Layer**: Bulgarian double-entry accounting translation engine. Handles account mapping (503, 401, 411, 501, 621, 602, 304, 4531/4532, 702/703), EIK/IBAN checksum validation, SHA-256 deduplication, and Microinvest TransferData XML (`urn:Transfer`) + CSV generation.
 - **Unsloth AI Fine-Tuning & Classifier Layer**: `src/ai/unsloth_classifier.py` & `src/ai/unsloth_finetune.py` with QLoRA instruction dataset generator (1,000+ Bulgarian accounting pairs) and Unsloth FastLanguageModel training parameters.
+- **Production Docker Compose Packaging**: `Dockerfile`, `docker-compose.yml`, and `scripts/deploy_production_stack.sh` providing zero-downtime containerized stack deployment across macmini-primary and secondary nodes.
 - **Infisical Vault Secrets Manager**: `src/security/infisical_vault.py` integrated with `infisical-standalone` (`http://100.83.83.8:8080`).
 - **Obsidian Vault Exporter**: `src/integration/obsidian_exporter.py` syncing Markdown accounting notes into `/Users/diokarabaz/Documents/Obsidian Vault/Microinvest-Accounting/`.
 - **Supabase Database Logger**: `src/integration/supabase_logger.py` persisting audit runs to `supabase-db`.
@@ -27,11 +28,12 @@
 | 9 | Database SQL Verification | Query SQLEXPRESS tables (Partners, Operations, OperationDetails) via sqlcmd | M4 | DONE |
 | 10 | Persistent Audit Log Export | Export validated C:\TRANSFER.LOG on persistent Windows 11 QEMU VM storage | M4 | DONE |
 | 11 | E2E Test Suite Creation | Create requirement-driven opaque-box E2E test infra (Tiers 1-4) and publish TEST_READY.md | E2E Track | DONE |
-| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (160/160 passed) and complete Tier 5 coverage | M5 | DONE |
+| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (163/163 passed) and complete Tier 5 coverage | M5 | DONE |
 | 13 | Self-Hosted Ecosystem Integration | Connect Infisical, n8n, Supabase, Obsidian Vault, Unsloth AI, OpenBalancer Telemetry | M6 | DONE |
 | 14 | Multi-PDF Batch Queue & ZIP Processing | Directory scanner, ZIP archive ingestion, fault-tolerant batch execution (`POST /process-batch`) | M7 | DONE |
 | 15 | Automated Email Intake Pipeline | IMAP/Gmail fetcher, MIME parser, Cloudflare Email Routing Worker (`POST /email-intake`) | M8 | DONE |
 | 16 | Unsloth AI Fine-Tuning Module | QLoRA dataset generator (1,000+ Bulgarian accounting pairs) & FastLanguageModel SFTTrainer config | M9 | DONE |
+| 17 | Production Docker Compose Stack | `Dockerfile`, `docker-compose.yml`, health checks, zero-downtime stack deployment | M10 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -41,18 +43,17 @@
 | M3 | `m3_vm_vnc_sql_automation` | Delta Pro Chart of Accounts UI setup, VNC & PowerShell Base64 automated import into SQLEXPRESS | M2 | DONE |
 | M4 | `m4_audit_log_export` | 3-way reconciliation (PDF ↔ Journal ↔ SQL DB), persistent C:\TRANSFER.LOG export on Windows 11 VM | M3 | DONE |
 | E2E | `m_e2e_testing` | E2E Test infrastructure, Tiers 1-4 test suite creation, publish TEST_READY.md | none | DONE |
-| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (160/160 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
+| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (163/163 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
 | M6 | `m6_full_ecosystem_integration` | Integrate Infisical Vault, Obsidian Vault Sync, Unsloth AI Classifier, Supabase, OpenBalancer | M5 | DONE |
 | M7 | `m7_multi_pdf_batch_queue` | Batch processing queue for processing multiple bank PDF statements, ZIP archives, and multi-page statements | M6 | DONE |
 | M8 | `m8_automated_email_intake` | IMAP/Gmail/Cloudflare Worker email intake parser to automatically ingest PDF attachments into n8n webhook | M7 | DONE |
 | M9 | `m9_unsloth_fine_tuning` | Fine-tune Unsloth.ai Llama-3.2-3B model on 1,000+ Bulgarian bank transaction narratives for 99.9% accuracy | M8 | DONE |
-
-## 🎯 Next Priority Roadmap Milestones
-| # | Name | Proposed Scope | Target |
-|---|------|----------------|--------|
-| **M10**| `m10_docker_compose_production` | Production `docker-compose.yml` packaging for single-command stack launch across macmini-primary and secondary nodes | Upcoming |
+| M10 | `m10_docker_compose_production` | Production `docker-compose.yml` packaging for single-command stack launch across macmini nodes | M9 | DONE |
 
 ## Code Layout
+- `Dockerfile`: Multi-stage Tesseract + Python production image
+- `docker-compose.yml`: Production self-hosted stack manifest
+- `requirements.txt`: Python package dependencies
 - `src/ai/`: Unsloth AI narrative classifier & fine-tuner (`unsloth_classifier.py`, `unsloth_finetune.py`)
 - `src/intake/`: Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)
 - `src/ocr/`: PDF OCR & batch processing scripts (`extract_dsk_statement.py`, `batch_processor.py`)
@@ -62,5 +63,5 @@
 - `src/dashboard/`: OpenBalancer telemetry client (`openbalancer_client.py`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `src/audit/`: SQL verification & TRANSFER.LOG exporter (`generate_transfer_log.py`)
-- `scripts/`: Microinvest n8n service & workflow deployment scripts (`microinvest_n8n_service.py`, `deploy_n8n_workflow.py`, `test_batch_execution.py`)
-- `tests/`: Unit and E2E test suites (160/160 passed)
+- `scripts/`: Microinvest n8n service, production stack deployer (`microinvest_n8n_service.py`, `deploy_production_stack.sh`, `test_batch_execution.py`)
+- `tests/`: Unit and E2E test suites (163/163 passed)

@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  microinvest-ocr-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: microinvest-ocr-service
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    environment:
+      - INFISICAL_URL=http://100.83.83.8:8080
+      - SUPABASE_URL=http://100.83.83.8:8002
+      - N8N_WEBHOOK_URL=http://100.83.83.8:5679/webhook/microinvest-ocr
+      - QEMU_VNC_HOST=127.0.0.1
+      - QEMU_VNC_PORT=5901
+    volumes:
+      - ./data:/app/data
+      - /tmp/microinvest_ocr:/tmp
+      - /Users/diokarabaz/Documents/Obsidian Vault:/app/obsidian_vault
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - microinvest-net
+
+networks:
+  microinvest-net:
+    driver: bridge
