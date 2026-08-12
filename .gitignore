@@ -1,3 +1,4 @@
+# Python / pytest / build artifacts
 __pycache__/
 *.py[cod]
 *$py.class
@@ -14,4 +15,15 @@ htmlcov/
 "C:\\TRANSFER.LOG"
 C:\TRANSFER.LOG
 .agents/
+
+# QEMU / Disk Images / Screenshots / Temp
+*.iso
+*.qcow2
+*.vhdx
+*.vmdk
+*.ppm
+*.png
+/tmp/
+
+# OS metadata
 .DS_Store
