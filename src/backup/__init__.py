@@ -1,7 +1,12 @@
 """
-Automated Nightly Backup Package.
+Backup Package.
 """
 
-from src.backup.nightly_backup import BackupSummary, NightlyBackupManager
+from src.backup.disaster_recovery_replication import DRReplicationManager, ReplicationTarget
+from src.backup.nightly_backup import NightlyBackupManager
 
-__all__ = ["BackupSummary", "NightlyBackupManager"]
+__all__ = [
+    "NightlyBackupManager",
+    "DRReplicationManager",
+    "ReplicationTarget",
+]
