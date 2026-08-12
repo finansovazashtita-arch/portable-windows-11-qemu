@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TransferData xmlns="urn:Transfer">
+  <Header>
+    <CompanyEIK>114077876</CompanyEIK>
+    <CompanyIBAN>BG71STSA93000028013479</CompanyIBAN>
+    <PeriodStart>01.01.2026</PeriodStart>
+    <PeriodEnd>31.01.2026</PeriodEnd>
+    <CreatedDate>2026-01-31</CreatedDate>
+  </Header>
+  <Operations>
+    <Operation>
+      <ItemNo>1</ItemNo>
+      <Date>2026-01-05</Date>
+      <DocNum>12101</DocNum>
+      <Counterparty>НАП</Counterparty>
+      <CounterpartyIBAN>BG16BNBG966180001</CounterpartyIBAN>
+      <DebitAcc>455</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>44.05</Amount>
+      <Currency>EUR</Currency>
+      <Description>NCC WITHDRAWAL 12101</Description>
+      <DedupHash>21252876483e5d8e64071495ee23c5ea61f97eb875f8c0d36937ce1ed20713c1</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>2</ItemNo>
+      <Date>2026-01-05</Date>
+      <DocNum>11801</DocNum>
+      <Counterparty>НАП</Counterparty>
+      <CounterpartyIBAN>BG65BNBG966180001</CounterpartyIBAN>
+      <DebitAcc>455</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>27.53</Amount>
+      <Currency>EUR</Currency>
+      <Description>ДЗПО НАП 11801</Description>
+      <DedupHash>b36e4b3b7d7765badf451b8c2bce4ac44fa6012068b69602822214c24b3a3173</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>3</ItemNo>
+      <Date>2026-01-05</Date>
+      <DocNum>95001</DocNum>
+      <Counterparty>НАП</Counterparty>
+      <CounterpartyIBAN>BG88BNBG966180001</CounterpartyIBAN>
+      <DebitAcc>454</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>47.48</Amount>
+      <Currency>EUR</Currency>
+      <Description>ДДФЛ НАП 95001</Description>
+      <DedupHash>d6b3fd63e75684db32f163620d5b5d4cc0f6b5f76b7353fe1640119fd0ab66a8</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>4</ItemNo>
+      <Date>2026-01-05</Date>
+      <DocNum>112001</DocNum>
+      <Counterparty>НАП</Counterparty>
+      <CounterpartyIBAN>BG97BNBG966180001</CounterpartyIBAN>
+      <DebitAcc>455</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>111.24</Amount>
+      <Currency>EUR</Currency>
+      <Description>ДОО НАП 112001</Description>
+      <DedupHash>d0ca5a0d0ef888be1e6734455f523c550982564743204016b8670711c75bb2ae</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>5</ItemNo>
+      <Date>2026-01-05</Date>
+      <DocNum>7000000763</DocNum>
+      <Counterparty>НИКОЛАЙ ВЕНКОВ ТРИФОНОВ</Counterparty>
+      <CounterpartyIBAN>BG37UNCR76301025139612</CounterpartyIBAN>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>30.68</Amount>
+      <Currency>EUR</Currency>
+      <Description>7000000763 ОТСТЪПКА</Description>
+      <DedupHash>59f8c117a77a5acd1498246ea0cf566de0c7745f4a62685ea2f9a7d3e51c5e64</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>6</ItemNo>
+      <Date>2026-01-06</Date>
+      <DocNum>0000000072911303</DocNum>
+      <Counterparty>БАНКА ДСК ЕАД</Counterparty>
+      <CounterpartyIBAN>0000000072911303</CounterpartyIBAN>
+      <DebitAcc>621</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>2.05</Amount>
+      <Currency>EUR</Currency>
+      <Description>ОТСТЪПКА ИЗПЪЛНЕНО УСЛОВИЕ ПЛАН ДСК НАЧАЛО</Description>
+      <DedupHash>492fb6663a14817a871fdad2168f835ba5a96ca79d5ce3627b5bdc24db65717d</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>7</ItemNo>
+      <Date>2026-01-12</Date>
+      <DocNum>847040558</DocNum>
+      <Counterparty>ЗОРА М.М.С. ООД</Counterparty>
+      <CounterpartyIBAN>BG11UNCR966010ZORAMMS1</CounterpartyIBAN>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>653.94</Amount>
+      <Currency>EUR</Currency>
+      <Description>ФРА 847040558 ПЛАЩАНЕ ПО Ф-РА</Description>
+      <DedupHash>47a7b95385da7c4e4153472d78dcfca0a329c12eaa99f8c6fec1258d824e8ba5</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>8</ItemNo>
+      <Date>2026-01-14</Date>
+      <DocNum>7000000765</DocNum>
+      <Counterparty>ПОЛИХИМКОМЕРС 1 ЕООД</Counterparty>
+      <CounterpartyIBAN>BG08UBBS81551010343647</CounterpartyIBAN>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>768.00</Amount>
+      <Currency>EUR</Currency>
+      <Description>7000000765 14.01.26</Description>
+      <DedupHash>2c6ad1a21a47b3293ecaa8405ee1d70c8812cb5d63d43a445fac22e049aeafe0</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>9</ItemNo>
+      <Date>2026-01-19</Date>
+      <DocNum>0401.012565</DocNum>
+      <Counterparty>АУТО БОХЕМИЯ АД</Counterparty>
+      <CounterpartyIBAN>BG68UBBS81551068010910</CounterpartyIBAN>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>940.24</Amount>
+      <Currency>EUR</Currency>
+      <Description>СТОРГОЗИЯ АД 0401.012565 ВНОСКА 41 2026</Description>
+      <DedupHash>43176a5a9dd39909270f273512f52d1c42426f7639c4ba116b26e44f163d04a8</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>10</ItemNo>
+      <Date>2026-01-19</Date>
+      <DocNum>7600</DocNum>
+      <Counterparty>ТОПЛОФИКАЦИЯ ПЛЕВЕН АД</Counterparty>
+      <CounterpartyIBAN>BG40IORT73801036825800</CounterpartyIBAN>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>211.80</Amount>
+      <Currency>EUR</Currency>
+      <Description>ФРА 7600 31.12.2025Г.</Description>
+      <DedupHash>998a8883096c86d3924061a9112a2e366267ee595052c4638a3477383cb104b0</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>11</ItemNo>
+      <Date>2026-01-19</Date>
+      <DocNum>2000094184</DocNum>
+      <Counterparty>ПЕТРОМАКС СЕКЮРИТИ ГРУП ООД</Counterparty>
+      <CounterpartyIBAN>BG52UNCR70001500670905</CounterpartyIBAN>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>140.00</Amount>
+      <Currency>EUR</Currency>
+      <Description>ФРА 2000094184 09.01.2026Г.</Description>
+      <DedupHash>a588182d130e86dd56040b04b0f20bdb18f6441cfcc5ba341510249a27f3c5d7</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>12</ItemNo>
+      <Date>2026-01-19</Date>
+      <DocNum>5000438432</DocNum>
+      <Counterparty>ЕЛЕКТРОХОЛД ТРЕЙД ЕАД</Counterparty>
+      <CounterpartyIBAN>BG56UNCR70001524463090</CounterpartyIBAN>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>2266.99</Amount>
+      <Currency>EUR</Currency>
+      <Description>ФРА 5000438432 17.01.2026Г.</Description>
+      <DedupHash>0792ed89d3c1b6e61e90a9d1326409efd785bcd7bd15f03a576adb81cb749e6c</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>13</ItemNo>
+      <Date>2026-01-19</Date>
+      <DocNum>7000000767</DocNum>
+      <Counterparty>ДИАЛ ИНТЕРГРАФИК ЕООД</Counterparty>
+      <CounterpartyIBAN>BG80UBBS81551088263615</CounterpartyIBAN>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>1074.74</Amount>
+      <Currency>EUR</Currency>
+      <Description>7000000767 НАЕМ И КОНСУМАТИВИ</Description>
+      <DedupHash>5bdb28d61d2d8396884a8b6e2dc512c1691174ce3de37dd55be9f4c646685c3b</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>14</ItemNo>
+      <Date>2026-01-20</Date>
+      <DocNum>20265</DocNum>
+      <Counterparty>ФЛОКСЕР ЕООД</Counterparty>
+      <CounterpartyIBAN>BG91UNCR96601016918815</CounterpartyIBAN>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>32.40</Amount>
+      <Currency>EUR</Currency>
+      <Description>ФРА 20265 19.01.2026</Description>
+      <DedupHash>125a32abea8585a7ac1f8459155407722e22b0a1da84d3ace2c2bd460e940d88</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>15</ItemNo>
+      <Date>2026-01-20</Date>
+      <DocNum>7-768</DocNum>
+      <Counterparty>АЙТИ ДИЗАЙН 2020 ЕООД</Counterparty>
+      <CounterpartyIBAN>BG80UBBS81551012844951</CounterpartyIBAN>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>870.98</Amount>
+      <Currency>EUR</Currency>
+      <Description>Ф-РА 7-768</Description>
+      <DedupHash>a2b588507995b3d3095f9bbe5d7d13c53acc4dd7b61c64a0e9cea19427659756</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>16</ItemNo>
+      <Date>2026-01-20</Date>
+      <DocNum>2407</DocNum>
+      <Counterparty>ЕТИЕН ЕООД</Counterparty>
+      <CounterpartyIBAN>BG61UNCR70001524642644</CounterpartyIBAN>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>1472.64</Amount>
+      <Currency>EUR</Currency>
+      <Description>ФРА 2407 20.01.2026Г.</Description>
+      <DedupHash>0d686171fd746c91ebbd8bdcbdb356f0065e04ddb002744650d290da1774d0db</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>17</ItemNo>
+      <Date>2026-01-20</Date>
+      <DocNum>N/A</DocNum>
+      <Counterparty>HAN KRUM - BG EOOD</Counterparty>
+      <CounterpartyIBAN>BG83FINV91501017666857</CounterpartyIBAN>
+      <DebitAcc>602</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>454.21</Amount>
+      <Currency>EUR</Currency>
+      <Description>НАЕМ М. ФЕВРУАРИ 01.</Description>
+      <DedupHash>19b9a126bad4063755f1464d07a5d374a4e997f2c647f4c113d1f934b5c5f422</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>18</ItemNo>
+      <Date>2026-01-20</Date>
+      <DocNum>7000000771</DocNum>
+      <Counterparty>ЙОРДАН ИВАНОВ ЙОТОВ</Counterparty>
+      <CounterpartyIBAN>BG78UNCR70001524558821</CounterpartyIBAN>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>430.22</Amount>
+      <Currency>EUR</Currency>
+      <Description>7000000771 ОТ 18.01.2026</Description>
+      <DedupHash>110f798bb168e5c44d659f8adac84407aa9ae94d6b406c9a783f47b49e9bd082</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>19</ItemNo>
+      <Date>2026-01-21</Date>
+      <DocNum>770</DocNum>
+      <Counterparty>ГЕМА АМ ЕООД</Counterparty>
+      <CounterpartyIBAN>BG45UNCR70001523826580</CounterpartyIBAN>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>970.00</Amount>
+      <Currency>EUR</Currency>
+      <Description>фактура 770</Description>
+      <DedupHash>1b3ce8f3c97a903b52dd00fbc16ffe4bb55ff021303372f40a18c937f5ca5506</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>20</ItemNo>
+      <Date>2026-01-21</Date>
+      <DocNum>772</DocNum>
+      <Counterparty>УЛТРОН СОЛАР ЕООД</Counterparty>
+      <CounterpartyIBAN>BG49STSA93000029495550</CounterpartyIBAN>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>336.44</Amount>
+      <Currency>EUR</Currency>
+      <Description>772 18.01.26</Description>
+      <DedupHash>d1193bcf78fb1dc6a043c282ab2167f6f186875bffecdfd1a4e97a2dd6ed7464</DedupHash>
+    </Operation>
+    <Operation>
+      <ItemNo>21</ItemNo>
+      <Date>2026-01-21</Date>
+      <DocNum>10902306</DocNum>
+      <Counterparty>ВИК ЕООД</Counterparty>
+      <CounterpartyIBAN>BG10BGUS91601011840601</CounterpartyIBAN>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>53.95</Amount>
+      <Currency>EUR</Currency>
+      <Description>ФРА 10902306 18.12.2025 / 479687xxxxxx7707</Description>
+      <DedupHash>4c54457bbf945c9ef44c2aea3bc32f2e089d29f982b35f517097bcc3d08b7923</DedupHash>
+    </Operation>
+  </Operations>
+  <Accountings>
+    <Accounting>
+      <ItemNo>1</ItemNo>
+      <PostingDate>2026-01-05</PostingDate>
+      <DocNum>12101</DocNum>
+      <DebitAcc>455</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>44.05</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>NCC WITHDRAWAL 12101</Narrative>
+      <DedupHash>21252876483e5d8e64071495ee23c5ea61f97eb875f8c0d36937ce1ed20713c1</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>2</ItemNo>
+      <PostingDate>2026-01-05</PostingDate>
+      <DocNum>11801</DocNum>
+      <DebitAcc>455</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>27.53</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>ДЗПО НАП 11801</Narrative>
+      <DedupHash>b36e4b3b7d7765badf451b8c2bce4ac44fa6012068b69602822214c24b3a3173</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>3</ItemNo>
+      <PostingDate>2026-01-05</PostingDate>
+      <DocNum>95001</DocNum>
+      <DebitAcc>454</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>47.48</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>ДДФЛ НАП 95001</Narrative>
+      <DedupHash>d6b3fd63e75684db32f163620d5b5d4cc0f6b5f76b7353fe1640119fd0ab66a8</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>4</ItemNo>
+      <PostingDate>2026-01-05</PostingDate>
+      <DocNum>112001</DocNum>
+      <DebitAcc>455</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>111.24</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>ДОО НАП 112001</Narrative>
+      <DedupHash>d0ca5a0d0ef888be1e6734455f523c550982564743204016b8670711c75bb2ae</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>5</ItemNo>
+      <PostingDate>2026-01-05</PostingDate>
+      <DocNum>7000000763</DocNum>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>30.68</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>7000000763 ОТСТЪПКА</Narrative>
+      <DedupHash>59f8c117a77a5acd1498246ea0cf566de0c7745f4a62685ea2f9a7d3e51c5e64</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>6</ItemNo>
+      <PostingDate>2026-01-06</PostingDate>
+      <DocNum>0000000072911303</DocNum>
+      <DebitAcc>621</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>2.05</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>ОТСТЪПКА ИЗПЪЛНЕНО УСЛОВИЕ ПЛАН ДСК НАЧАЛО</Narrative>
+      <DedupHash>492fb6663a14817a871fdad2168f835ba5a96ca79d5ce3627b5bdc24db65717d</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>7</ItemNo>
+      <PostingDate>2026-01-12</PostingDate>
+      <DocNum>847040558</DocNum>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>653.94</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>ФРА 847040558 ПЛАЩАНЕ ПО Ф-РА</Narrative>
+      <DedupHash>47a7b95385da7c4e4153472d78dcfca0a329c12eaa99f8c6fec1258d824e8ba5</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>8</ItemNo>
+      <PostingDate>2026-01-14</PostingDate>
+      <DocNum>7000000765</DocNum>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>768.00</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>7000000765 14.01.26</Narrative>
+      <DedupHash>2c6ad1a21a47b3293ecaa8405ee1d70c8812cb5d63d43a445fac22e049aeafe0</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>9</ItemNo>
+      <PostingDate>2026-01-19</PostingDate>
+      <DocNum>0401.012565</DocNum>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>940.24</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>СТОРГОЗИЯ АД 0401.012565 ВНОСКА 41 2026</Narrative>
+      <DedupHash>43176a5a9dd39909270f273512f52d1c42426f7639c4ba116b26e44f163d04a8</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>10</ItemNo>
+      <PostingDate>2026-01-19</PostingDate>
+      <DocNum>7600</DocNum>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>211.80</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>ФРА 7600 31.12.2025Г.</Narrative>
+      <DedupHash>998a8883096c86d3924061a9112a2e366267ee595052c4638a3477383cb104b0</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>11</ItemNo>
+      <PostingDate>2026-01-19</PostingDate>
+      <DocNum>2000094184</DocNum>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>140.00</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>ФРА 2000094184 09.01.2026Г.</Narrative>
+      <DedupHash>a588182d130e86dd56040b04b0f20bdb18f6441cfcc5ba341510249a27f3c5d7</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>12</ItemNo>
+      <PostingDate>2026-01-19</PostingDate>
+      <DocNum>5000438432</DocNum>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>2266.99</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>ФРА 5000438432 17.01.2026Г.</Narrative>
+      <DedupHash>0792ed89d3c1b6e61e90a9d1326409efd785bcd7bd15f03a576adb81cb749e6c</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>13</ItemNo>
+      <PostingDate>2026-01-19</PostingDate>
+      <DocNum>7000000767</DocNum>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>1074.74</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>7000000767 НАЕМ И КОНСУМАТИВИ</Narrative>
+      <DedupHash>5bdb28d61d2d8396884a8b6e2dc512c1691174ce3de37dd55be9f4c646685c3b</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>14</ItemNo>
+      <PostingDate>2026-01-20</PostingDate>
+      <DocNum>20265</DocNum>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>32.40</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>ФРА 20265 19.01.2026</Narrative>
+      <DedupHash>125a32abea8585a7ac1f8459155407722e22b0a1da84d3ace2c2bd460e940d88</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>15</ItemNo>
+      <PostingDate>2026-01-20</PostingDate>
+      <DocNum>7-768</DocNum>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>870.98</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>Ф-РА 7-768</Narrative>
+      <DedupHash>a2b588507995b3d3095f9bbe5d7d13c53acc4dd7b61c64a0e9cea19427659756</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>16</ItemNo>
+      <PostingDate>2026-01-20</PostingDate>
+      <DocNum>2407</DocNum>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>1472.64</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>ФРА 2407 20.01.2026Г.</Narrative>
+      <DedupHash>0d686171fd746c91ebbd8bdcbdb356f0065e04ddb002744650d290da1774d0db</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>17</ItemNo>
+      <PostingDate>2026-01-20</PostingDate>
+      <DocNum>N/A</DocNum>
+      <DebitAcc>602</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>454.21</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>НАЕМ М. ФЕВРУАРИ 01.</Narrative>
+      <DedupHash>19b9a126bad4063755f1464d07a5d374a4e997f2c647f4c113d1f934b5c5f422</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>18</ItemNo>
+      <PostingDate>2026-01-20</PostingDate>
+      <DocNum>7000000771</DocNum>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>430.22</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>7000000771 ОТ 18.01.2026</Narrative>
+      <DedupHash>110f798bb168e5c44d659f8adac84407aa9ae94d6b406c9a783f47b49e9bd082</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>19</ItemNo>
+      <PostingDate>2026-01-21</PostingDate>
+      <DocNum>770</DocNum>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>970.00</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>фактура 770</Narrative>
+      <DedupHash>1b3ce8f3c97a903b52dd00fbc16ffe4bb55ff021303372f40a18c937f5ca5506</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>20</ItemNo>
+      <PostingDate>2026-01-21</PostingDate>
+      <DocNum>772</DocNum>
+      <DebitAcc>503</DebitAcc>
+      <CreditAcc>411</CreditAcc>
+      <Amount>336.44</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>772 18.01.26</Narrative>
+      <DedupHash>d1193bcf78fb1dc6a043c282ab2167f6f186875bffecdfd1a4e97a2dd6ed7464</DedupHash>
+    </Accounting>
+    <Accounting>
+      <ItemNo>21</ItemNo>
+      <PostingDate>2026-01-21</PostingDate>
+      <DocNum>10902306</DocNum>
+      <DebitAcc>401</DebitAcc>
+      <CreditAcc>503</CreditAcc>
+      <Amount>53.95</Amount>
+      <Currency>EUR</Currency>
+      <Narrative>ФРА 10902306 18.12.2025 / 479687xxxxxx7707</Narrative>
+      <DedupHash>4c54457bbf945c9ef44c2aea3bc32f2e089d29f982b35f517097bcc3d08b7923</DedupHash>
+    </Accounting>
+  </Accountings>
+</TransferData>
