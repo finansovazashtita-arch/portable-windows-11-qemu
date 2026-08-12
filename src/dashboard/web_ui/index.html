@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinansProtect Audit Dashboard | Microinvest OCR & QEMU Automation</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-icon">🛡️</div>
+        <div class="brand-text">
+          <h1>FinansProtect</h1>
+          <span class="version">v2.5 Enterprise</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#" class="nav-item active">
+          <span class="icon">📊</span> Табло за Мониторинг
+        </a>
+        <a href="#" class="nav-item">
+          <span class="icon">🏦</span> Банкови Извлечения
+        </a>
+        <a href="#" class="nav-item">
+          <span class="icon">🖥️</span> Windows 11 QEMU VM
+        </a>
+        <a href="#" class="nav-item">
+          <span class="icon">🔒</span> Infisical Vault Секрети
+        </a>
+        <a href="#" class="nav-item">
+          <span class="icon">📓</span> Obsidian Vault Синх
+        </a>
+      </nav>
+
+      <div class="node-status-card">
+        <h3>Инфраструктура</h3>
+        <div class="status-indicator online">
+          <span class="dot"></span> macmini-primary (100.83.83.8)
+        </div>
+        <div class="status-indicator online">
+          <span class="dot"></span> macmini-secondary (100.70.181.127)
+        </div>
+        <div class="status-indicator online">
+          <span class="dot"></span> QEMU Win11 VM (127.0.0.1:5901)
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="top-header">
+        <div class="header-title">
+          <h2>Реално Табло за Одит & Счетоводство</h2>
+          <p>Microinvest Delta Pro & MS SQL Server Автоматизация</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" id="btn-refresh">🔄 Обнови Данни</button>
+          <button class="btn btn-primary" id="btn-trigger-intake">⚡ Нов Имейл Intake</button>
+        </div>
+      </header>
+
+      <!-- Stat Cards Grid -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Обработен Оборот (Дебит)</span>
+            <span class="stat-icon">💶</span>
+          </div>
+          <div class="stat-value" id="stat-total-debits">€21,988.50</div>
+          <div class="stat-footer positive">↑ 100% Верифициран счетоводно</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Обработени Постъпления</span>
+            <span class="stat-icon">📈</span>
+          </div>
+          <div class="stat-value" id="stat-total-credits">€10,830.24</div>
+          <div class="stat-footer positive">↑ Балансирани статии</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Точност & Разхождение</span>
+            <span class="stat-icon">🎯</span>
+          </div>
+          <div class="stat-value" id="stat-discrepancy">0.00 EUR</div>
+          <div class="stat-footer badge-success">PASSED (0.00 разхождение)</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Одит Хеш Защита</span>
+            <span class="stat-icon">🔒</span>
+          </div>
+          <div class="stat-value text-small" id="stat-sha256">53c0a63d...4a3</div>
+          <div class="stat-footer info">SHA-256 одит лог валидиран</div>
+        </div>
+      </section>
+
+      <!-- Middle Layout: Live Table & VM Preview -->
+      <div class="content-layout">
+        <!-- Live Statements Table -->
+        <section class="panel table-panel">
+          <div class="panel-header">
+            <h3>📑 Жив Списък Банкови Извлечения</h3>
+            <span class="badge" id="badge-count">15 извлечения</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Банка</th>
+                  <th>Титуляр / IBAN</th>
+                  <th>Период</th>
+                  <th>Дебит (€)</th>
+                  <th>Кредит (€)</th>
+                  <th>Статус</th>
+                </tr>
+              </thead>
+              <tbody id="statements-tbody">
+                <tr>
+                  <td><span class="bank-badge dsk">Банка ДСК</span></td>
+                  <td><strong>СТОРГОЗИЯ АД</strong><br><small>BG71STSA93000028013479</small></td>
+                  <td>01.01.2026 – 31.01.2026</td>
+                  <td>€7,329.50</td>
+                  <td>€3,610.08</td>
+                  <td><span class="status-pill success">ИМПОРТИРАНО</span></td>
+                </tr>
+                <tr>
+                  <td><span class="bank-badge unicredit">УниКредит</span></td>
+                  <td><strong>СТОРГОЗИЯ АД</strong><br><small>BG12UNCR80001122334455</small></td>
+                  <td>01.01.2026 – 31.01.2026</td>
+                  <td>€5.50</td>
+                  <td>€0.00</td>
+                  <td><span class="status-pill success">ИМПОРТИРАНО</span></td>
+                </tr>
+                <tr>
+                  <td><span class="bank-badge ubb">ОББ</span></td>
+                  <td><strong>СТОРГОЗИЯ АД</strong><br><small>BG99UBBS90001234567890</small></td>
+                  <td>01.01.2026 – 31.01.2026</td>
+                  <td>€10.00</td>
+                  <td>€0.00</td>
+                  <td><span class="status-pill success">ИМПОРТИРАНО</span></td>
+                </tr>
+                <tr>
+                  <td><span class="bank-badge postbank">Пощенска</span></td>
+                  <td><strong>СТОРГОЗИЯ АД</strong><br><small>BG55BPBI91001122334455</small></td>
+                  <td>01.01.2026 – 31.01.2026</td>
+                  <td>€0.00</td>
+                  <td>€500.00</td>
+                  <td><span class="status-pill success">ИМПОРТИРАНО</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Live QEMU Windows 11 VM Monitor Widget -->
+        <section class="panel vm-panel">
+          <div class="panel-header">
+            <h3>🖥️ QEMU Windows 11 VM Монитор</h3>
+            <span class="status-pill active-vm">VNC :5901 LIVE</span>
+          </div>
+          <div class="vm-screen-wrapper">
+            <div class="vm-screen-placeholder">
+              <div class="win11-preview-card">
+                <div class="win-header">
+                  <span>Microinvest Delta Pro - [СТОРГОЗИЯ АД]</span>
+                  <span class="win-controls">_ ◽ X</span>
+                </div>
+                <div class="win-body">
+                  <p><strong>MS SQL Server:</strong> SQLEXPRESS (Connected)</p>
+                  <p><strong>Последен Импорт:</strong> 21 операции (100% OK)</p>
+                  <p><strong>Сметкоплан:</strong> Търговски предприятия</p>
+                  <div class="progress-bar-container">
+                    <div class="progress-fill"></div>
+                  </div>
+                  <span class="audit-tag">C:\TRANSFER.LOG OK</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="vm-footer">
+            <span>RAM Оптимизация: TB-Size 256M | VirtIO Ballooning</span>
+            <button class="btn btn-sm" onclick="alert('VNC Връзка установена на 127.0.0.1:5901')">🔗 Свържи VNC</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
