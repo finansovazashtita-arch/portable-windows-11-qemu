@@ -3,7 +3,8 @@ Multi-PDF Batch Processing Queue Module.
 
 Supports scanning directories for bank statement PDFs, extracting ZIP archives containing
 multiple statement files, processing them in parallel or sequentially with fault tolerance,
-and aggregating transactions, double-entry accounting journals, and audit metrics.
+and aggregating transactions, double-entry accounting journals, and audit metrics across
+multiple Bulgarian commercial banks (DSK, UniCredit, UBB, Postbank).
 """
 
 import dataclasses
@@ -15,7 +16,7 @@ import tempfile
 import zipfile
 from typing import Any, Dict, List, Optional, Tuple
 
-from src.ocr.extract_dsk_statement import DSKStatementExtractor
+from src.ocr.multi_bank_extractor import BankStatementFactory
 
 logger = logging.getLogger("batch_processor")
 
@@ -102,7 +103,7 @@ class MultiPDFBatchProcessor:
             )
 
         try:
-            extractor = DSKStatementExtractor(pdf_path=pdf_path, strict=False)
+            extractor = BankStatementFactory.get_extractor(pdf_path=pdf_path, strict=False)
             dataset = extractor.extract_and_build_dataset()
 
             meta = dataset.get("statement_metadata", {})
