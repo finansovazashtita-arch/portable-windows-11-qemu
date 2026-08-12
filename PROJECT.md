@@ -2,6 +2,7 @@
 
 ## Architecture
 - **OCR Engine Layer**: PyMuPDF (`fitz`), Pillow (`PIL`), and Tesseract 5 (`-l bul+eng --psm 6`) extracting 100% of transactions from PDF statements with PyMuPDF direct text fallback.
+- **Peppol Cross-Border EU E-Invoicing Engine**: `src/integration/peppol_einvoicing.py` generating, parsing, and validating Peppol BIS Billing v3.0 UBL v2.1 XML invoices meeting European EN 16931 e-invoicing standards.
 - **Sovereign Autonomous Enterprise AI Agent Swarm Engine (24/7/365)**: `src/ai/autonomous_agent_swarm.py` coordinating a self-healing swarm of specialized AI cognitive agents (`AuditorAgent`, `ReconcilerAgent`, `FraudGuardAgent`, `ForecasterAgent`) with automatic fault-recovery and 24/7/365 audit loops.
 - **Zero-Trust HSM Cryptographic Signer Engine**: `src/security/hsm_signer.py` providing tamper-proof PKCS#11 / YubiKey HSM hardware token cryptographic signatures for `C:\TRANSFER.LOG` audit files and e-invoices.
 - **Automated Customs & Excise Tax Accounting**: `src/accounting/customs_excise_accounting.py` generating double-entry journal entries for customs duties (Accounts 304/457), excise taxes (304/458), import VAT (4531/457), and bank settlements (457/503).
@@ -47,7 +48,7 @@
 | 9 | Database SQL Verification | Query SQLEXPRESS tables (Partners, Operations, OperationDetails) via sqlcmd | M4 | DONE |
 | 10 | Persistent Audit Log Export | Export validated C:\TRANSFER.LOG on persistent Windows 11 QEMU VM storage | M4 | DONE |
 | 11 | E2E Test Suite Creation | Create requirement-driven opaque-box E2E test infra (Tiers 1-4) and publish TEST_READY.md | E2E Track | DONE |
-| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (224/224 passed) and complete Tier 5 coverage | M5 | DONE |
+| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (226/226 passed) and complete Tier 5 coverage | M5 | DONE |
 | 13 | Self-Hosted Ecosystem Integration | Connect Infisical, n8n, Supabase, Obsidian Vault, Unsloth AI, OpenBalancer Telemetry | M6 | DONE |
 | 14 | Multi-PDF Batch Queue & ZIP Processing | Directory scanner, ZIP archive ingestion, fault-tolerant batch execution (`POST /process-batch`) | M7 | DONE |
 | 15 | Automated Email Intake Pipeline | IMAP/Gmail fetcher, MIME parser, Cloudflare Email Routing Worker (`POST /email-intake`) | M8 | DONE |
@@ -73,6 +74,7 @@
 | 35 | Customs & Excise Tax Accounting Engine | Double-entry journal entries for customs duties (304/457), excise taxes (304/458), and import VAT (4531/457) | M28 | DONE |
 | 36 | Zero-Trust HSM Cryptographic Signer | PKCS#11 / YubiKey HSM hardware token cryptographic signatures for audit logs and e-invoices | M29 | DONE |
 | 37 | Autonomous AI Agent Swarm Engine | 24/7/365 self-healing swarm of cognitive AI agents auditing, reconciling, and forecasting | M30 | DONE |
+| 38 | Peppol EU E-Invoicing Integration | Peppol BIS Billing v3.0 UBL v2.1 XML generation and EN 16931 compliance validation | M31 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -82,7 +84,7 @@
 | M3 | `m3_vm_vnc_sql_automation` | Delta Pro Chart of Accounts UI setup, VNC & PowerShell Base64 automated import into SQLEXPRESS | M2 | DONE |
 | M4 | `m4_audit_log_export` | 3-way reconciliation (PDF ↔ Journal ↔ SQL DB), persistent C:\TRANSFER.LOG export on Windows 11 VM | M3 | DONE |
 | E2E | `m_e2e_testing` | E2E Test infrastructure, Tiers 1-4 test suite creation, publish TEST_READY.md | none | DONE |
-| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (224/224 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
+| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (226/226 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
 | M6 | `m6_full_ecosystem_integration` | Integrate Infisical Vault, Obsidian Vault Sync, Unsloth AI Classifier, Supabase, OpenBalancer | M5 | DONE |
 | M7 | `m7_multi_pdf_batch_queue` | Batch processing queue for processing multiple bank PDF statements, ZIP archives, and multi-page statements | M6 | DONE |
 | M8 | `m8_automated_email_intake` | IMAP/Gmail/Cloudflare Worker email intake parser to automatically ingest PDF attachments into n8n webhook | M7 | DONE |
@@ -108,19 +110,20 @@
 | M28 | `m28_customs_excise_accounting` | Automated double-entry journal entries for customs duties (304/457), excise taxes (304/458) & import VAT | M27 | DONE |
 | M29 | `m29_hsm_audit_signer` | PKCS#11 / YubiKey HSM hardware token cryptographic signatures for audit logs and e-invoices | M28 | DONE |
 | M30 | `m30_autonomous_agent_swarm` | 24/7/365 self-healing swarm of cognitive AI agents auditing, reconciling, and forecasting | M29 | DONE |
+| M31 | `m31_peppol_einvoicing` | Peppol BIS Billing v3.0 UBL v2.1 XML generation and EN 16931 compliance validation | M30 | DONE |
 
 ## Code Layout
+- `src/integration/`: Peppol EU E-Invoicing Engine (`peppol_einvoicing.py`), Telegram Bot Guard (`telegram_notifier.py`), VIES VAT Checker (`vies_vat_checker.py`), Obsidian Vault exporter (`obsidian_exporter.py`) & Supabase logger (`supabase_logger.py`)
 - `src/ai/`: Autonomous Agent Swarm (`autonomous_agent_swarm.py`), Multi-Modal Document Reconciler (`multimodal_reconciler.py`), Cash Flow Forecaster (`cashflow_forecaster.py`), Fraud Detector (`fraud_detector.py`), Active Learning Loop (`active_learning_loop.py`), Unsloth AI classifier & fine-tuner (`unsloth_classifier.py`, `unsloth_finetune.py`)
 - `src/security/`: Zero-Trust HSM Cryptographic Signer (`hsm_signer.py`), Multi-Tenant RBAC (`tenant_rbac.py`) & Infisical Vault client (`infisical_vault.py`)
 - `src/accounting/`: Customs & Excise Accounting Engine (`customs_excise_accounting.py`), Payroll Accounting Engine (`payroll_accounting.py`), FX Revaluation Engine (`fx_revaluation.py`), Bulgarian double-entry translation & XML generator (`translate_to_delta.py`)
 - `src/backup/`: DR Multi-Region Replication Manager (`disaster_recovery_replication.py`), Automated Nightly Backup Manager (`nightly_backup.py`)
 - `src/intake/`: Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)
 - `src/ocr/`: Image Preprocessor (`image_preprocessor.py`), PDF OCR, multi-bank extractors & batch processing (`extract_dsk_statement.py`, `multi_bank_extractor.py`, `batch_processor.py`)
-- `src/integration/`: Telegram Bot Guard (`telegram_notifier.py`), VIES VAT Checker (`vies_vat_checker.py`), Obsidian Vault exporter (`obsidian_exporter.py`) & Supabase logger (`supabase_logger.py`)
 - `src/audit/`: OECD SAF-T Exporter (`saft_exporter.py`), SQL verification & TRANSFER.LOG exporter (`generate_transfer_log.py`)
 - `src/cluster/`: High Availability Cluster Manager (`ha_failover.py`)
 - `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
 - `src/dashboard/`: Dashboard server & OpenBalancer telemetry client (`dashboard_server.py`, `openbalancer_client.py`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `scripts/`: Microinvest n8n service, DR replication runner, HA cluster deployer, nightly backup scheduler (`microinvest_n8n_service.py`, `run_dr_replication.sh`, `deploy_ha_cluster.sh`, `schedule_nightly_backup.sh`, `deploy_production_stack.sh`)
-- `tests/`: Unit and E2E test suites (224/224 passed)
+- `tests/`: Unit and E2E test suites (226/226 passed)
