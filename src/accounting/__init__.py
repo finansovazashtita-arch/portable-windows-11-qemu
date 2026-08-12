@@ -3,6 +3,7 @@ Accounting Package.
 """
 
 from src.accounting.fx_revaluation import FXRateProvider, FXRevaluationCalculator, FXRevaluationResult
+from src.accounting.payroll_accounting import PayrollProcessor, PayrollSummary
 from src.accounting.translate_to_delta import process_translation, translate_transactions, validate_eik, validate_iban
 
 __all__ = [
@@ -13,4 +14,6 @@ __all__ = [
     "FXRateProvider",
     "FXRevaluationCalculator",
     "FXRevaluationResult",
+    "PayrollProcessor",
+    "PayrollSummary",
 ]
