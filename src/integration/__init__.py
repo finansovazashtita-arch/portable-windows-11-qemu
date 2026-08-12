@@ -2,6 +2,7 @@
 Integration Package.
 """
 
+from src.integration.mobile_push_gateway import MobilePushGateway, MobilePushNotification, PushPriority, PushProvider
 from src.integration.obsidian_exporter import ObsidianVaultExporter
 from src.integration.peppol_einvoicing import PeppolDocumentFormat, PeppolEInvoicingEngine, PeppolInvoice
 from src.integration.supabase_logger import SupabaseLogger
@@ -16,4 +17,8 @@ __all__ = [
     "PeppolEInvoicingEngine",
     "PeppolInvoice",
     "PeppolDocumentFormat",
+    "MobilePushGateway",
+    "MobilePushNotification",
+    "PushProvider",
+    "PushPriority",
 ]
