@@ -58,6 +58,7 @@ OPENAPI_SPEC: Dict[str, Any] = {
     "tags": [
         {"name": "Telemetry", "description": "System health, entity metrics, and PQC mesh telemetry"},
         {"name": "Compliance", "description": "Real-time compliance summary, discrepancy corrections & NRA E-Invoicing"},
+        {"name": "Smart Reconciliation", "description": "M71 AI-powered narrative vector embedding matching, fuzzy amount auto-reconciliation, and 1-click accountant confirmation"},
         {"name": "Mobile Suite", "description": "Edge-AI fiscal receipt processing, WASM OCR status, and offline queue sync"},
         {"name": "Documentation", "description": "OpenAPI specifications & interactive UI endpoints"}
     ],
@@ -218,12 +219,86 @@ OPENAPI_SPEC: Dict[str, Any] = {
                         }
                     },
                     "400": {
-                        "description": "Invalid scan payload",
+                        "description": "Invalid correction payload",
                         "content": {
                             "application/json": {
                                 "schema": {"$ref": "#/components/schemas/ErrorResponse"}
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/v1/reconciliation/pending-matches": {
+            "get": {
+                "tags": ["Smart Reconciliation"],
+                "summary": "Get Pending AI Reconciled Pairs",
+                "description": "Returns AI-suggested match pairs (Invoice <-> Bank Row) awaiting 1-click accountant confirmation.",
+                "operationId": "getPendingReconciliationMatches",
+                "responses": {
+                    "200": {
+                        "description": "List of pending smart reconciliation match candidates",
+                        "content": {"application/json": {}}
+                    }
+                }
+            }
+        },
+        "/api/v1/reconciliation/smart-match": {
+            "post": {
+                "tags": ["Smart Reconciliation"],
+                "summary": "Batch AI Invoice-to-Bank Auto-Matching",
+                "description": "Executes vector embedding narrative matching & fuzzy amount matching on invoice & bank transaction lists.",
+                "operationId": "executeSmartMatchBatch",
+                "requestBody": {
+                    "required": True,
+                    "content": {
+                        "application/json": {}
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "AI smart reconciliation candidates generated",
+                        "content": {"application/json": {}}
+                    }
+                }
+            }
+        },
+        "/api/v1/reconciliation/confirm": {
+            "post": {
+                "tags": ["Smart Reconciliation"],
+                "summary": "1-Click Accountant Confirmation",
+                "description": "Confirms an AI-recommended match candidate, posts double-entry journal entry, and updates SHA-256 audit hash chain.",
+                "operationId": "confirmReconciliationMatch",
+                "requestBody": {
+                    "required": True,
+                    "content": {
+                        "application/json": {}
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Match confirmed and double-entry posted",
+                        "content": {"application/json": {}}
+                    }
+                }
+            }
+        },
+        "/api/v1/reconciliation/reject": {
+            "post": {
+                "tags": ["Smart Reconciliation"],
+                "summary": "Reject AI Reconciled Candidate",
+                "description": "Rejects an AI-recommended match pair candidate from the auto-suggest queue.",
+                "operationId": "rejectReconciliationMatch",
+                "requestBody": {
+                    "required": True,
+                    "content": {
+                        "application/json": {}
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Match candidate rejected",
+                        "content": {"application/json": {}}
                     }
                 }
             }

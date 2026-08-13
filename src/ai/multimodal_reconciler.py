@@ -60,13 +60,28 @@ class MultiModalReconciler:
             inv_no = str(inv.get("doc_number", "N/A"))
             inv_amt = float(inv.get("amount", 0.0))
 
-            # 1. Match against Bank Transactions
+            # 1. Match against Bank Transactions (Exact match first, then M71 Smart AI Matcher)
             matched_tx = None
+            tx_confidence = 0.99
+            tx_notes = ""
             for tx in bank_txs:
                 tx_amt = float(tx.get("debit_amount", 0.0)) or float(tx.get("credit_amount", 0.0))
                 if abs(tx_amt - inv_amt) < 0.01:
                     matched_tx = tx
+                    tx_confidence = 0.99
                     break
+
+            if not matched_tx and bank_txs:
+                try:
+                    from src.ai.smart_invoice_matcher import SmartInvoiceMatcher
+                    ai_candidates = SmartInvoiceMatcher.match_invoices_and_bank_txs([inv], bank_txs, min_confidence_threshold=0.5)
+                    if ai_candidates:
+                        best = ai_candidates[0]
+                        matched_tx = next((t for t in bank_txs if str(t.get("item_id", "")) == best.bank_tx_id), None)
+                        tx_confidence = best.overall_confidence
+                        tx_notes = f" (M71 AI Similarity Score: {round(best.overall_confidence*100, 1)}%)"
+                except Exception as e:
+                    logger.debug(f"Smart AI invoice matcher fallback error: {e}")
 
             # 2. Match against Receipts
             matched_receipt = None
@@ -82,10 +97,10 @@ class MultiModalReconciler:
                         invoice_id=inv_no,
                         receipt_id=str(matched_receipt.get("receipt_id", "REC_01")),
                         bank_tx_id=str(matched_tx.get("item_id", "TX_01")),
-                        match_confidence=0.99,
+                        match_confidence=tx_confidence,
                         amount_difference=0.0,
                         status=ReconciliationStatus.MATCHED,
-                        notes="Идеална 3-странна съвместимост между фактура, бон и банка.",
+                        notes=f"Идеална 3-странна съвместимост между фактура, бон и банка.{tx_notes}",
                     )
                 )
             elif matched_tx:
@@ -94,10 +109,10 @@ class MultiModalReconciler:
                         invoice_id=inv_no,
                         receipt_id="MISSING",
                         bank_tx_id=str(matched_tx.get("item_id", "TX_01")),
-                        match_confidence=0.85,
+                        match_confidence=tx_confidence,
                         amount_difference=0.0,
                         status=ReconciliationStatus.MATCHED,
-                        notes="Фактурата и банката съвпадат (липсва хартиен касов бон).",
+                        notes=f"Фактурата и банката съвпадат (липсва хартиен касов бон).{tx_notes}",
                     )
                 )
             else:

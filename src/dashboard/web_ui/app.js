@@ -28,6 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const pqcNodesContainer = document.getElementById("pqc-nodes-container");
   const flaggedEntriesTbody = document.getElementById("flagged-entries-tbody");
   const correctionsLedgerTbody = document.getElementById("corrections-ledger-tbody");
+  const smartReconcileTbody = document.getElementById("smart-reconcile-tbody");
+  const smartMatchCountBadge = document.getElementById("smart-match-count-badge");
   const flaggedCountBadge = document.getElementById("flagged-count-badge");
   const overallComplianceBadge = document.getElementById("overall-compliance-badge");
 
@@ -246,6 +248,111 @@ document.addEventListener("DOMContentLoaded", () => {
           <td><code title="${c.new_audit_hash}">${c.new_audit_hash.substring(0, 12)}...</code></td>
         </tr>
       `).join("");
+    }
+
+    // 7. Render M71 Smart Auto-Reconciliation Candidates Table
+    if (data.smart_reconciliation_pending && smartReconcileTbody) {
+      if (data.smart_reconciliation_pending.length === 0) {
+        smartReconcileTbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; color: #10b981; padding: 2rem;">
+              ✅ Всички AI препоръки за засичане на фактури са потвърдени! Няма чакащи съвпадения.
+            </td>
+          </tr>
+        `;
+      } else {
+        smartReconcileTbody.innerHTML = data.smart_reconciliation_pending.map(m => {
+          const confPct = m.overall_confidence_pct || (m.overall_confidence * 100).toFixed(1);
+          let badgeClass = "badge badge-success";
+          if (confPct < 85) badgeClass = "badge badge-warning";
+          if (confPct < 65) badgeClass = "badge badge-danger";
+
+          const je = m.suggested_journal_entry || {};
+          const jeStr = `Дб ${je.debit_account || '503'} / Кр ${je.credit_account || '411'} (${(je.amount_bgn || m.invoice_amount).toFixed(2)} лв)`;
+
+          return `
+            <tr>
+              <td>
+                <strong>#${m.invoice_number}</strong><br>
+                <small>${m.invoice_counterparty}</small><br>
+                <span class="text-muted">${m.invoice_amount.toFixed(2)} ${m.currency}</span>
+              </td>
+              <td>
+                <strong>${m.bank_tx_id}</strong><br>
+                <small>${m.bank_tx_narrative}</small><br>
+                <span class="text-muted">${m.bank_tx_amount.toFixed(2)} BGN</span>
+              </td>
+              <td>
+                <span class="${badgeClass}">🤖 ${confPct}%</span><br>
+                <small class="text-muted">${m.confidence_tier}</small>
+              </td>
+              <td>
+                <strong>${m.amount_difference.toFixed(2)} лв</strong><br>
+                <small class="text-muted">${m.amount_difference === 0 ? 'Точна сума' : 'Fuzzy толеранс'}</small>
+              </td>
+              <td>
+                <small>${m.match_notes}</small>
+              </td>
+              <td>
+                <code>${jeStr}</code>
+              </td>
+              <td>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button class="btn btn-sm btn-primary" onclick="confirmSmartMatch('${m.match_id}')">
+                    ✅ Потвърди
+                  </button>
+                  <button class="btn btn-sm btn-secondary" onclick="rejectSmartMatch('${m.match_id}')">
+                    ✕ Отхвърли
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      if (smartMatchCountBadge) {
+        const cnt = data.smart_reconciliation_pending.length;
+        smartMatchCountBadge.innerText = `AI Засичания: ${cnt} Чакат Потвърждение`;
+        smartMatchCountBadge.className = cnt === 0 ? "badge badge-success" : "badge badge-warning";
+      }
+    }
+  };
+
+  // 1-Click Confirmation & Rejection Handlers for M71 Smart Reconciliation
+  window.confirmSmartMatch = async (matchId) => {
+    console.log(`🤖 1-Click confirming M71 match: ${matchId}`);
+    try {
+      const resp = await fetch("/api/v1/reconciliation/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ match_id: matchId, confirmed_by: "accountant_ui_user" }),
+      });
+      if (resp.ok) {
+        const res = await resp.json();
+        console.log("✅ Match confirmed:", res);
+        fetchTelemetryREST();
+      } else {
+        alert("Грешка при потвърждаване на съвпадението.");
+      }
+    } catch (e) {
+      alert(`Грешка при мрежова заявка: ${e}`);
+    }
+  };
+
+  window.rejectSmartMatch = async (matchId) => {
+    console.log(`🤖 Rejecting M71 match: ${matchId}`);
+    try {
+      const resp = await fetch("/api/v1/reconciliation/reject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ match_id: matchId }),
+      });
+      if (resp.ok) {
+        fetchTelemetryREST();
+      }
+    } catch (e) {
+      console.warn("Reject request error:", e);
     }
   };
 

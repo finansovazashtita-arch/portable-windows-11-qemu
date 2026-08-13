@@ -33,6 +33,9 @@
         <a href="#corrections" class="nav-item" id="nav-corrections">
           <span class="icon">🛠️</span> Модул Корекции
         </a>
+        <a href="#smart-reconcile" class="nav-item" id="nav-smart-reconcile">
+          <span class="icon">🤖</span> AI Авто-Свързване M71
+        </a>
       </nav>
 
       <!-- WebSockets Stream Status Indicator -->
@@ -241,6 +244,34 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </section>
+
+      <!-- Section 4: M71 AI Smart Invoice Matching & Auto-Reconciliation Panel -->
+      <section class="panel mt-4" id="section-smart-reconcile">
+        <div class="panel-header">
+          <h3>🤖 M71: AI-Powered Smart Invoice Matching & Auto-Reconciliation</h3>
+          <span class="badge badge-success" id="smart-match-count-badge">AI Засичания: 3 Чакат Потвърждение</span>
+        </div>
+        <p class="panel-desc">Векторни семантични ембединги (Narrative Cosine Similarity) + Fuzzy Amount Matcher с допуск за банкови такси и закръгления.</p>
+
+        <div class="table-container mt-3">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Издадена Фактура</th>
+                <th>Банков Ред / Основание</th>
+                <th>AI Увереност (%)</th>
+                <th>Разлика в Сумата</th>
+                <th>Детайли / Декомпозиция</th>
+                <th>Препоръчана Счетоводна Статия</th>
+                <th>1-Click Действие</th>
+              </tr>
+            </thead>
+            <tbody id="smart-reconcile-tbody">
+              <!-- Dynamically populated via JS/WebSockets -->
+            </tbody>
+          </table>
         </div>
       </section>
     </main>

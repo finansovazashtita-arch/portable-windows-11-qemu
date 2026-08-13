@@ -164,6 +164,15 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             })
             return
 
+        elif canonical_path in ("/api/v1/reconciliation/pending-matches", "/api/reconciliation/pending-matches"):
+            payload = COMPLIANCE_ENGINE.get_telemetry_payload()
+            self._send_json_response({
+                "success": True,
+                "count": len(payload.get("smart_reconciliation_pending", [])),
+                "matches": payload.get("smart_reconciliation_pending", []),
+            })
+            return
+
         # 5. Server-Sent Events (SSE) Stream Fallback
         elif canonical_path in ("/api/compliance/stream", "/api/stream"):
             self.send_response(200)
@@ -255,6 +264,31 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         elif canonical_path in ("/api/v1/compliance/mesh/sync", "/api/compliance/mesh/sync", "/api/mesh/sync"):
             node_id = req_data.get("node_id", "hetzner-fsn1-dc14")
             res = COMPLIANCE_ENGINE.sync_pqc_mesh_node(node_id)
+            self._send_json_response(res, status=200 if res.get("success") else 400)
+            if res.get("success"):
+                broadcast_telemetry_frame()
+            return
+
+        elif canonical_path in ("/api/v1/reconciliation/smart-match", "/api/reconciliation/smart-match"):
+            invoices = req_data.get("invoices", [])
+            bank_txs = req_data.get("bank_transactions") or req_data.get("bank_txs") or []
+            res = COMPLIANCE_ENGINE.submit_smart_match_batch(invoices, bank_txs)
+            self._send_json_response(res, status=200)
+            broadcast_telemetry_frame()
+            return
+
+        elif canonical_path in ("/api/v1/reconciliation/confirm", "/api/reconciliation/confirm"):
+            match_id = req_data.get("match_id", "")
+            confirmed_by = req_data.get("confirmed_by", "accountant_user")
+            res = COMPLIANCE_ENGINE.confirm_smart_match(match_id, confirmed_by)
+            self._send_json_response(res, status=200 if res.get("success") else 400)
+            if res.get("success"):
+                broadcast_telemetry_frame()
+            return
+
+        elif canonical_path in ("/api/v1/reconciliation/reject", "/api/reconciliation/reject"):
+            match_id = req_data.get("match_id", "")
+            res = COMPLIANCE_ENGINE.reject_smart_match(match_id)
             self._send_json_response(res, status=200 if res.get("success") else 400)
             if res.get("success"):
                 broadcast_telemetry_frame()

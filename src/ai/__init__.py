@@ -31,6 +31,14 @@ from src.ai.synthetic_stress_harness import SyntheticStressHarness
 from src.ai.unsloth_classifier import UnslothTransactionClassifier
 from src.ai.unsloth_finetune import BulgarianAccountingDatasetGenerator, UnslothFineTuner
 from src.ai.voice_accounting_assistant import VoiceAccountingAssistant, VoiceQueryResult
+from src.ai.smart_invoice_matcher import (
+    SmartInvoiceMatcher,
+    SmartReconciliationCandidate,
+    MatchConfidenceTier,
+    ReconcileMatchStatus,
+    NarrativeEmbeddingEngine,
+    FuzzyAmountMatcher,
+)
 
 # Backward compatibility aliases
 ActiveLearningLoop = ActiveLearningManager
@@ -83,4 +91,10 @@ __all__ = [
     "NeuralTrialBalanceSentinel",
     "TrialBalanceAccountItem",
     "AnomalyReport",
+    "SmartInvoiceMatcher",
+    "SmartReconciliationCandidate",
+    "MatchConfidenceTier",
+    "ReconcileMatchStatus",
+    "NarrativeEmbeddingEngine",
+    "FuzzyAmountMatcher",
 ]

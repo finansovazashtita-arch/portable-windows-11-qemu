@@ -137,6 +137,7 @@ class RealTimeComplianceEngine:
         self.pqc_nodes: Dict[str, PQCReplicationNodeTelemetry] = {}
         self.corrections_ledger: List[AuditCorrectionRecord] = []
         self.flagged_entries: List[Dict[str, Any]] = []
+        self.smart_matches_pending: List[Dict[str, Any]] = []
 
         # Hash chain head for audit protection
         self.global_audit_hash_chain: List[str] = [
@@ -333,6 +334,69 @@ class RealTimeComplianceEngine:
                 },
             ]
 
+            # 5. M71 AI Smart Reconciliation Pending Matches
+            try:
+                from src.ai.smart_invoice_matcher import SmartInvoiceMatcher
+                seed_invoices = [
+                    {
+                        "invoice_id": "INV-2026-0102",
+                        "doc_number": "0000000102",
+                        "amount": 1250.00,
+                        "currency": "BGN",
+                        "counterparty_name": "Текстил БГ ЕООД",
+                        "counterparty_eik": "831201948",
+                        "description": "Доставка на текстилни материали",
+                    },
+                    {
+                        "invoice_id": "INV-2026-0044",
+                        "doc_number": "2026044",
+                        "amount": 3420.50,
+                        "currency": "BGN",
+                        "counterparty_name": "Евротранс Логистик ООД",
+                        "counterparty_eik": "115982031",
+                        "description": "Международен сухопътен транспорт",
+                    },
+                    {
+                        "invoice_id": "INV-2026-9988",
+                        "doc_number": "9988",
+                        "amount": 850.00,
+                        "currency": "EUR",
+                        "counterparty_name": "TechServices GmbH",
+                        "counterparty_eik": "DE998877661",
+                        "description": "Cloud Architecture Consulting",
+                    },
+                ]
+                seed_bank_txs = [
+                    {
+                        "item_id": "TX-BG-88201",
+                        "credit_amount": 1248.50,
+                        "currency": "BGN",
+                        "narrative": "плащане фактура 102 Текстил",
+                        "counterparty_name": "Tekstil BG EOOD",
+                        "counterparty_eik": "831201948",
+                    },
+                    {
+                        "item_id": "TX-BG-88202",
+                        "credit_amount": 3420.50,
+                        "currency": "BGN",
+                        "narrative": "плащ. ф-ра 44/2026 евротранс логистика",
+                        "counterparty_name": "Eurotrans Logistic OOD",
+                        "counterparty_eik": "115982031",
+                    },
+                    {
+                        "item_id": "TX-BG-88203",
+                        "credit_amount": 1662.46, # 850 EUR @ 1.95583 = 1662.46 BGN
+                        "currency": "BGN",
+                        "narrative": "Pay inv 9988 TechServices",
+                        "counterparty_name": "TechServices GmbH",
+                    },
+                ]
+                candidates = SmartInvoiceMatcher.match_invoices_and_bank_txs(seed_invoices, seed_bank_txs)
+                self.smart_matches_pending = [c.to_dict() for c in candidates]
+            except Exception as e:
+                logger.warning(f"Failed seeding M71 smart matches: {e}")
+                self.smart_matches_pending = []
+
     # --- Engine API Methods ---
 
     def get_telemetry_payload(self) -> Dict[str, Any]:
@@ -364,7 +428,86 @@ class RealTimeComplianceEngine:
                 "pqc_replication_nodes": [asdict(node) for node in self.pqc_nodes.values()],
                 "flagged_entries": self.flagged_entries,
                 "corrections_ledger": [asdict(c) for c in self.corrections_ledger],
+                "smart_reconciliation_pending": [dict(item) for item in self.smart_matches_pending],
             }
+
+    def confirm_smart_match(self, match_id: str, confirmed_by: str = "accountant_user") -> Dict[str, Any]:
+        """Processes 1-click confirmation of a pending AI smart reconciliation candidate."""
+        with self._lock:
+            target = None
+            for idx, item in enumerate(self.smart_matches_pending):
+                if item.get("match_id") == match_id:
+                    target = self.smart_matches_pending.pop(idx)
+                    break
+
+            if not target:
+                return {"success": False, "error": f"Match ID '{match_id}' not found in pending list"}
+
+            # Log to SHA-256 audit hash chain
+            prev_hash = self.global_audit_hash_chain[-1]
+            raw_data = f"{prev_hash}:CONFIRM_SMART_MATCH:{match_id}:{confirmed_by}:{time.time()}"
+            new_hash = hashlib.sha256(raw_data.encode("utf-8")).hexdigest()
+            self.global_audit_hash_chain.append(new_hash)
+
+            # Record in corrections ledger for audit trace
+            corr = AuditCorrectionRecord(
+                correction_id=f"M71-{match_id}",
+                entity_id="BG-STORGOZIA-01",
+                entry_id=target.get("invoice_id", "INV"),
+                account_debit=target.get("suggested_journal_entry", {}).get("debit_account", "503"),
+                account_credit=target.get("suggested_journal_entry", {}).get("credit_account", "411"),
+                original_amount=target.get("invoice_amount", 0.0),
+                corrected_amount=target.get("bank_tx_amount", 0.0),
+                reason=f"1-Click Accountant Confirmation by {confirmed_by} of M71 AI Match #{target.get('invoice_number')} ({target.get('overall_confidence_pct')}% confidence)",
+                status="APPLIED",
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                new_audit_hash=new_hash,
+            )
+            self.corrections_ledger.append(corr)
+
+            logger.info(f"M71 Smart match '{match_id}' confirmed by {confirmed_by}.")
+            return {
+                "success": True,
+                "match_id": match_id,
+                "status": "ACCOUNTANT_CONFIRMED",
+                "confirmed_by": confirmed_by,
+                "journal_entry": target.get("suggested_journal_entry"),
+                "audit_hash": new_hash,
+                "message": f"Успешно потвърдено AI съвпадение M71 за фактура #{target.get('invoice_number')}.",
+            }
+
+    def reject_smart_match(self, match_id: str) -> Dict[str, Any]:
+        """Rejects a pending AI smart reconciliation match candidate."""
+        with self._lock:
+            target = None
+            for idx, item in enumerate(self.smart_matches_pending):
+                if item.get("match_id") == match_id:
+                    target = self.smart_matches_pending.pop(idx)
+                    break
+
+            if not target:
+                return {"success": False, "error": f"Match ID '{match_id}' not found in pending list"}
+
+            return {
+                "success": True,
+                "match_id": match_id,
+                "status": "REJECTED",
+                "message": f"Препоръката M71 за фактура #{target.get('invoice_number')} бе отхвърлена.",
+            }
+
+    def submit_smart_match_batch(self, invoices: List[Dict[str, Any]], bank_txs: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Executes smart invoice matching for custom input lists and updates pending queue."""
+        from src.ai.smart_invoice_matcher import SmartInvoiceMatcher
+        candidates = SmartInvoiceMatcher.match_invoices_and_bank_txs(invoices, bank_txs)
+        new_items = [c.to_dict() for c in candidates]
+        with self._lock:
+            self.smart_matches_pending.extend(new_items)
+
+        return {
+            "success": True,
+            "candidates_count": len(candidates),
+            "candidates": new_items,
+        }
 
     def submit_correction(self, correction_payload: Dict[str, Any]) -> Dict[str, Any]:
         """
