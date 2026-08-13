@@ -35,3 +35,13 @@ Phase 16 extends the Microinvest Bank Statement OCR & Delta Pro Accounting Autom
   - EN 16931 and Peppol BIS Billing 3.0 UBL 2.1 XML generation with QES (КЕП) digital signatures.
 - **Target Deliverables**: `src/integration/nra_einvoice_gateway.py`, `tests/integration/test_nra_einvoice_gateway.py`
 
+### Milestone M61: Autonomous Voice & NLU Command Executor (`m61_nlu_voice_command_executor`)
+- **Objective**: Upgrade the Bulgarian voice assistant (M46) from "Queries" mode to "Autonomous Execution" mode.
+- **Scope**:
+  - Bookkeeping & double-entry journal entry execution (осчетоводявания: Accounts 503, 401, 411, 602, 621, 702, 4531/4532) via Bulgarian speech and text commands.
+  - Autonomous Open Banking PISP and SEPA/BISERA 6 instant payment generation towards vendors.
+  - Statutory NRA VAT Declaration Package generation and filing launch (`DEKLAR.TXT`, `POKUPKI.TXT`, `PRODAGBI.TXT`).
+  - Security guardrails & confirmation token flow for high-value payments (> 10,000 BGN) and official tax filings.
+- **Target Deliverables**: `src/ai/nlu_voice_command_executor.py`, `tests/ai/test_nlu_voice_command_executor.py`
+
+

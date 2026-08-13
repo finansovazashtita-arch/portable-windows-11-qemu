@@ -42,6 +42,7 @@ class MeshAttestationDocument:
     signature: CryptographicSignature
     timestamp_iso: str
     is_verified: bool = False
+    raw_payload: str = ""
 
 @dataclasses.dataclass
 class MeshSignatureChain:
@@ -126,10 +127,27 @@ class PQMeshSigner:
         logger.info(f"✅ Registered mesh node {node_id}")
         return identity
 
-    def create_attestation(self, issuer_node_id: str, target_node_id: str, attestation_type: str, payload_data: Dict[str, Any]) -> MeshAttestationDocument:
+    def create_attestation(
+        self, 
+        issuer_node_id: str = "", 
+        target_node_id: str = "", 
+        attestation_type: str = "", 
+        payload_data: Optional[Dict[str, Any]] = None,
+        issuer: Optional[str] = None,
+        target: Optional[str] = None,
+        type: Optional[str] = None,
+        payload: Optional[Dict[str, Any]] = None
+    ) -> MeshAttestationDocument:
         """
         Signs an attestation with the issuer's PQC key via HSMAuditLogSigner.
         """
+        issuer_node_id = issuer or issuer_node_id
+        target_node_id = target or target_node_id
+        attestation_type = type or attestation_type
+        payload_data = payload if payload is not None else payload_data
+        if payload_data is None:
+            payload_data = {}
+
         logger.info(f"✍️ Creating attestation from {issuer_node_id} for {target_node_id} ({attestation_type})")
         if issuer_node_id not in self.node_identities:
             raise ValueError(f"Issuer node {issuer_node_id} not registered.")
@@ -160,7 +178,8 @@ class PQMeshSigner:
             payload_hash=payload_hash,
             signature=signature,
             timestamp_iso=timestamp,
-            is_verified=True
+            is_verified=True,
+            raw_payload=payload_str
         )
         logger.info(f"✅ Created attestation {attestation_id}")
         return attestation
@@ -179,8 +198,9 @@ class PQMeshSigner:
             logger.warning(f"❌ Issuer node {attestation.issuer_node_id} is inactive.")
             return False
             
+        payload_to_verify = attestation.raw_payload if attestation.raw_payload else attestation.payload_hash
         is_valid = HSMAuditLogSigner.verify_audit_signature(
-            payload_content=attestation.payload_hash,  # Assuming hsm_signer verifies payload or its hash
+            payload_content=payload_to_verify,
             signature=attestation.signature
         )
         
@@ -239,10 +259,20 @@ class PQMeshSigner:
         logger.info(f"✅ Signature chain {chain.chain_id} is valid")
         return True, None
 
-    def issue_mesh_certificate(self, subject_node_id: str, issuer_node_id: str, validity_days: int = 365) -> PQMeshCertificate:
+    def issue_mesh_certificate(
+        self, 
+        subject_node_id: str = "", 
+        issuer_node_id: str = "", 
+        validity_days: int = 365,
+        subject: Optional[str] = None,
+        issuer: Optional[str] = None
+    ) -> PQMeshCertificate:
         """
         Issues PQC-signed mutual TLS certificate for WireGuard mesh.
         """
+        subject_node_id = subject or subject_node_id
+        issuer_node_id = issuer or issuer_node_id
+
         logger.info(f"📜 Issuing mesh certificate for {subject_node_id} by {issuer_node_id}")
         if subject_node_id not in self.node_identities:
             raise ValueError(f"Subject node {subject_node_id} not registered.")
@@ -291,10 +321,22 @@ class PQMeshSigner:
         logger.info(f"✅ Revoked certificate {cert_id}")
         return True
 
-    def authorize_failover(self, requesting_node_id: str, target_node_id: str, failover_reason: str) -> MeshAttestationDocument:
+    def authorize_failover(
+        self, 
+        requesting_node_id: str = "", 
+        target_node_id: str = "", 
+        failover_reason: str = "",
+        requesting: Optional[str] = None,
+        target: Optional[str] = None,
+        reason: Optional[str] = None
+    ) -> MeshAttestationDocument:
         """
         Creates and signs a FAILOVER_AUTH attestation document.
         """
+        requesting_node_id = requesting or requesting_node_id
+        target_node_id = target or target_node_id
+        failover_reason = reason or failover_reason
+
         logger.info(f"⚡ Authorizing failover from {requesting_node_id} to {target_node_id}")
         payload_data = {
             "reason": failover_reason,
@@ -307,6 +349,7 @@ class PQMeshSigner:
             attestation_type="FAILOVER_AUTH",
             payload_data=payload_data
         )
+
 
     def get_mesh_trust_status(self) -> Dict[str, Any]:
         """
