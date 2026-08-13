@@ -260,6 +260,85 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 broadcast_telemetry_frame()
             return
 
+        elif canonical_path in ("/api/v1/gfo/generate", "/api/gfo/generate"):
+            from src.accounting.gfo_generator import CompanyEntityProfile, GFOGeneratorEngine
+            comp_data = req_data.get("company_profile", {})
+            profile = CompanyEntityProfile(
+                company_name=comp_data.get("company_name", "ЕТ Неизвестен"),
+                eik=comp_data.get("eik", "000000000"),
+                address=comp_data.get("address", "София"),
+                manager_name=comp_data.get("manager_name", "Управител"),
+                vat_number=comp_data.get("vat_number"),
+                accounting_standard=comp_data.get("accounting_standard", "NAS"),
+            )
+            tb = req_data.get("trial_balance", {})
+            fiscal_year = req_data.get("fiscal_year", datetime.datetime.now().year - 1)
+            report = GFOGeneratorEngine.generate_gfo(profile, tb, fiscal_year)
+            self._send_json_response({"success": True, "report": GFOGeneratorEngine.export_canonical_json(report)})
+            return
+
+        elif canonical_path in ("/api/v1/gfo/validate", "/api/gfo/validate"):
+            from src.accounting.gfo_generator import CompanyEntityProfile, GFOGeneratorEngine
+            comp_data = req_data.get("company_profile", {})
+            profile = CompanyEntityProfile(
+                company_name=comp_data.get("company_name", "ЕТ Неизвестен"),
+                eik=comp_data.get("eik", "000000000"),
+                address=comp_data.get("address", "София"),
+                manager_name=comp_data.get("manager_name", "Управител"),
+            )
+            tb = req_data.get("trial_balance", {})
+            fiscal_year = req_data.get("fiscal_year", datetime.datetime.now().year - 1)
+            report = GFOGeneratorEngine.generate_gfo(profile, tb, fiscal_year)
+            val = GFOGeneratorEngine.validate_gfo(report)
+            self._send_json_response({"success": True, "validation": dataclasses.asdict(val)})
+            return
+
+        elif canonical_path in ("/api/v1/gfo/export/xml", "/api/gfo/export/xml"):
+            from src.accounting.gfo_generator import CompanyEntityProfile, GFOGeneratorEngine
+            comp_data = req_data.get("company_profile", {})
+            profile = CompanyEntityProfile(
+                company_name=comp_data.get("company_name", "ЕТ Неизвестен"),
+                eik=comp_data.get("eik", "000000000"),
+                address=comp_data.get("address", "София"),
+                manager_name=comp_data.get("manager_name", "Управител"),
+            )
+            tb = req_data.get("trial_balance", {})
+            fiscal_year = req_data.get("fiscal_year", datetime.datetime.now().year - 1)
+            report = GFOGeneratorEngine.generate_gfo(profile, tb, fiscal_year)
+            xml_str = GFOGeneratorEngine.export_commercial_register_xml(report)
+            self._send_json_response({"success": True, "xml_payload": xml_str})
+            return
+
+        elif canonical_path in ("/api/v1/gfo/export/html", "/api/gfo/export/html"):
+            from src.accounting.gfo_generator import CompanyEntityProfile, GFOGeneratorEngine
+            comp_data = req_data.get("company_profile", {})
+            profile = CompanyEntityProfile(
+                company_name=comp_data.get("company_name", "ЕТ Неизвестен"),
+                eik=comp_data.get("eik", "000000000"),
+                address=comp_data.get("address", "София"),
+                manager_name=comp_data.get("manager_name", "Управител"),
+            )
+            tb = req_data.get("trial_balance", {})
+            fiscal_year = req_data.get("fiscal_year", datetime.datetime.now().year - 1)
+            report = GFOGeneratorEngine.generate_gfo(profile, tb, fiscal_year)
+            html_str = GFOGeneratorEngine.export_printable_html(report)
+            self._send_json_response({"success": True, "html_content": html_str})
+            return
+
+        elif canonical_path in ("/api/v1/gfo/no-activity-declaration", "/api/gfo/no-activity-declaration"):
+            from src.accounting.gfo_generator import CompanyEntityProfile, GFOGeneratorEngine
+            comp_data = req_data.get("company_profile", {})
+            profile = CompanyEntityProfile(
+                company_name=comp_data.get("company_name", "ЕТ Неизвестен"),
+                eik=comp_data.get("eik", "000000000"),
+                address=comp_data.get("address", "София"),
+                manager_name=comp_data.get("manager_name", "Управител"),
+            )
+            fiscal_year = req_data.get("fiscal_year", datetime.datetime.now().year - 1)
+            decl = GFOGeneratorEngine.generate_no_activity_declaration(profile, fiscal_year)
+            self._send_json_response({"success": True, "declaration": decl})
+            return
+
         else:
             self.send_error(404, "Endpoint Not Found")
 

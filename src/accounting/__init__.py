@@ -23,6 +23,12 @@ from src.accounting.translate_to_delta import (
     validate_eik,
     validate_iban,
 )
+from src.accounting.gfo_generator import (
+    CompanyEntityProfile,
+    GFOGeneratorEngine,
+    GFOReport,
+    GFOValidationResult,
+)
 from src.accounting.travel_expense_manager import (
     BusinessTravelOrder,
     BusinessTravelReport,
@@ -77,4 +83,8 @@ __all__ = [
     "BusinessTravelOrder",
     "BusinessTravelReport",
     "TravelType",
+    "CompanyEntityProfile",
+    "GFOGeneratorEngine",
+    "GFOReport",
+    "GFOValidationResult",
 ]
