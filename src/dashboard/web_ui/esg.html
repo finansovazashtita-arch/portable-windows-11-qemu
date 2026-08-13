@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinansProtect | Enterprise ESG & Carbon Tax Accounting Engine (M81)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #080c14;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      --esg-green: #10b981;
+      --esg-emerald: #059669;
+      --warning-amber: #f59e0b;
+      --danger-red: #ef4444;
+      --blue-accent: #3b82f6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .esg-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .leaf-icon {
+      font-size: 26px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 6px 10px;
+      border-radius: 8px;
+    }
+
+    .brand-title h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, #ffffff 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .badge-esg {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 16px;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--esg-green);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .kpi-card .label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .kpi-card .value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .kpi-card .subtext {
+      font-size: 12px;
+      color: var(--esg-green);
+      margin-top: 6px;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .section-grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      box-sizing: border-box;
+      background: #0d1322;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--text-main);
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--esg-green);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .preset-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .preset-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--esg-green);
+      color: #34d399;
+    }
+
+    .btn-primary {
+      background: var(--esg-emerald);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #047857;
+    }
+
+    .btn-secondary {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(59, 130, 246, 0.3);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    th {
+      color: var(--text-muted);
+      font-weight: 500;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .badge-scope {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-scope-1 { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .badge-scope-2 { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .badge-scope-3 { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+
+    .journal-box {
+      background: #090e1a;
+      border: 1px dashed var(--esg-green);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    .journal-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    .journal-debit { color: #34d399; }
+    .journal-credit { color: #60a5fa; padding-left: 20px; }
+
+    .progress-bar-bg {
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+      height: 10px;
+      overflow: hidden;
+      margin-top: 6px;
+      margin-bottom: 16px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.4s ease;
+    }
+
+    .rec-item {
+      background: rgba(16, 185, 129, 0.05);
+      border-left: 3px solid var(--esg-green);
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="esg-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <div class="brand-title">
+        <span class="leaf-icon">🌱</span>
+        <div>
+          <h1>FinansProtect ESG & Carbon Tax Engine</h1>
+          <span class="badge-esg">M81 GHG Protocol Scope 1-3 & EU CBAM</span>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a href="/">📊 Табло</a>
+        <a href="/esg.html" class="active">🌱 ESG & CBAM</a>
+        <a href="/mydata.html">🇬🇷 Greece myDATA</a>
+        <a href="/ksef.html">🇵🇱 Poland KSeF</a>
+        <a href="/anaf.html">🇷🇴 Romania ANAF</a>
+        <a href="/analytics.html">📈 BI Analytics</a>
+        <a href="/advisory.html">💡 AI Advisory</a>
+      </div>
+    </div>
+
+    <!-- Executive KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="label">Scope 1 (Пряко гориво) <span>⛽</span></div>
+        <div class="value" id="kpi-scope1">6.72 <small style="font-size: 14px; color: var(--text-muted)">tCO2e</small></div>
+        <div class="subtext">Дизел & Природен газ</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Scope 2 (Електроенергия) <span>⚡</span></div>
+        <div class="value" id="kpi-scope2">21.00 <small style="font-size: 14px; color: var(--text-muted)">tCO2e</small></div>
+        <div class="subtext">Мрежа БГ Grid Mix (0.420 kg/kWh)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Scope 3 & CBAM (Внос) <span>🚢</span></div>
+        <div class="value" id="kpi-scope3">50.25 <small style="font-size: 14px; color: var(--text-muted)">tCO2e</small></div>
+        <div class="subtext">Вносна стомана & алуминий</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">CBAM Провизии (Сметка 609/454) <span>💶</span></div>
+        <div class="value" id="kpi-cbam-tax">€4,271.25</div>
+        <div class="subtext" id="kpi-cbam-bgn">8,353.84 лв. (При ETS €85/tCO2e)</div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="section-grid">
+      <!-- Invoice Calculator Form -->
+      <div class="card">
+        <h2>📝 Калкулатор за Въглероден Отпечатък от Покупни Фактури</h2>
+
+        <div class="preset-btn-group">
+          <button class="preset-btn" onclick="applyPreset('elec')">⚡ Елекроенергия 50 MWh</button>
+          <button class="preset-btn" onclick="applyPreset('diesel')">⛽ Дизел 2500 Л</button>
+          <button class="preset-btn" onclick="applyPreset('steel')">🏗️ Внос Стомана (Турция)</button>
+          <button class="preset-btn" onclick="applyPreset('aluminum')">⚙️ Внос Алуминий (Китай)</button>
+        </div>
+
+        <form id="esg-form" onsubmit="calculateCustomItem(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Номер на фактура</label>
+              <input type="text" id="doc-num" class="form-control" value="INV-2026-005" required>
+            </div>
+            <div class="form-group">
+              <label>Вид активност / Гориво / Внос</label>
+              <select id="activity-type" class="form-control" onchange="updateUnitHint()">
+                <option value="electricity_grid_bg">⚡ Електроенергия БГ (Scope 2)</option>
+                <option value="diesel_fuel">⛽ Дизелово гориво (Scope 1)</option>
+                <option value="natural_gas">🔥 Природен газ (Scope 1)</option>
+                <option value="imported_steel">🏗️ Вносна стомана - CBAM (Scope 3)</option>
+                <option value="imported_aluminum">⚙️ Вносен алуминий - CBAM (Scope 3)</option>
+                <option value="imported_cement">🧱 Вносен цимент - CBAM (Scope 3)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Количество</label>
+              <input type="number" step="0.01" id="item-qty" class="form-control" value="50" required>
+            </div>
+            <div class="form-group">
+              <label>Мерна единица</label>
+              <input type="text" id="item-unit" class="form-control" value="MWh" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Държава на произход (ISO)</label>
+              <input type="text" id="origin-country" class="form-control" value="BG" placeholder="BG, TR, CN, DE..." required>
+            </div>
+            <div class="form-group">
+              <label>Сума на фактурата (€)</label>
+              <input type="number" step="0.01" id="amount-eur" class="form-control" value="7500.00" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">🧮 Изчисли Въглеродни Емисии и CBAM Данък</button>
+        </form>
+      </div>
+
+      <!-- Scope Breakdown & Journal Preview -->
+      <div class="card">
+        <h2>📊 Структура на Емисиите & Счетоводни Операции</h2>
+
+        <div style="margin-bottom: 12px;">
+          <div style="display:flex; justify-shadow:space-between; font-size:13px;">
+            <span>Scope 1 (Пряко гориво)</span>
+            <span id="pct-scope1">8.6%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="bar-scope1" style="width: 8.6%; background: var(--danger-red);"></div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; font-size:13px;">
+            <span>Scope 2 (Електроенергия)</span>
+            <span id="pct-scope2">26.9%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="bar-scope2" style="width: 26.9%; background: var(--warning-amber);"></div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; font-size:13px;">
+            <span>Scope 3 (Внос & CBAM)</span>
+            <span id="pct-scope3">64.5%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="bar-scope3" style="width: 64.5%; background: var(--blue-accent);"></div>
+          </div>
+        </div>
+
+        <div class="journal-box">
+          <div style="color: var(--text-muted); margin-bottom: 8px;">Двустранна счетоводна операция за въглеродни провизии:</div>
+          <div class="journal-line journal-debit">
+            <span>Дебит 609 (Други разходи - Въглеродни провизии)</span>
+            <span id="j-debit-val">8,353.84 лв.</span>
+          </div>
+          <div class="journal-line journal-credit">
+            <span>Кредит 454 (Разчети за въглеродни данъци / CBAM)</span>
+            <span id="j-credit-val">8,353.84 лв.</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px; display: flex; gap: 12px;">
+          <button class="btn-primary" onclick="postJournals()">💾 Осчетоводи Провизии в Главната Книга</button>
+          <button class="btn-secondary" onclick="exportCSRD()">📄 CSRD Репорт</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit & Itemized Table -->
+    <div class="card" style="margin-bottom: 24px;">
+      <h2>📋 Детайлен Одитен Опис на Покупните Фактури</h2>
+      <table id="audit-table">
+        <thead>
+          <tr>
+            <th>Документ #</th>
+            <th>Описание</th>
+            <th>Количество</th>
+            <th>Scope</th>
+            <th>Емисии (tCO2e)</th>
+            <th>CBAM Статус</th>
+            <th>Произход</th>
+            <th>CBAM Данък (€)</th>
+            <th>CBAM Данък (лв.)</th>
+          </tr>
+        </thead>
+        <tbody id="audit-tbody">
+          <!-- Populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CSRD Compliance Status Card -->
+    <div class="card">
+      <h2>🇪🇺 CSRD / ESRS E1 Счетоводен & Екологичен Анализ</h2>
+      <div id="csrd-content">
+        <div class="rec-item">💡 <strong>Препоръка Scope 2:</strong> Преминаване към 100% зелена електроенергия с ВЕИ сертификати (GO) за намаляване на Scope 2 емисиите до 0.75 tCO2e.</div>
+        <div class="rec-item">💡 <strong>Препоръка CBAM:</strong> Оптимизиране на доставките на стомана/алуминий от нисковъглеродни производители за намаляване на CBAM данъка с до 35%.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentFootprintData = null;
+
+    async function loadFootprintData() {
+      try {
+        const res = await fetch('/api/v1/esg/footprint/calculate');
+        const data = await res.json();
+        currentFootprintData = data;
+        renderDashboard(data);
+      } catch (err) {
+        console.error("Грешка при зареждане на ESG данни:", err);
+      }
+    }
+
+    function renderDashboard(data) {
+      document.getElementById('kpi-scope1').innerText = `${data.scope1_tco2e.toFixed(2)} tCO2e`;
+      document.getElementById('kpi-scope2').innerText = `${data.scope2_location_tco2e.toFixed(2)} tCO2e`;
+      document.getElementById('kpi-scope3').innerText = `${data.scope3_tco2e.toFixed(2)} tCO2e`;
+      document.getElementById('kpi-cbam-tax').innerText = `€${data.cbam_total_tax_liability_eur.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      document.getElementById('kpi-cbam-bgn').innerText = `${data.cbam_total_tax_liability_bgn.toLocaleString('bg-BG', {minimumFractionDigits: 2})} лв. (При ETS €85/tCO2e)`;
+
+      // Progress bars
+      const total = data.total_tco2e || 1;
+      const s1Pct = ((data.scope1_tco2e / total) * 100).toFixed(1);
+      const s2Pct = ((data.scope2_location_tco2e / total) * 100).toFixed(1);
+      const s3Pct = ((data.scope3_tco2e / total) * 100).toFixed(1);
+
+      document.getElementById('pct-scope1').innerText = `${s1Pct}%`;
+      document.getElementById('pct-scope2').innerText = `${s2Pct}%`;
+      document.getElementById('pct-scope3').innerText = `${s3Pct}%`;
+
+      document.getElementById('bar-scope1').style.width = `${s1Pct}%`;
+      document.getElementById('bar-scope2').style.width = `${s2Pct}%`;
+      document.getElementById('bar-scope3').style.width = `${s3Pct}%`;
+
+      // Journal preview
+      const bgnVal = `${data.cbam_total_tax_liability_bgn.toLocaleString('bg-BG', {minimumFractionDigits: 2})} лв.`;
+      document.getElementById('j-debit-val').innerText = bgnVal;
+      document.getElementById('j-credit-val').innerText = bgnVal;
+
+      // Audit table
+      const tbody = document.getElementById('audit-tbody');
+      tbody.innerHTML = '';
+      (data.itemized_results || []).forEach(item => {
+        const tr = document.createElement('tr');
+
+        let scopeBadge = 'badge-scope-3';
+        if (item.scope.includes('Scope 1')) scopeBadge = 'badge-scope-1';
+        else if (item.scope.includes('Scope 2')) scopeBadge = 'badge-scope-2';
+
+        const cbamBadge = item.is_cbam_applicable 
+          ? '<span style="color:#ef4444; font-weight:600;">⚠️ Приложим</span>'
+          : '<span style="color:#94a3b8;">—</span>';
+
+        tr.innerHTML = `
+          <td style="font-family:'JetBrains Mono'">${item.document_number}</td>
+          <td>${item.description}</td>
+          <td>${item.quantity} ${item.unit}</td>
+          <td><span class="badge-scope ${scopeBadge}">${item.scope.split(' ')[0]} ${item.scope.split(' ')[1] || ''}</span></td>
+          <td style="font-family:'JetBrains Mono'; font-weight:600">${item.tco2e.toFixed(3)}</td>
+          <td>${cbamBadge}</td>
+          <td>${item.origin_country}</td>
+          <td style="font-family:'JetBrains Mono'; color:#34d399">€${item.cbam_tax_liability_eur.toFixed(2)}</td>
+          <td style="font-family:'JetBrains Mono'; color:#60a5fa">${item.cbam_tax_liability_bgn.toFixed(2)} лв.</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function applyPreset(type) {
+      if (type === 'elec') {
+        document.getElementById('doc-num').value = 'INV-2026-010';
+        document.getElementById('activity-type').value = 'electricity_grid_bg';
+        document.getElementById('item-qty').value = '50';
+        document.getElementById('item-unit').value = 'MWh';
+        document.getElementById('origin-country').value = 'BG';
+        document.getElementById('amount-eur').value = '7500.00';
+      } else if (type === 'diesel') {
+        document.getElementById('doc-num').value = 'INV-2026-011';
+        document.getElementById('activity-type').value = 'diesel_fuel';
+        document.getElementById('item-qty').value = '2500';
+        document.getElementById('item-unit').value = 'liter';
+        document.getElementById('origin-country').value = 'BG';
+        document.getElementById('amount-eur').value = '3250.00';
+      } else if (type === 'steel') {
+        document.getElementById('doc-num').value = 'INV-2026-012';
+        document.getElementById('activity-type').value = 'imported_steel';
+        document.getElementById('item-qty').value = '15';
+        document.getElementById('item-unit').value = 'ton';
+        document.getElementById('origin-country').value = 'TR';
+        document.getElementById('amount-eur').value = '12000.00';
+      } else if (type === 'aluminum') {
+        document.getElementById('doc-num').value = 'INV-2026-013';
+        document.getElementById('activity-type').value = 'imported_aluminum';
+        document.getElementById('item-qty').value = '5';
+        document.getElementById('item-unit').value = 'ton';
+        document.getElementById('origin-country').value = 'CN';
+        document.getElementById('amount-eur').value = '11500.00';
+      }
+    }
+
+    async function calculateCustomItem(e) {
+      e.preventDefault();
+      const docNum = document.getElementById('doc-num').value;
+      const activity = document.getElementById('activity-type').value;
+      const qty = parseFloat(document.getElementById('item-qty').value);
+      const unit = document.getElementById('item-unit').value;
+      const origin = document.getElementById('origin-country').value;
+      const amt = parseFloat(document.getElementById('amount-eur').value);
+
+      const newItem = {
+        item_id: `ITEM-${Date.now()}`,
+        document_number: docNum,
+        date: new Date().toISOString().split('T')[0],
+        description: `Покупка ${activity} (${qty} ${unit})`,
+        quantity: qty,
+        unit: unit,
+        activity_type: activity,
+        amount_eur: amt,
+        origin_country: origin
+      };
+
+      const items = currentFootprintData && currentFootprintData.itemized_results 
+        ? currentFootprintData.itemized_results.map(i => ({
+            item_id: i.item_id,
+            document_number: i.document_number,
+            date: '2026-08-13',
+            description: i.description,
+            quantity: i.quantity,
+            unit: i.unit,
+            activity_type: i.activity_type,
+            amount_eur: 5000.0,
+            origin_country: i.origin_country
+          }))
+        : [];
+      
+      items.push(newItem);
+
+      try {
+        const res = await fetch('/api/v1/esg/footprint/calculate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ items: items, period: '2026-Q3', revenue_eur: 300000.0 })
+        });
+        const data = await res.json();
+        currentFootprintData = data;
+        renderDashboard(data);
+        alert('✅ Успешно изчислени нови емисии и CBAM данък!');
+      } catch (err) {
+        alert('Грешка при калкулация: ' + err);
+      }
+    }
+
+    async function postJournals() {
+      try {
+        const res = await fetch('/api/v1/esg/journals/post', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ period: '2026-Q3' })
+        });
+        const data = await res.json();
+        alert(`✅ ${data.message}\nОбща сума на провизията: ${data.total_provision_bgn} лв. (${data.total_provision_eur} €)`);
+      } catch (err) {
+        alert('Грешка при запис на счетоводни операции: ' + err);
+      }
+    }
+
+    async function exportCSRD() {
+      try {
+        const res = await fetch('/api/v1/esg/csrd/export');
+        const data = await res.json();
+        const jsonBlob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        const url = URL.createObjectURL(jsonBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `CSRD_ESRS_E1_Report_${data.reporting_period}.json`;
+        a.click();
+      } catch (err) {
+        alert('Грешка при експорт на CSRD репорт: ' + err);
+      }
+    }
+
+    window.onload = loadFootprintData;
+  </script>
+</body>
+</html>
