@@ -147,6 +147,8 @@
 | 79 | AI Smart Invoice Matching & Auto-Reconciliation | AI-powered vector embeddings, Cyrillic/Latin transliteration, fuzzy amount tolerance & 1-click UI confirmation | M71 | DONE |
 | 80 | Production Kubernetes Helm Chart & Deploy Pipeline | Complete Helm chart with 15 templates, K3s manifests, Traefik IngressRoute, cert-manager, GitHub Actions CI/CD deploy workflow | M73 | DONE |
 | 81 | Comprehensive Bilingual User Documentation | MkDocs Material site with 42 pages (BG/EN), admin guide, user manual, API reference, Postman collection | M74 | DONE |
+| 82 | Multi-Tenant SaaS Billing & Subscription Management | Stripe payment integration, tenant provisioning, usage metering, database isolation, GDPR Art. 17 erasure | M75 | DONE |
+| 83 | Business Intelligence (BI) Analytics Dashboard | Multi-dimensional OLAP query engine, executive KPI matrix, scenario simulator, threshold alerting, multi-format exports & modern web UI | M76 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -226,9 +228,13 @@
 | M72 | `m72_gfo_generator` | Autonomous Bulgarian Annual Financial Statement (ГФО) Generation, Validation & Multi-Format Regulatory Export | M51, M56, M65 | DONE |
 | M73 | `m73_k8s_helm_deployment` | Production Kubernetes Helm Chart, K3s manifests, Traefik IngressRoute, cert-manager ClusterIssuer & GitHub Actions deploy pipeline | M10, M18, M34, M63, M69 | DONE |
 | M74 | `m74_user_documentation` | Comprehensive bilingual (BG/EN) MkDocs Material user documentation, admin guide, API reference & Postman collection | M12, M70 | DONE |
+| M75 | `m75_saas_billing` | Multi-Tenant SaaS Billing & Subscription Management with Stripe integration, tenant provisioning API, usage metering & GDPR Art. 17 erasure | M15, M69, M73 | DONE |
+| M76 | `m76_bi_analytics_dashboard` | Business Intelligence (BI) Analytics Dashboard with financial & operational KPIs, multi-dimensional OLAP query engine, threshold alerts, scenario simulations & interactive web UI | M12, M19, M41, M65, M75 | DONE |
 
 ## Code Layout
 - `src/config/`: Production Configuration & Secrets Management Hardening (`config_hardening.py`)
+- `src/analytics/`: BI Analytics Engine (`bi_engine.py`), Financial & Operational KPI Calculator (`kpi_calculator.py`), OLAP Query Builder (`query_builder.py`), Threshold Alert Manager (`bi_alerts.py`), Report Exporter (`exporter.py`), REST API Router (`bi_api.py`)
+- `src/billing/`: Multi-Tenant SaaS Billing System (`tenant_manager.py`, `stripe_client.py`, `metering_engine.py`, `schema_manager.py`, `gdpr_compliance.py`, `webhook_handler.py`, `tenant_api.py`)
 - `src/intake/`: Open Banking PISP Aggregator (`open_banking_pisp.py`), Bank Feed Guard (`bank_feed_guard.py`), SEPA Instant / BISERA 6 Adapter (`sepa_bisera_instant.py`), Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)
 - `src/security/`: E-Archiving Compliance Vault (`e_archiving_compliance_vault.py`), Post-Quantum Mesh Signer (`pq_mesh_signer.py`), Audit Ledger Integrity Guard (`audit_ledger_guard.py`), Zero-Trust HSM Cryptographic Signer & PQC (`hsm_signer.py`), Multi-Tenant RBAC (`tenant_rbac.py`) & Infisical Vault client (`infisical_vault.py`)
 - `src/accounting/`: GFO Generator (`gfo_generator.py`), Travel Expense Manager (`travel_expense_manager.py`), Cash Desk Manager (`cash_desk_manager.py`), Corporate Consolidation Engine (`corporate_consolidation.py`), Fixed Assets & Depreciation Manager (`fixed_assets_depreciation.py`), Inventory Valuation Engine (`inventory_valuation.py`), EU OSS E-Commerce Invoicing Adapter (`eu_oss_accounting.py`), Customs & Excise Accounting Engine (`customs_excise_accounting.py`), Payroll Accounting Engine (`payroll_accounting.py`), FX Revaluation Engine (`fx_revaluation.py`), Bulgarian double-entry translation & XML generator (`translate_to_delta.py`)

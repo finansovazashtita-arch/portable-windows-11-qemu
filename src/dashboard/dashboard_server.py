@@ -176,6 +176,50 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._send_json_response(response_payload, status=status_code)
             return
 
+        elif canonical_path.startswith("/api/v1/analytics") or canonical_path.startswith("/api/analytics"):
+            from src.analytics.bi_api import (
+                get_executive_overview,
+                get_kpis,
+                get_analytics_trends,
+                get_active_alerts,
+            )
+            from urllib.parse import parse_qs, urlparse
+            parsed_url = urlparse(self.path)
+            q_params = {k: v[0] for k, v in parse_qs(parsed_url.query).items()}
+
+            if canonical_path.endswith("/overview"):
+                res = get_executive_overview(
+                    tenant_id=q_params.get("tenant_id"),
+                    currency=q_params.get("currency", "BGN"),
+                    period=q_params.get("period", "monthly"),
+                )
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/kpis"):
+                res = get_kpis(tenant_id=q_params.get("tenant_id"))
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/trends"):
+                res = get_analytics_trends(
+                    tenant_id=q_params.get("tenant_id"),
+                    period_dimension=q_params.get("period_dimension", "month"),
+                )
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/alerts"):
+                res = get_active_alerts(tenant_id=q_params.get("tenant_id"))
+                self._send_json_response(res)
+                return
+
+        elif self.path in ("/analytics", "/analytics.html"):
+            with open(os.path.join(WEB_UI_DIR, "analytics.html"), "rb") as f:
+                content = f.read()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
         elif canonical_path in ("/api/v1/reconciliation/pending-matches", "/api/reconciliation/pending-matches"):
 
             payload = COMPLIANCE_ENGINE.get_telemetry_payload()
@@ -235,6 +279,43 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             status_code, response_payload = TENANT_API.handle_post(canonical_path, req_data, headers=req_headers)
             self._send_json_response(response_payload, status=status_code)
             return
+
+        elif canonical_path.startswith("/api/v1/analytics") or canonical_path.startswith("/api/analytics"):
+            from src.analytics.bi_api import (
+                execute_analytics_query,
+                simulate_scenario,
+                add_alert_rule,
+                export_analytics_report,
+                QueryRequestPayload,
+                ScenarioSimulationRequest,
+                AlertRulePayload,
+                ReportExportRequest,
+            )
+            if canonical_path.endswith("/query"):
+                payload = QueryRequestPayload(**req_data)
+                res = execute_analytics_query(payload)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/scenario"):
+                payload = ScenarioSimulationRequest(**req_data)
+                res = simulate_scenario(payload)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/alerts/rules"):
+                payload = AlertRulePayload(**req_data)
+                res = add_alert_rule(payload)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/export"):
+                payload = ReportExportRequest(**req_data)
+                response = export_analytics_report(payload)
+                self.send_response(200)
+                self.send_header("Content-Type", response.headers.get("Content-Type", "text/csv"))
+                for k, v in response.headers.items():
+                    self.send_header(k, v)
+                self.end_headers()
+                self.wfile.write(response.body)
+                return
 
         elif canonical_path in ("/api/v1/mobile/scan", "/api/mobile/scan"):
 

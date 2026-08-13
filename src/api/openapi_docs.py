@@ -61,6 +61,7 @@ OPENAPI_SPEC: Dict[str, Any] = {
         {"name": "Smart Reconciliation", "description": "M71 AI-powered narrative vector embedding matching, fuzzy amount auto-reconciliation, and 1-click accountant confirmation"},
         {"name": "Mobile Suite", "description": "Edge-AI fiscal receipt processing, WASM OCR status, and offline queue sync"},
         {"name": "SaaS Billing", "description": "M75 Stripe subscription management, multi-tenant provisioning, usage metering, and GDPR Art. 17 data erasure"},
+        {"name": "BI Analytics Dashboard", "description": "M76 BI analytics engine, C-level executive KPIs, multi-dimensional OLAP query builder, scenario simulations, alerts, and multi-format exports"},
         {"name": "Documentation", "description": "OpenAPI specifications & interactive UI endpoints"}
     ],
     "paths": {
@@ -540,6 +541,70 @@ OPENAPI_SPEC: Dict[str, Any] = {
                 "summary": "Stripe Webhook Handler",
                 "description": "Processes subscription created/updated/deleted and invoice.paid events with signature verification and idempotency protection.",
                 "responses": {"200": {"description": "Webhook processed"}}
+            }
+        },
+        "/api/v1/analytics/overview": {
+            "get": {
+                "tags": ["BI Analytics Dashboard"],
+                "summary": "Executive C-Level BI Summary",
+                "description": "Retrieves comprehensive executive financial summary including Gross/Net Revenue, Net Profit %, Cash Runway, SaaS MRR/ARR, DSO/DPO, and growth rates.",
+                "responses": {"200": {"description": "Executive BI summary payload"}}
+            }
+        },
+        "/api/v1/analytics/kpis": {
+            "get": {
+                "tags": ["BI Analytics Dashboard"],
+                "summary": "Detailed BI KPI Matrix",
+                "description": "Returns high-level financial and operational KPI breakdown.",
+                "responses": {"200": {"description": "Detailed KPI matrix"}}
+            }
+        },
+        "/api/v1/analytics/query": {
+            "post": {
+                "tags": ["BI Analytics Dashboard"],
+                "summary": "Multi-Dimensional OLAP Aggregation Query",
+                "description": "Executes dynamic multi-dimensional aggregation queries across financial records with filtering, group-by, and custom metric definitions.",
+                "responses": {"200": {"description": "OLAP query aggregation result"}}
+            }
+        },
+        "/api/v1/analytics/trends": {
+            "get": {
+                "tags": ["BI Analytics Dashboard"],
+                "summary": "Time-Series Trend Data for UI Charts",
+                "description": "Returns monthly revenue, expense, and transaction count time series.",
+                "responses": {"200": {"description": "Trend series dataset"}}
+            }
+        },
+        "/api/v1/analytics/scenario": {
+            "post": {
+                "tags": ["BI Analytics Dashboard"],
+                "summary": "Sensitivity Scenario Simulation",
+                "description": "Simulates sensitivity impacts on net profit, margin, and cash runway based on revenue, expense, or subscriber growth adjustments.",
+                "responses": {"200": {"description": "Simulation comparison result"}}
+            }
+        },
+        "/api/v1/analytics/alerts": {
+            "get": {
+                "tags": ["BI Analytics Dashboard"],
+                "summary": "Active BI Threshold Alerts",
+                "description": "Returns active threshold alerts and operational anomaly triggers.",
+                "responses": {"200": {"description": "Active alerts list"}}
+            }
+        },
+        "/api/v1/analytics/alerts/rules": {
+            "post": {
+                "tags": ["BI Analytics Dashboard"],
+                "summary": "Register or Update Alert Rule",
+                "description": "Adds a new operational or financial threshold alert rule.",
+                "responses": {"200": {"description": "Alert rule registered"}}
+            }
+        },
+        "/api/v1/analytics/export": {
+            "post": {
+                "tags": ["BI Analytics Dashboard"],
+                "summary": "Export BI Report or Dataset",
+                "description": "Exports KPI summary or OLAP query dataset into CSV, JSON, HTML, or XLSX format.",
+                "responses": {"200": {"description": "File attachment response"}}
             }
         }
     },
