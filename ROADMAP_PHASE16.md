@@ -27,3 +27,11 @@ Phase 16 extends the Microinvest Bank Statement OCR & Delta Pro Accounting Autom
   - Automated health probes, virtual machine state cloning, and database synchronization check
   - Zero downtime failover drill execution
 - **Target Deliverables**: `src/cluster/dr_failover_orchestrator.py`, `tests/cluster/test_dr_failover_orchestrator.py`
+
+### Milestone M60: Autonomous NRA E-Invoicing & Portal Gateway (`m60_nra_einvoice_portal_gateway`)
+- **Objective**: Direct integration with the official NRA e-invoicing portal (НАП Е-Фактура API) for real-time automatic submission, verification, and digital signing.
+- **Scope**:
+  - Direct integration with CAIS EPP (ЦАИС ЕОП) for B2G public procurement e-invoicing and B2B voluntary e-invoicing.
+  - EN 16931 and Peppol BIS Billing 3.0 UBL 2.1 XML generation with QES (КЕП) digital signatures.
+- **Target Deliverables**: `src/integration/nra_einvoice_gateway.py`, `tests/integration/test_nra_einvoice_gateway.py`
+

@@ -127,6 +127,8 @@
 | 63 | Audit Ledger Integrity Guard | Tamper-evident SHA-256 hash chaining of accounting entries for 100% NRA tax audit protection | M56 | DONE |
 | 64 | Open Banking PISP Payment Initiation | PSD2 PISP automated vendor invoice payments (401/503) and multi-bank balance aggregation | M57 | DONE |
 | 65 | Real-Time Trial Balance Anomaly Sentinel | Autonomous trial balance movement analysis, debit/credit imbalance alerts & correction entries | M58 | DONE |
+| 66 | Zero-Trust DR Failover & Instant Recovery Orchestrator | Automated scheduled disaster recovery failover testing, sub-5s RTO switchover | M59 | DONE |
+| 67 | Autonomous NRA E-Invoicing & Portal Gateway | Direct integration with NRA portal (НАП Е-Фактура API) for real-time submission, verification & QES signing | M60 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -191,6 +193,7 @@
 | M57 | `m57_open_banking_pisp` | PSD2 PISP automated vendor invoice payments (401/503) and multi-bank balance aggregation | M56 | DONE |
 | M58 | `m58_neural_trial_balance_sentinel` | Autonomous trial balance movement analysis, debit/credit imbalance alerts & correction entries | M57 | DONE |
 | M59 | `m59_zero_trust_dr_orchestrator` | Scheduled zero-trust DR failover testing, VM cloning, DB sync check & sub-5s RTO switchover | M58 | DONE |
+| M60 | `m60_nra_einvoice_portal_gateway` | Direct integration with NRA portal (НАП Е-Фактура API) for real-time submission, verification & QES signing | M59 | DONE |
 
 ## Code Layout
 - `src/intake/`: Open Banking PISP Aggregator (`open_banking_pisp.py`), Bank Feed Guard (`bank_feed_guard.py`), SEPA Instant / BISERA 6 Adapter (`sepa_bisera_instant.py`), Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)
@@ -201,7 +204,7 @@
 - `src/dashboard/`: Executive Briefing Generator (`executive_briefing.py`), Prometheus Telemetry Exporter (`prometheus_exporter.py`), Web UI Dashboard server & OpenBalancer client (`dashboard_server.py`, `openbalancer_client.py`)
 - `src/backup/`: Active-Active SQL Sync Guard (`active_active_sql_sync.py`), Autonomous Audit Log Cold Storage Archiver (`cold_storage_archiver.py`), DR Multi-Region Replication Manager (`disaster_recovery_replication.py`), Automated Nightly Backup Manager (`nightly_backup.py`)
 - `src/cluster/`: Zero-Trust DR Failover Orchestrator (`dr_failover_orchestrator.py`), Rolling Upgrade Controller (`rolling_upgrade_controller.py`), High Availability Cluster Manager (`ha_failover.py`)
-- `src/integration/`: Native Mobile Push Gateway (`mobile_push_gateway.py`), Peppol EU E-Invoicing Engine (`peppol_einvoicing.py`), Telegram Bot Guard (`telegram_notifier.py`), VIES VAT Checker (`vies_vat_checker.py`), Obsidian Vault exporter (`obsidian_exporter.py`) & Supabase logger (`supabase_logger.py`)
+- `src/integration/`: Autonomous NRA E-Invoicing Gateway (`nra_einvoice_gateway.py`), Native Mobile Push Gateway (`mobile_push_gateway.py`), Peppol EU E-Invoicing Engine (`peppol_einvoicing.py`), Telegram Bot Guard (`telegram_notifier.py`), VIES VAT Checker (`vies_vat_checker.py`), Obsidian Vault exporter (`obsidian_exporter.py`) & Supabase logger (`supabase_logger.py`)
 - `src/ocr/`: Image Preprocessor (`image_preprocessor.py`), PDF OCR, multi-bank extractors & batch processing (`extract_dsk_statement.py`, `multi_bank_extractor.py`, `batch_processor.py`)
 - `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)

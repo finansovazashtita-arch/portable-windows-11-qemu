@@ -1,11 +1,9 @@
 """
-Intelligent AI Voice Assistant & Hands-Free Accounting Query Interface.
+Intelligent AI Voice Assistant & Autonomous Command Execution Interface.
 
-Processes speech-to-text (STT) queries in Bulgarian for hands-free accounting lookups:
-- Real-time turnover (€ and BGN)
-- Account balances (503, 401, 411)
-- 30/60/90-day liquidity forecasts
-- Missing invoice alerts and tax audit warnings
+Processes speech-to-text (STT) queries and execution commands in Bulgarian:
+- Read-only Lookups: Real-time turnover (€ and BGN), Account balances (503, 401, 411), Liquidity forecasts, Missing invoices (M46)
+- Autonomous Execution: Bookkeeping entries, Payment initiation (PISP/BISERA), Statutory NRA VAT Declarations (M61)
 """
 
 import dataclasses
@@ -21,24 +19,29 @@ class VoiceQueryType(str, enum.Enum):
     BALANCE_QUERY = "BALANCE_QUERY"
     LIQUIDITY_FORECAST = "LIQUIDITY_FORECAST"
     MISSING_INVOICES = "MISSING_INVOICES"
+    BOOKKEEPING_EXECUTION = "BOOKKEEPING_EXECUTION"
+    PAYMENT_GENERATION = "PAYMENT_GENERATION"
+    VAT_DECLARATION_LAUNCH = "VAT_DECLARATION_LAUNCH"
     UNKNOWN_QUERY = "UNKNOWN_QUERY"
 
 
 @dataclasses.dataclass
 class VoiceAssistantResponse:
-    """Dataclass holding voice assistant speech recognition and query response."""
+    """Dataclass holding voice assistant speech recognition and query/command response."""
 
     transcript_bg: str
     query_type: VoiceQueryType
     spoken_response_bg: str
     data_payload: Dict[str, Any]
+    execution_status: str = "COMPLETED"
+    confirmation_token: Optional[str] = None
 
 
 VoiceQueryResult = VoiceAssistantResponse
 
 
 class VoiceAccountingAssistant:
-    """Voice Assistant engine converting Bulgarian STT voice queries into accounting answers."""
+    """Voice Assistant engine converting Bulgarian STT voice queries and execution commands into accounting results."""
 
     @classmethod
     def process_voice_query(
@@ -48,6 +51,47 @@ class VoiceAccountingAssistant:
         context = context_data or {}
         text = voice_transcript_bg.lower().strip()
 
+        # Check for M61 Execution Commands first
+        if any(kw in text for kw in ["осчетоводи", "запиши счетоводна", "въведи операци"]):
+            from src.ai.nlu_voice_command_executor import AutonomousVoiceCommandExecutor
+            executor = AutonomousVoiceCommandExecutor(company_eik=context.get("company_eik", "123456789"))
+            exec_res = executor.execute_command(voice_transcript_bg, context)
+            return VoiceAssistantResponse(
+                transcript_bg=voice_transcript_bg,
+                query_type=VoiceQueryType.BOOKKEEPING_EXECUTION,
+                spoken_response_bg=exec_res.spoken_response_bg,
+                data_payload=exec_res.data_payload,
+                execution_status=exec_res.status.value,
+                confirmation_token=exec_res.confirmation_token,
+            )
+
+        if any(kw in text for kw in ["плати", "преведи", "генерирай плащане", "направи превод"]):
+            from src.ai.nlu_voice_command_executor import AutonomousVoiceCommandExecutor
+            executor = AutonomousVoiceCommandExecutor(company_eik=context.get("company_eik", "123456789"))
+            exec_res = executor.execute_command(voice_transcript_bg, context)
+            return VoiceAssistantResponse(
+                transcript_bg=voice_transcript_bg,
+                query_type=VoiceQueryType.PAYMENT_GENERATION,
+                spoken_response_bg=exec_res.spoken_response_bg,
+                data_payload=exec_res.data_payload,
+                execution_status=exec_res.status.value,
+                confirmation_token=exec_res.confirmation_token,
+            )
+
+        if any(kw in text for kw in ["ддс декларация", "стартирай ддс", "генерирай ддс", "пускай ддс"]):
+            from src.ai.nlu_voice_command_executor import AutonomousVoiceCommandExecutor
+            executor = AutonomousVoiceCommandExecutor(company_eik=context.get("company_eik", "123456789"))
+            exec_res = executor.execute_command(voice_transcript_bg, context)
+            return VoiceAssistantResponse(
+                transcript_bg=voice_transcript_bg,
+                query_type=VoiceQueryType.VAT_DECLARATION_LAUNCH,
+                spoken_response_bg=exec_res.spoken_response_bg,
+                data_payload=exec_res.data_payload,
+                execution_status=exec_res.status.value,
+                confirmation_token=exec_res.confirmation_token,
+            )
+
+        # M46 Queries Mode Lookups
         if "оборот" in text or "приход" in text:
             query_type = VoiceQueryType.TURNOVER_QUERY
             turnover = context.get("turnover_eur", 12500.50)
