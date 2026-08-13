@@ -152,9 +152,12 @@
 | 84 | Predictive AI Advisory & Executive Decision Engine | Multi-scenario financial trajectory simulator, prescriptive C-level action cards, double-entry journal advice, working capital CCC optimizer & tax strategy advisor | M77 | DONE |
 | 85 | Romania ANAF e-Factura Gateway | UBL 2.1 RO-CIUS XML generation, Romanian CIF check digit validation, ANAF OAuth 2.0 SPV, QES XMLDSig signing, submission upload/status/download, ANAF VAT Registry API, REST API router & web UI dashboard | M78 | DONE |
 | 86 | Poland KSeF e-Fakturowanie Gateway | FA(2)/FA(3) structured XML invoice generator, Modulo 11 NIP validation, KSeF Session Token auth, XAdES digital signature wrapper, invoice submission, status tracking, UPO receipt archiving, GUS BIR1.1 API company lookup & web UI | M79 | DONE |
+| 87 | Greece myDATA Compliance Gateway | AADE myDATA XML document validation, Greek AFM tax ID verification, REST API transmission to AADE, MARK registration tracking & double-entry journal sync | M80 | DONE |
+| 88 | Enterprise ESG & Carbon Tax Accounting Engine | GHG Protocol Scope 1-3 carbon footprint calculation, EU CBAM carbon tax accounting, double-entry carbon liabilities & CSRD reporting | M81 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
+|---|------|-------|-------------|--------|
 |---|------|-------|-------------|--------|
 | M1 | `m1_ocr_extraction` | PDF rendering, Tesseract OCR parsing, 21 transaction extractions, canonical JSON output | none | DONE |
 | M2 | `m2_accounting_translation` | Double-entry translation, account mapping, EIK/IBAN validation, TransferData XML generation | M1 | DONE |
@@ -236,6 +239,8 @@
 | M77 | `m77_predictive_ai_advisory` | Predictive AI Advisory & Autonomous Decision Engine with multi-scenario financial simulations, prescriptive C-level action cards, Bulgarian double-entry journal advice, working capital CCC optimizer & interactive web UI | M12, M19, M41, M64, M76 | DONE |
 | M78 | `m78_romania_anaf_efactura` | Romania ANAF e-Factura & Cross-Border CEE Compliance Gateway with UBL 2.1 RO-CIUS XML generation, CUI/CIF validation, OAuth 2.0 SPV, QES signing, submission upload/status/download, ANAF VAT Registry API, REST API router & web UI dashboard | M12, M19, M41, M60, M77 | DONE |
 | M79 | `m79_poland_ksef_gateway` | Poland KSeF (Krajowy System e-Faktur) Gateway with FA(2)/FA(3) XML invoice generation, Modulo 11 NIP validation, KSeF Session Token auth, XAdES digital signature wrapper, submission/status/UPO receipt archiving, GUS BIR1.1 API, REST API router & web UI dashboard | M12, M19, M41, M60, M77, M78 | DONE |
+| M80 | `m80_greece_mydata_gateway` | Greece myDATA Compliance Gateway with AADE myDATA XML document validation, Greek AFM tax ID verification, REST API transmission to AADE, MARK registration tracking & double-entry journal sync | M12, M19, M41, M60, M77, M78 | DONE |
+| M81 | `m81_esg_carbon_accounting` | Enterprise ESG & Carbon Tax Accounting Engine with GHG Protocol Scope 1-3 carbon footprint calculation, EU CBAM carbon tax accounting, double-entry carbon liabilities & CSRD reporting | M12, M19, M41, M48, M76, M77 | DONE |
 
 ## Code Layout
 - `src/config/`: Production Configuration & Secrets Management Hardening (`config_hardening.py`)
