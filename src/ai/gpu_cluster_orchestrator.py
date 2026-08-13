@@ -34,6 +34,9 @@ class GPUNode:
     is_healthy: bool = True
 
 
+GPUNodeStatus = GPUNode
+
+
 class DistributedGPUClusterOrchestrator:
     """Orchestrator for managing multi-node GPU inference clusters."""
 

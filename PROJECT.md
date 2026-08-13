@@ -126,6 +126,7 @@
 | 62 | Business Travel Expenses & Per Diem Manager | Domestic & international per diem calculation under Bulgarian Travel Regulations, journal entries (609/422) | M55 | DONE |
 | 63 | Audit Ledger Integrity Guard | Tamper-evident SHA-256 hash chaining of accounting entries for 100% NRA tax audit protection | M56 | DONE |
 | 64 | Open Banking PISP Payment Initiation | PSD2 PISP automated vendor invoice payments (401/503) and multi-bank balance aggregation | M57 | DONE |
+| 65 | Real-Time Trial Balance Anomaly Sentinel | Autonomous trial balance movement analysis, debit/credit imbalance alerts & correction entries | M58 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -188,6 +189,7 @@
 | M55 | `m55_travel_expense_manager` | Domestic & international per diem calculation under Bulgarian Travel Regulations, journal entries (609/422) | M54 | DONE |
 | M56 | `m56_audit_ledger_guard` | Tamper-evident SHA-256 hash chaining of accounting entries for 100% NRA tax audit protection | M55 | DONE |
 | M57 | `m57_open_banking_pisp` | PSD2 PISP automated vendor invoice payments (401/503) and multi-bank balance aggregation | M56 | DONE |
+| M58 | `m58_neural_trial_balance_sentinel` | Autonomous trial balance movement analysis, debit/credit imbalance alerts & correction entries | M57 | DONE |
 
 ## Code Layout
 - `src/intake/`: Open Banking PISP Aggregator (`open_banking_pisp.py`), Bank Feed Guard (`bank_feed_guard.py`), SEPA Instant / BISERA 6 Adapter (`sepa_bisera_instant.py`), Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)

@@ -34,6 +34,9 @@ class LiquidityForecastResult:
     recommendations: List[str]
 
 
+CashFlowForecastResult = LiquidityForecastResult
+
+
 class CashFlowForecaster:
     """Predictive ML model for liquidity forecasting and VAT tax liability estimation."""
 

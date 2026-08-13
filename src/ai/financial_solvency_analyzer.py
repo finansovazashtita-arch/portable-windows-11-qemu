@@ -34,6 +34,9 @@ class FinancialAnalysisReport:
     recommendation_bg: str
 
 
+FinancialSolvencyReport = FinancialAnalysisReport
+
+
 class CorporateSolvencyAnalyzer:
     """Analyzer calculating liquidity ratios and Altman Z-Score solvency indicators."""
 

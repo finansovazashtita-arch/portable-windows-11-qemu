@@ -34,6 +34,9 @@ class VoiceAssistantResponse:
     data_payload: Dict[str, Any]
 
 
+VoiceQueryResult = VoiceAssistantResponse
+
+
 class VoiceAccountingAssistant:
     """Voice Assistant engine converting Bulgarian STT voice queries into accounting answers."""
 

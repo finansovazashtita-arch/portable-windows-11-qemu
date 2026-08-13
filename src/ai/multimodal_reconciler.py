@@ -40,6 +40,9 @@ class ReconciliationMatch:
     notes: str
 
 
+ReconciliationMatchResult = ReconciliationMatch
+
+
 class MultiModalReconciler:
     """3-Way Cross-Document Reconciler (Invoices ↔ Receipts ↔ Bank Transactions)."""
 

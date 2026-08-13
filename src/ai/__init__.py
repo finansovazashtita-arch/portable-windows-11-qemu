@@ -1,48 +1,56 @@
 """
-AI & Unsloth Intelligence Package.
+AI Package.
 """
 
 from src.ai.active_learning_loop import ActiveLearningManager, CorrectionFeedback
-from src.ai.autonomous_agent_swarm import AgentRole, AgentStatus, AutonomousAgentSwarm
-from src.ai.cashflow_forecaster import CashFlowForecaster, LiquidityForecastResult, LiquidityStatus
-from src.ai.financial_solvency_analyzer import CorporateSolvencyAnalyzer, FinancialAnalysisReport, SolvencyRiskLevel
-from src.ai.fraud_detector import AnomalyRiskLevel, FraudFlag, FraudGuardrailEngine, TransactionRiskEvaluation
-from src.ai.gpu_cluster_orchestrator import DistributedGPUClusterOrchestrator, GPUNode, InferenceBackend
-from src.ai.multimodal_reconciler import DocumentType, MultiModalReconciler, ReconciliationMatch, ReconciliationStatus
-from src.ai.synthetic_stress_harness import SyntheticStressHarness, SyntheticTransaction
+from src.ai.autonomous_agent_swarm import AgentRole, AgentStatus, AutonomousAgentSwarm, SwarmAgentState
+from src.ai.cashflow_forecaster import CashFlowForecaster, CashFlowForecastResult
+from src.ai.financial_solvency_analyzer import CorporateSolvencyAnalyzer, FinancialSolvencyReport
+from src.ai.fraud_detector import FraudGuardrailEngine, FraudRiskAssessment
+from src.ai.gpu_cluster_orchestrator import DistributedGPUClusterOrchestrator, GPUNodeStatus
+from src.ai.multimodal_reconciler import MultiModalReconciler, ReconciliationMatchResult
+from src.ai.neural_trial_balance_sentinel import AnomalyReport, NeuralTrialBalanceSentinel, TrialBalanceAccountItem
+from src.ai.synthetic_stress_harness import SyntheticStressHarness
 from src.ai.unsloth_classifier import UnslothTransactionClassifier
 from src.ai.unsloth_finetune import BulgarianAccountingDatasetGenerator, UnslothFineTuner
-from src.ai.voice_accounting_assistant import VoiceAccountingAssistant, VoiceAssistantResponse, VoiceQueryType
+from src.ai.voice_accounting_assistant import VoiceAccountingAssistant, VoiceQueryResult
+
+# Backward compatibility aliases
+ActiveLearningLoop = ActiveLearningManager
+AccountantCorrection = CorrectionFeedback
+UnslothFineTuneManager = UnslothFineTuner
+CognitiveAgent = AgentRole
+SwarmStatus = AgentStatus
 
 __all__ = [
     "UnslothTransactionClassifier",
     "BulgarianAccountingDatasetGenerator",
     "UnslothFineTuner",
+    "UnslothFineTuneManager",
     "ActiveLearningManager",
+    "ActiveLearningLoop",
     "CorrectionFeedback",
+    "AccountantCorrection",
     "FraudGuardrailEngine",
-    "AnomalyRiskLevel",
-    "FraudFlag",
-    "TransactionRiskEvaluation",
+    "FraudRiskAssessment",
     "CashFlowForecaster",
-    "LiquidityForecastResult",
-    "LiquidityStatus",
+    "CashFlowForecastResult",
+    "VoiceAccountingAssistant",
+    "VoiceQueryResult",
+    "CorporateSolvencyAnalyzer",
+    "FinancialSolvencyReport",
+    "DistributedGPUClusterOrchestrator",
+    "GPUNodeStatus",
+    "SyntheticStressHarness",
     "MultiModalReconciler",
-    "ReconciliationMatch",
-    "DocumentType",
-    "ReconciliationStatus",
+    "ReconciliationMatchResult",
     "AutonomousAgentSwarm",
     "AgentRole",
+    "CognitiveAgent",
     "AgentStatus",
-    "SyntheticStressHarness",
-    "SyntheticTransaction",
-    "DistributedGPUClusterOrchestrator",
-    "GPUNode",
-    "InferenceBackend",
-    "CorporateSolvencyAnalyzer",
-    "FinancialAnalysisReport",
-    "SolvencyRiskLevel",
-    "VoiceAccountingAssistant",
-    "VoiceAssistantResponse",
-    "VoiceQueryType",
+    "SwarmStatus",
+    "SwarmAgentState",
+    "NeuralTrialBalanceSentinel",
+    "TrialBalanceAccountItem",
+    "AnomalyReport",
 ]

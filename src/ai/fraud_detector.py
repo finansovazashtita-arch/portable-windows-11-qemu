@@ -54,6 +54,9 @@ class TransactionRiskEvaluation:
     recommendation: str
 
 
+FraudRiskAssessment = TransactionRiskEvaluation
+
+
 class FraudGuardrailEngine:
     """Evaluates transaction risk against security guardrails and historical trends."""
 
