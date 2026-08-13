@@ -1,0 +1,95 @@
+site_name: FinansProtect Platform
+site_description: Comprehensive User Manual & Administrator Guide for FinansProtect
+site_author: FinansProtect Team
+
+theme:
+  name: material
+  language: bg
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+
+nav:
+  - Home: 'index.md'
+  - Български:
+    - Бърз старт: 'bg/quick-start.md'
+    - Администраторско ръководство:
+      - Инсталация: 'bg/admin/installation.md'
+      - QEMU Настройка: 'bg/admin/qemu-setup.md'
+      - Конфигурация: 'bg/admin/configuration.md'
+      - HA Клъстер: 'bg/admin/ha-cluster.md'
+      - Резервни копия и DR: 'bg/admin/backup-dr.md'
+      - Мониторинг: 'bg/admin/monitoring.md'
+      - Сигурност: 'bg/admin/security.md'
+    - Ръководство за потребителя:
+      - Табло: 'bg/user/dashboard.md'
+      - OCR Обработка: 'bg/user/ocr-processing.md'
+      - Съвпадение на фактури: 'bg/user/reconciliation.md'
+      - ГФО Отчети: 'bg/user/gfo-reports.md'
+      - Данъчно съответствие: 'bg/user/tax-compliance.md'
+      - Банкиране: 'bg/user/banking.md'
+      - AI Функции: 'bg/user/ai-features.md'
+    - API Справка:
+      - Общ преглед: 'bg/api/overview.md'
+      - Крайни точки: 'bg/api/endpoints.md'
+      - Webhooks: 'bg/api/webhooks.md'
+      - Грешки: 'bg/api/errors.md'
+    - Отстраняване на проблеми: 'bg/troubleshooting.md'
+  - English:
+    - Quick Start: 'en/quick-start.md'
+    - Administrator Guide:
+      - Installation: 'en/admin/installation.md'
+      - QEMU Setup: 'en/admin/qemu-setup.md'
+      - Configuration: 'en/admin/configuration.md'
+      - HA Cluster: 'en/admin/ha-cluster.md'
+      - Backup and DR: 'en/admin/backup-dr.md'
+      - Monitoring: 'en/admin/monitoring.md'
+      - Security: 'en/admin/security.md'
+    - User Manual:
+      - Dashboard: 'en/user/dashboard.md'
+      - OCR Processing: 'en/user/ocr-processing.md'
+      - Reconciliation: 'en/user/reconciliation.md'
+      - GFO Reports: 'en/user/gfo-reports.md'
+      - Tax Compliance: 'en/user/tax-compliance.md'
+      - Banking: 'en/user/banking.md'
+      - AI Features: 'en/user/ai-features.md'
+    - API Reference:
+      - Overview: 'en/api/overview.md'
+      - Endpoints: 'en/api/endpoints.md'
+      - Webhooks: 'en/api/webhooks.md'
+      - Errors: 'en/api/errors.md'
+    - Troubleshooting: 'en/troubleshooting.md'
