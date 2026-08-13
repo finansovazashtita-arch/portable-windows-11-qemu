@@ -220,6 +220,38 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(content)
             return
 
+        elif canonical_path.startswith("/api/v1/advisory") or canonical_path.startswith("/api/advisory"):
+            from src.ai.advisory_api import (
+                get_advisory_insights_handler,
+                get_cash_conversion_cycle_handler,
+                get_tax_strategy_handler,
+            )
+            from urllib.parse import parse_qs, urlparse
+            parsed_url = urlparse(self.path)
+            q_params = {k: v[0] for k, v in parse_qs(parsed_url.query).items()}
+
+            if canonical_path.endswith("/insights"):
+                res = get_advisory_insights_handler(q_params)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/cash-conversion-cycle"):
+                res = get_cash_conversion_cycle_handler(q_params)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/tax-strategy"):
+                res = get_tax_strategy_handler(q_params)
+                self._send_json_response(res)
+                return
+
+        elif self.path in ("/advisory", "/advisory.html"):
+            with open(os.path.join(WEB_UI_DIR, "advisory.html"), "rb") as f:
+                content = f.read()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
         elif canonical_path in ("/api/v1/reconciliation/pending-matches", "/api/reconciliation/pending-matches"):
 
             payload = COMPLIANCE_ENGINE.get_telemetry_payload()
@@ -315,6 +347,20 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     self.send_header(k, v)
                 self.end_headers()
                 self.wfile.write(response.body)
+                return
+
+        elif canonical_path.startswith("/api/v1/advisory") or canonical_path.startswith("/api/advisory"):
+            from src.ai.advisory_api import (
+                run_scenario_simulation_handler,
+                export_advisory_report_handler,
+            )
+            if canonical_path.endswith("/scenarios"):
+                res = run_scenario_simulation_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/export"):
+                res = export_advisory_report_handler(req_data)
+                self._send_json_response(res)
                 return
 
         elif canonical_path in ("/api/v1/mobile/scan", "/api/mobile/scan"):

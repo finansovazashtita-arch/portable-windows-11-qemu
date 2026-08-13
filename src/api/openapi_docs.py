@@ -62,6 +62,7 @@ OPENAPI_SPEC: Dict[str, Any] = {
         {"name": "Mobile Suite", "description": "Edge-AI fiscal receipt processing, WASM OCR status, and offline queue sync"},
         {"name": "SaaS Billing", "description": "M75 Stripe subscription management, multi-tenant provisioning, usage metering, and GDPR Art. 17 data erasure"},
         {"name": "BI Analytics Dashboard", "description": "M76 BI analytics engine, C-level executive KPIs, multi-dimensional OLAP query builder, scenario simulations, alerts, and multi-format exports"},
+        {"name": "Predictive AI Advisory", "description": "M77 Predictive AI Advisory engine, multi-scenario simulations, prescriptive action cards, working capital CCC optimization, and tax strategies"},
         {"name": "Documentation", "description": "OpenAPI specifications & interactive UI endpoints"}
     ],
     "paths": {
@@ -605,6 +606,46 @@ OPENAPI_SPEC: Dict[str, Any] = {
                 "summary": "Export BI Report or Dataset",
                 "description": "Exports KPI summary or OLAP query dataset into CSV, JSON, HTML, or XLSX format.",
                 "responses": {"200": {"description": "File attachment response"}}
+            }
+        },
+        "/api/v1/advisory/insights": {
+            "get": {
+                "tags": ["Predictive AI Advisory"],
+                "summary": "Get Prescriptive AI Advisory Insights",
+                "description": "Returns active AI recommendations with financial impact, confidence score, and Bulgarian double-entry journal advice.",
+                "responses": {"200": {"description": "List of prescriptive AI advisory insights"}}
+            }
+        },
+        "/api/v1/advisory/scenarios": {
+            "post": {
+                "tags": ["Predictive AI Advisory"],
+                "summary": "Run Multi-Scenario Financial Trajectory Simulation",
+                "description": "Executes What-If financial simulations across Base Case, Optimistic, Downturn, and Expansion scenarios.",
+                "responses": {"200": {"description": "Scenario trajectory simulation result"}}
+            }
+        },
+        "/api/v1/advisory/cash-conversion-cycle": {
+            "get": {
+                "tags": ["Predictive AI Advisory"],
+                "summary": "Get Cash Conversion Cycle Breakdown",
+                "description": "Calculates DSO, DPO, DIO, CCC, and working capital cash release potential.",
+                "responses": {"200": {"description": "Cash conversion cycle metrics and recommendations"}}
+            }
+        },
+        "/api/v1/advisory/tax-strategy": {
+            "get": {
+                "tags": ["Predictive AI Advisory"],
+                "summary": "Get Statutory Tax Strategy Report",
+                "description": "Evaluates Art. 96 VATA registration threshold, 10% CITA pre-calculation, and 5% dividend tax timing.",
+                "responses": {"200": {"description": "Tax optimization strategy report"}}
+            }
+        },
+        "/api/v1/advisory/export": {
+            "post": {
+                "tags": ["Predictive AI Advisory"],
+                "summary": "Export Executive Advisory Brief",
+                "description": "Exports comprehensive executive advisory brief in PDF, JSON, or CSV format.",
+                "responses": {"200": {"description": "Advisory report export payload"}}
             }
         }
     },
