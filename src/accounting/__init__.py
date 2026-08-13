@@ -2,6 +2,11 @@
 Accounting Package.
 """
 
+from src.accounting.corporate_consolidation import (
+    ConsolidatedFinancialStatement,
+    CorporateConsolidationEngine,
+    EntityFinancialTrialBalance,
+)
 from src.accounting.customs_excise_accounting import CustomsDeclaration, CustomsExciseProcessor
 from src.accounting.eu_oss_accounting import EUOSSAccountingAdapter, OSSDeclarationQuarter, OSSSaleTransaction
 from src.accounting.fixed_assets_depreciation import CITATaxCategory, FixedAsset, FixedAssetsDepreciationEngine
@@ -54,4 +59,7 @@ __all__ = [
     "FixedAssetsDepreciationEngine",
     "FixedAsset",
     "CITATaxCategory",
+    "CorporateConsolidationEngine",
+    "EntityFinancialTrialBalance",
+    "ConsolidatedFinancialStatement",
 ]
