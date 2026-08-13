@@ -60,12 +60,33 @@ class AutonomousAgentSwarm:
             state.status = AgentStatus.RUNNING
             state.last_heartbeat = time.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-            # Simulated agent cognitive work
+            # Execute specialized agent cognitive work
+            if role == AgentRole.FORECASTER_AGENT:
+                try:
+                    from src.ai.cash_optimizer import AICashOptimizer
+
+                    mc_sim = AICashOptimizer.run_monte_carlo_simulation(
+                        starting_balance=50000.0,
+                        forecast_days=30,
+                        iterations=100,
+                        random_seed=42,
+                    )
+                    extra_data = {
+                        "monte_carlo_var_95": mc_sim.var_95,
+                        "monte_carlo_expected_balance": mc_sim.expected_ending_balance,
+                    }
+                except Exception as e:
+                    logger.warning(f"Forecaster agent Monte Carlo execution warning: {e}")
+                    extra_data = {}
+            else:
+                extra_data = {}
+
             state.processed_count += 1
             state.status = AgentStatus.HEALTHY
             results[role.value] = {
                 "status": state.status.value,
                 "processed_items": state.processed_count,
+                **extra_data,
             }
 
         logger.info(f"🤖 Autonomous AI Swarm completed cycle across {len(self.agents)} agents.")

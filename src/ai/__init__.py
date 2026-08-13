@@ -4,6 +4,15 @@ AI Package.
 
 from src.ai.active_learning_loop import ActiveLearningManager, CorrectionFeedback
 from src.ai.autonomous_agent_swarm import AgentRole, AgentStatus, AutonomousAgentSwarm, SwarmAgentState
+from src.ai.cash_optimizer import (
+    AICashOptimizer,
+    CashOptimizationResult,
+    MonteCarloSimulationResult,
+    OptimizationStrategy,
+    OptimizedPaymentSchedule,
+    PaymentScheduleItem,
+    SupplierInvoice,
+)
 from src.ai.cashflow_forecaster import CashFlowForecaster, CashFlowForecastResult
 from src.ai.financial_solvency_analyzer import CorporateSolvencyAnalyzer, FinancialSolvencyReport
 from src.ai.fraud_detector import FraudGuardrailEngine, FraudRiskAssessment
@@ -43,6 +52,13 @@ __all__ = [
     "FraudRiskAssessment",
     "CashFlowForecaster",
     "CashFlowForecastResult",
+    "AICashOptimizer",
+    "SupplierInvoice",
+    "MonteCarloSimulationResult",
+    "PaymentScheduleItem",
+    "OptimizedPaymentSchedule",
+    "CashOptimizationResult",
+    "OptimizationStrategy",
     "VoiceAccountingAssistant",
     "VoiceQueryResult",
     "AutonomousVoiceCommandExecutor",

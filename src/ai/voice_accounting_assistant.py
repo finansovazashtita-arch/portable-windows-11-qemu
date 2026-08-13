@@ -102,10 +102,29 @@ class VoiceAccountingAssistant:
             balance = context.get("balance_bgn", 45000.0)
             spoken = f"Наличното салдо по разплащателната сметка 503 е {balance:,.2f} лева."
             payload = {"account": "503", "balance_bgn": balance}
-        elif "ликвидност" in text or "прогноза" in text:
+        elif "ликвидност" in text or "прогноза" in text or "монте карло" in text or "оптимизация" in text:
             query_type = VoiceQueryType.LIQUIDITY_FORECAST
-            spoken = "Прогнозата за ликвидност за следващите 30 дни е оптимална без риск от дефицит."
-            payload = {"forecast_days": 30, "status": "OPTIMAL"}
+            try:
+                from src.ai.cash_optimizer import AICashOptimizer
+
+                res = AICashOptimizer.run_full_cash_optimization(
+                    invoices=[],
+                    current_cash_balance=context.get("balance_bgn", 50000.0),
+                    forecast_days=30,
+                    iterations=100,
+                    random_seed=42,
+                )
+                spoken = (
+                    f"Прогнозата за ликвидност чрез Монте Карло симулация за 30 дни: "
+                    f"Очакван завършващ баланс BGN {res.monte_carlo_simulation.expected_ending_balance:,.2f}, "
+                    f"Value at Risk (95%): BGN {res.monte_carlo_simulation.var_95:,.2f}. "
+                    f"{res.recommended_action}"
+                )
+                payload = res.to_dict()
+            except Exception as e:
+                logger.warning(f"Voice query cash optimizer call warning: {e}")
+                spoken = "Прогнозата за ликвидност за следващите 30 дни е оптимална без риск от дефицит."
+                payload = {"forecast_days": 30, "status": "OPTIMAL"}
         elif "липсващи" in text or "фактур" in text:
             query_type = VoiceQueryType.MISSING_INVOICES
             count = context.get("missing_count", 0)

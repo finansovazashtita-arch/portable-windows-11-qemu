@@ -44,4 +44,12 @@ Phase 16 extends the Microinvest Bank Statement OCR & Delta Pro Accounting Autom
   - Security guardrails & confirmation token flow for high-value payments (> 10,000 BGN) and official tax filings.
 - **Target Deliverables**: `src/ai/nlu_voice_command_executor.py`, `tests/ai/test_nlu_voice_command_executor.py`
 
+### Milestone M64: Autonomous Dynamic Cash Flow Optimization & Predictive Liquidity AI Engine (`m64_ai_cash_optimizer`)
+- **Objective**: Extend liquidity forecasting with Monte Carlo stochastic simulations and automated supplier payment scheduling optimizing cash discounts against cost of capital & interest rates.
+- **Scope**:
+  - Monte Carlo simulation engine with percentile cash flow trajectories, Value at Risk (VaR 95%/99%), deficit risk probabilities, and safety buffer calculations.
+  - Constrained optimization engine scheduling supplier invoice payments to maximize cash discount capture, avoid overdue penalties, and generate Bulgarian double-entry journal entries (Account 401 -> 503 / 709).
+- **Target Deliverables**: `src/ai/cash_optimizer.py`, `tests/ai/test_cash_optimizer.py`
+
+
 

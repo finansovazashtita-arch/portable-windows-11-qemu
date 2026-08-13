@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FinansProtect Audit Dashboard | Microinvest OCR & QEMU Automation</title>
+  <title>FinansProtect Audit & Telemetry Dashboard | WebSockets & Multi-Entity Audit Compliance</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -15,82 +15,106 @@
         <div class="logo-icon">🛡️</div>
         <div class="brand-text">
           <h1>FinansProtect</h1>
-          <span class="version">v2.5 Enterprise</span>
+          <span class="version">v2.6 Enterprise (M65)</span>
         </div>
       </div>
 
       <nav class="nav-menu">
-        <a href="#" class="nav-item active">
-          <span class="icon">📊</span> Табло за Мониторинг
+        <a href="#compliance" class="nav-item active" id="nav-compliance">
+          <span class="icon">📊</span> Одит & Compliance
         </a>
-        <a href="#" class="nav-item">
-          <span class="icon">🏦</span> Банкови Извлечения
+        <a href="#einvoicing" class="nav-item" id="nav-einvoicing">
+          <span class="icon">⚡</span> НАП Е-Фактури
         </a>
-        <a href="#" class="nav-item">
-          <span class="icon">🖥️</span> Windows 11 QEMU VM
+        <a href="#pqc-mesh" class="nav-item" id="nav-pqc">
+          <span class="icon">🔒</span> PQC Mesh Нодове
         </a>
-        <a href="#" class="nav-item">
-          <span class="icon">🔒</span> Infisical Vault Секрети
-        </a>
-        <a href="#" class="nav-item">
-          <span class="icon">📓</span> Obsidian Vault Синх
+        <a href="#corrections" class="nav-item" id="nav-corrections">
+          <span class="icon">🛠️</span> Модул Корекции
         </a>
       </nav>
 
+      <!-- WebSockets Stream Status Indicator -->
+      <div class="websocket-card">
+        <div class="ws-header">
+          <span class="ws-dot pulse-online" id="ws-indicator-dot"></span>
+          <span class="ws-label" id="ws-status-text">WebSockets: CONNECTED</span>
+        </div>
+        <div class="ws-meta">
+          <small id="ws-meta-latency">Лаг: 1.2 ms | SHA-256 Chained</small>
+        </div>
+      </div>
+
+      <!-- Infrastructure Nodes -->
       <div class="node-status-card">
-        <h3>Инфраструктура</h3>
+        <h3>PQC Mesh Нодове</h3>
         <div class="status-indicator online">
-          <span class="dot"></span> macmini-primary (100.83.83.8)
+          <span class="dot"></span> macmini-primary (Dilithium5)
         </div>
         <div class="status-indicator online">
-          <span class="dot"></span> macmini-secondary (100.70.181.127)
+          <span class="dot"></span> macmini-secondary (Falcon1024)
         </div>
         <div class="status-indicator online">
-          <span class="dot"></span> QEMU Win11 VM (127.0.0.1:5901)
+          <span class="dot"></span> aws-eu-central-1 (Cloud)
+        </div>
+        <div class="status-indicator warning" id="node-hetzner-status">
+          <span class="dot"></span> hetzner-fsn1-dc14 (Syncing)
         </div>
       </div>
     </aside>
 
     <!-- Main Content Area -->
     <main class="main-content">
+      <!-- Top Header Bar -->
       <header class="top-header">
         <div class="header-title">
-          <h2>Реално Табло за Одит & Счетоводство</h2>
-          <p>Microinvest Delta Pro & MS SQL Server Автоматизация</p>
+          <h2>Реално Табло за Multi-Entity Одит & Compliance</h2>
+          <p>WebSockets стрийминг за НАП E-Invoicing, PQC репликационни нодове и интерактивни корекции</p>
         </div>
         <div class="header-actions">
-          <button class="btn btn-secondary" id="btn-refresh">🔄 Обнови Данни</button>
-          <button class="btn btn-primary" id="btn-trigger-intake">⚡ Нов Имейл Intake</button>
+          <button class="btn btn-secondary" id="btn-trigger-einvoice">⚡ Симулирай НАП Фактура</button>
+          <button class="btn btn-secondary" id="btn-sync-mesh">🔄 PQC Sync Нод</button>
+          <button class="btn btn-primary" id="btn-open-correction-modal">🛠️ Нова Корекция</button>
         </div>
       </header>
+
+      <!-- Entity Filter Tabs -->
+      <nav class="entity-tabs" id="entity-tabs">
+        <button class="tab-btn active" data-entity="ALL">🌍 Всички Дружества (5)</button>
+        <button class="tab-btn" data-entity="BG-STORGOZIA-01">🇧🇬 Сторгозия АД (NRA)</button>
+        <button class="tab-btn" data-entity="EU-DE-GMBH-02">🇩🇪 EU GmbH (OSS)</button>
+        <button class="tab-btn" data-entity="UK-LTD-03">🇬🇧 UK Ltd (MTD)</button>
+        <button class="tab-btn" data-entity="US-INC-04">🇺🇸 US Inc (Sales Tax)</button>
+        <button class="tab-btn" data-entity="CH-AG-05">🇨🇭 Swiss AG (ESTV)</button>
+      </nav>
 
       <!-- Stat Cards Grid -->
       <section class="stats-grid">
         <div class="stat-card">
           <div class="stat-header">
-            <span class="stat-label">Обработен Оборот (Дебит)</span>
+            <span class="stat-label">Общ Оборот (Дебит)</span>
             <span class="stat-icon">💶</span>
           </div>
-          <div class="stat-value" id="stat-total-debits">€21,988.50</div>
-          <div class="stat-footer positive">↑ 100% Верифициран счетоводно</div>
+          <div class="stat-value" id="stat-total-debits">€96,488.50</div>
+          <div class="stat-footer positive">↑ 100% Валидиран счетоводно</div>
         </div>
 
         <div class="stat-card">
           <div class="stat-header">
-            <span class="stat-label">Обработени Постъпления</span>
+            <span class="stat-label">Общи Постъпления (Кредит)</span>
             <span class="stat-icon">📈</span>
           </div>
-          <div class="stat-value" id="stat-total-credits">€10,830.24</div>
-          <div class="stat-footer positive">↑ Балансирани статии</div>
+          <div class="stat-value" id="stat-total-credits">€96,338.50</div>
+          <div class="stat-footer positive">↑ Multi-Entity консолидация</div>
         </div>
 
         <div class="stat-card">
           <div class="stat-header">
-            <span class="stat-label">Точност & Разхождение</span>
+            <span class="stat-label">Одиторско Разхождение</span>
             <span class="stat-icon">🎯</span>
           </div>
-          <div class="stat-value" id="stat-discrepancy">0.00 EUR</div>
-          <div class="stat-footer badge-success">PASSED (0.00 разхождение)</div>
+          <div class="stat-value text-alert" id="stat-discrepancy">€150.00</div>
+          <div class="stat-footer badge-warning" id="stat-discrepancy-badge">FLAGGED (1 корекция чака)</div>
         </div>
 
         <div class="stat-card">
@@ -99,100 +123,168 @@
             <span class="stat-icon">🔒</span>
           </div>
           <div class="stat-value text-small" id="stat-sha256">53c0a63d...4a3</div>
-          <div class="stat-footer info">SHA-256 одит лог валидиран</div>
+          <div class="stat-footer info">SHA-256 hash-chained</div>
         </div>
       </section>
 
-      <!-- Middle Layout: Live Table & VM Preview -->
+      <!-- Section 1: Multi-Entity Audit Compliance Summary Table -->
+      <section class="panel mb-4" id="section-entities">
+        <div class="panel-header">
+          <h3>🏢 Статус на Дружествата & Декларации по Юрисдикции</h3>
+          <span class="badge badge-success" id="overall-compliance-badge">Compliance: 80.0%</span>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Дружество</th>
+                <th>Юрисдикция / ДДС №</th>
+                <th>Данъчен Режим</th>
+                <th>Дебит (€)</th>
+                <th>Кредит (€)</th>
+                <th>Разхождение (€)</th>
+                <th>Статус Compliance</th>
+              </tr>
+            </thead>
+            <tbody id="entities-tbody">
+              <!-- Dynamically rendered via WebSockets/REST -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 2 Grid: Live НАП E-Invoicing Stream & PQC Replication Mesh -->
       <div class="content-layout">
-        <!-- Live Statements Table -->
-        <section class="panel table-panel">
+        <!-- Live НАП E-Invoicing Stream -->
+        <section class="panel stream-panel" id="section-einvoicing">
           <div class="panel-header">
-            <h3>📑 Жив Списък Банкови Извлечения</h3>
-            <span class="badge" id="badge-count">15 извлечения</span>
+            <h3>⚡ Реално Време НАП E-Invoicing Стрийм</h3>
+            <span class="status-pill active-vm" id="einvoice-stream-count">3 Фактури live</span>
           </div>
           <div class="table-container">
-            <table class="data-table">
+            <table class="data-table compact-table">
               <thead>
                 <tr>
-                  <th>Банка</th>
-                  <th>Титуляр / IBAN</th>
-                  <th>Период</th>
-                  <th>Дебит (€)</th>
-                  <th>Кредит (€)</th>
+                  <th>Фактура №</th>
+                  <th>Контрагент / ЕИК</th>
+                  <th>Сума (BGN)</th>
+                  <th>QES Алгоритъм</th>
+                  <th>CAIS EPP Референция</th>
                   <th>Статус</th>
                 </tr>
               </thead>
-              <tbody id="statements-tbody">
-                <tr>
-                  <td><span class="bank-badge dsk">Банка ДСК</span></td>
-                  <td><strong>СТОРГОЗИЯ АД</strong><br><small>BG71STSA93000028013479</small></td>
-                  <td>01.01.2026 – 31.01.2026</td>
-                  <td>€7,329.50</td>
-                  <td>€3,610.08</td>
-                  <td><span class="status-pill success">ИМПОРТИРАНО</span></td>
-                </tr>
-                <tr>
-                  <td><span class="bank-badge unicredit">УниКредит</span></td>
-                  <td><strong>СТОРГОЗИЯ АД</strong><br><small>BG12UNCR80001122334455</small></td>
-                  <td>01.01.2026 – 31.01.2026</td>
-                  <td>€5.50</td>
-                  <td>€0.00</td>
-                  <td><span class="status-pill success">ИМПОРТИРАНО</span></td>
-                </tr>
-                <tr>
-                  <td><span class="bank-badge ubb">ОББ</span></td>
-                  <td><strong>СТОРГОЗИЯ АД</strong><br><small>BG99UBBS90001234567890</small></td>
-                  <td>01.01.2026 – 31.01.2026</td>
-                  <td>€10.00</td>
-                  <td>€0.00</td>
-                  <td><span class="status-pill success">ИМПОРТИРАНО</span></td>
-                </tr>
-                <tr>
-                  <td><span class="bank-badge postbank">Пощенска</span></td>
-                  <td><strong>СТОРГОЗИЯ АД</strong><br><small>BG55BPBI91001122334455</small></td>
-                  <td>01.01.2026 – 31.01.2026</td>
-                  <td>€0.00</td>
-                  <td>€500.00</td>
-                  <td><span class="status-pill success">ИМПОРТИРАНО</span></td>
-                </tr>
+              <tbody id="einvoices-tbody">
+                <!-- Dynamically rendered -->
               </tbody>
             </table>
           </div>
         </section>
 
-        <!-- Live QEMU Windows 11 VM Monitor Widget -->
-        <section class="panel vm-panel">
+        <!-- PQC Replication Mesh Telemetry -->
+        <section class="panel pqc-panel" id="section-pqc">
           <div class="panel-header">
-            <h3>🖥️ QEMU Windows 11 VM Монитор</h3>
-            <span class="status-pill active-vm">VNC :5901 LIVE</span>
+            <h3>🔒 PQC Репликационна Мрежа & Нодове</h3>
+            <span class="status-pill active-vm">Active-Active Mesh</span>
           </div>
-          <div class="vm-screen-wrapper">
-            <div class="vm-screen-placeholder">
-              <div class="win11-preview-card">
-                <div class="win-header">
-                  <span>Microinvest Delta Pro - [СТОРГОЗИЯ АД]</span>
-                  <span class="win-controls">_ ◽ X</span>
-                </div>
-                <div class="win-body">
-                  <p><strong>MS SQL Server:</strong> SQLEXPRESS (Connected)</p>
-                  <p><strong>Последен Импорт:</strong> 21 операции (100% OK)</p>
-                  <p><strong>Сметкоплан:</strong> Търговски предприятия</p>
-                  <div class="progress-bar-container">
-                    <div class="progress-fill"></div>
-                  </div>
-                  <span class="audit-tag">C:\TRANSFER.LOG OK</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="vm-footer">
-            <span>RAM Оптимизация: TB-Size 256M | VirtIO Ballooning</span>
-            <button class="btn btn-sm" onclick="alert('VNC Връзка установена на 127.0.0.1:5901')">🔗 Свържи VNC</button>
+          <div class="pqc-nodes-grid" id="pqc-nodes-container">
+            <!-- Dynamically rendered -->
           </div>
         </section>
       </div>
+
+      <!-- Section 3: Interactive Audit Corrections Module -->
+      <section class="panel mt-4" id="section-corrections">
+        <div class="panel-header">
+          <h3>🛠️ Интерактивен Модул за Одиторски Корекции</h3>
+          <span class="badge badge-warning" id="flagged-count-badge">1 Маркирано Разхождение</span>
+        </div>
+
+        <div class="corrections-wrapper">
+          <div class="table-container mb-3">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID Запис</th>
+                  <th>Дружество</th>
+                  <th>Сметки (Дб / Кр)</th>
+                  <th>Оригинална Сума</th>
+                  <th>Открито Разхождение</th>
+                  <th>Проблем / Анализ</th>
+                  <th>Действие</th>
+                </tr>
+              </thead>
+              <tbody id="flagged-entries-tbody">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel-header header-sub">
+            <h4>📜 Хронология на Приложени Одиторски Корекции</h4>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID Корекция</th>
+                  <th>Дружество</th>
+                  <th>Запис ID</th>
+                  <th>Коригирана Сума</th>
+                  <th>Причина</th>
+                  <th>Време stamp</th>
+                  <th>Нов SHA-256 Одит Хеш</th>
+                </tr>
+              </thead>
+              <tbody id="corrections-ledger-tbody">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </main>
+  </div>
+
+  <!-- Interactive Audit Correction Modal -->
+  <div class="modal-backdrop hidden" id="correction-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>🛠️ Прилагане на Интерактивна Одиторска Корекция</h3>
+        <button class="close-btn" id="btn-close-modal">✕</button>
+      </div>
+      <form id="correction-form" class="modal-body">
+        <div class="form-group">
+          <label>ID на Записа / Discrepancy ID:</label>
+          <input type="text" id="modal-entry-id" value="ERR-UK-401-08" required readonly>
+        </div>
+        <div class="form-group">
+          <label>Засегнато Дружество:</label>
+          <input type="text" id="modal-entity-id" value="UK-LTD-03" required readonly>
+        </div>
+        <div class="form-row">
+          <div class="form-group col">
+            <label>Дебитна Сметка:</label>
+            <input type="text" id="modal-acc-debit" value="621" required>
+          </div>
+          <div class="form-group col">
+            <label>Кредитна Сметка:</label>
+            <input type="text" id="modal-acc-credit" value="401" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Коригираща Сума (EUR):</label>
+          <input type="number" step="0.01" id="modal-corrected-amount" value="150.00" required>
+        </div>
+        <div class="form-group">
+          <label>Одиторска Причина / Основание:</label>
+          <textarea id="modal-reason" rows="3" required>Осчетоводяване на пропусната банкова такса (Сметка 621) за изравняване на Account 401 vendor reconciliation.</textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Отказ</button>
+          <button type="submit" class="btn btn-primary">⚡ Приложи Корекция & Преизчисли SHA-256</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script src="app.js"></script>

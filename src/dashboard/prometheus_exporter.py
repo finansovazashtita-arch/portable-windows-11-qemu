@@ -24,11 +24,18 @@ class PrometheusTelemetryExporter:
         self.ocr_accuracy_ratio: float = 0.999
         self.qemu_vm_ram_bytes: int = 4096 * 1024 * 1024  # Default 4GB RAM
         self.is_cluster_leader: int = 1
+        self.cash_discounts_captured_bgn: float = 0.0
+        self.monte_carlo_var_95_bgn: float = 0.0
 
     def record_turnover(self, amount_eur: float, tx_count: int = 1):
         """Increments turnover and transaction count metrics."""
         self.total_turnover_eur += amount_eur
         self.total_transactions_count += tx_count
+
+    def update_cash_optimization_metrics(self, discounts_bgn: float, var_95_bgn: float):
+        """Updates cash discounts captured counter and Monte Carlo VaR 95% gauge."""
+        self.cash_discounts_captured_bgn += discounts_bgn
+        self.monte_carlo_var_95_bgn = var_95_bgn
 
     def update_qemu_ram(self, ram_bytes: int):
         """Updates QEMU VM RAM allocation gauge."""
@@ -52,6 +59,14 @@ class PrometheusTelemetryExporter:
             "# HELP financial_transactions_processed_total Total count of processed bank statement transactions.",
             "# TYPE financial_transactions_processed_total counter",
             f"financial_transactions_processed_total {self.total_transactions_count}",
+            "",
+            "# HELP cash_discounts_captured_bgn_total Total vendor cash discounts captured in BGN.",
+            "# TYPE cash_discounts_captured_bgn_total counter",
+            f"cash_discounts_captured_bgn_total {self.cash_discounts_captured_bgn:.2f}",
+            "",
+            "# HELP monte_carlo_var_95_bgn Monte Carlo Value at Risk (95% confidence) in BGN.",
+            "# TYPE monte_carlo_var_95_bgn gauge",
+            f"monte_carlo_var_95_bgn {self.monte_carlo_var_95_bgn:.2f}",
             "",
             "# HELP ocr_accuracy_ratio OCR extraction accuracy ratio (0.0 - 1.0).",
             "# TYPE ocr_accuracy_ratio gauge",

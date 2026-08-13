@@ -92,3 +92,37 @@ class OpenBankingPISPAggregator:
             "total_consolidated_balance_eur": total_balance_eur,
             "bank_count": len(bank_ibans),
         }
+
+    @classmethod
+    def execute_scheduled_payment_batch(
+        cls, schedule_items: List[Any], debtor_iban: str = "BG80STSA93000025123456"
+    ) -> Dict[str, Any]:
+        """Executes a batch of PSD2 PISP payments based on an optimized cash flow payment schedule."""
+        results = []
+        total_payout_eur = 0.0
+
+        for item in schedule_items:
+            invoice_id = getattr(item, "invoice_id", "INV-UNKNOWN")
+            vendor_name = getattr(item, "vendor_name", "Vendor")
+            net_amount_bgn = getattr(item, "net_payment_amount_bgn", getattr(item, "amount_bgn", 0.0))
+            amount_eur = round(net_amount_bgn / 1.95583, 2)
+
+            req = PaymentInitiationRequest(
+                payment_id=f"PISP_SCHED_{uuid.uuid4().hex[:8].upper()}",
+                debtor_iban=debtor_iban,
+                creditor_iban="BG98UNCR70001523984712",
+                creditor_name=vendor_name,
+                amount_eur=amount_eur,
+                remittance_info=f"Фактура {invoice_id}",
+                bank_code="DSK",
+            )
+            res = cls.initiate_vendor_payment(req)
+            results.append(res)
+            total_payout_eur += amount_eur
+
+        return {
+            "processed_count": len(results),
+            "total_payout_eur": round(total_payout_eur, 2),
+            "total_payout_bgn": round(total_payout_eur * 1.95583, 2),
+            "payment_results": [dataclasses.asdict(r) for r in results],
+        }
