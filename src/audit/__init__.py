@@ -8,6 +8,7 @@ from src.audit.corporate_tax_return import (
     CorporateTaxReturnGenerator,
     TaxableAdjustmentType,
 )
+from src.audit.dividend_tax_manager import DividendBeneficiaryType, DividendPayout, DividendTaxManager
 from src.audit.generate_transfer_log import generate_transfer_log, reconcile_3way
 from src.audit.nra_vat_reporter import NRAVATDeclaration, NRAVATReporter, VATPeriod
 from src.audit.saft_exporter import SAFTExporter
@@ -39,4 +40,7 @@ __all__ = [
     "CorporateTaxReturn",
     "AnnualTaxableAdjustment",
     "TaxableAdjustmentType",
+    "DividendTaxManager",
+    "DividendPayout",
+    "DividendBeneficiaryType",
 ]

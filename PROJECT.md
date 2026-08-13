@@ -2,6 +2,7 @@
 
 ## Architecture
 - **OCR Engine Layer**: PyMuPDF (`fitz`), Pillow (`PIL`), and Tesseract 5 (`-l bul+eng --psm 6`) extracting 100% of transactions from PDF statements with PyMuPDF direct text fallback.
+- **Autonomous Personal Income Tax & Dividend Withholding Tax Manager**: `src/audit/dividend_tax_manager.py` computing 5% dividend withholding tax under Art. 194 CITA / Art. 38 PITA, generating double-entry dividend entries (122/425/454), and producing quarterly NRA Form 55 filing declarations.
 - **Autonomous Corporate Income Tax (CITA / ЗКПО) Tax Return Generator**: `src/audit/corporate_tax_return.py` computing 10% corporate tax on taxable profit, financial result adjustments (609 non-deductible expenses), and generating Art. 92 CITA tax return entries (123/454).
 - **Autonomous Multi-Entity Corporate Consolidation & Intercompany Elimination Engine**: `src/accounting/corporate_consolidation.py` consolidating trial balances across holding subsidiaries and eliminating intercompany 411/401 balances.
 - **Automated Fixed Assets & Depreciation Schedule Manager**: `src/accounting/fixed_assets_depreciation.py` managing fixed asset registration (204/401) across CITA tax categories I-VII and generating monthly depreciation entries (603/241).
@@ -67,7 +68,7 @@
 | 9 | Database SQL Verification | Query SQLEXPRESS tables (Partners, Operations, OperationDetails) via sqlcmd | M4 | DONE |
 | 10 | Persistent Audit Log Export | Export validated C:\TRANSFER.LOG on persistent Windows 11 QEMU VM storage | M4 | DONE |
 | 11 | E2E Test Suite Creation | Create requirement-driven opaque-box E2E test infra (Tiers 1-4) and publish TEST_READY.md | E2E Track | DONE |
-| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (273/273 passed) and complete Tier 5 coverage | M5 | DONE |
+| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (277/277 passed) and complete Tier 5 coverage | M5 | DONE |
 | 13 | Self-Hosted Ecosystem Integration | Connect Infisical, n8n, Supabase, Obsidian Vault, Unsloth AI, OpenBalancer Telemetry | M6 | DONE |
 | 14 | Multi-PDF Batch Queue & ZIP Processing | Directory scanner, ZIP archive ingestion, fault-tolerant batch execution (`POST /process-batch`) | M7 | DONE |
 | 15 | Automated Email Intake Pipeline | IMAP/Gmail fetcher, MIME parser, Cloudflare Email Routing Worker (`POST /email-intake`) | M8 | DONE |
@@ -114,6 +115,7 @@
 | 56 | Fixed Assets & Depreciation Manager | PPE registration (204/401) across CITA tax categories I-VII, monthly depreciation entries (603/241) | M49 | DONE |
 | 57 | Corporate Consolidation & Elimination | Multi-subsidiary trial balance aggregation, automated intercompany 411/401 elimination entries | M50 | DONE |
 | 58 | Corporate Income Tax (CITA) Return | 10% corporate tax calculation on taxable profit, 609 adjustments & Art. 92 CITA tax return entries (123/454) | M51 | DONE |
+| 59 | Personal & Dividend Withholding Tax Manager | 5% dividend tax under Art. 194 CITA / Art. 38 PITA, entries (122/425/454), quarterly Form 55 filing | M52 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -123,7 +125,7 @@
 | M3 | `m3_vm_vnc_sql_automation` | Delta Pro Chart of Accounts UI setup, VNC & PowerShell Base64 automated import into SQLEXPRESS | M2 | DONE |
 | M4 | `m4_audit_log_export` | 3-way reconciliation (PDF ↔ Journal ↔ SQL DB), persistent C:\TRANSFER.LOG export on Windows 11 VM | M3 | DONE |
 | E2E | `m_e2e_testing` | E2E Test infrastructure, Tiers 1-4 test suite creation, publish TEST_READY.md | none | DONE |
-| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (273/273 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
+| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (277/277 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
 | M6 | `m6_full_ecosystem_integration` | Integrate Infisical Vault, Obsidian Vault Sync, Unsloth AI Classifier, Supabase, OpenBalancer | M5 | DONE |
 | M7 | `m7_multi_pdf_batch_queue` | Batch processing queue for processing multiple bank PDF statements, ZIP archives, and multi-page statements | M6 | DONE |
 | M8 | `m8_automated_email_intake` | IMAP/Gmail/Cloudflare Worker email intake parser to automatically ingest PDF attachments into n8n webhook | M7 | DONE |
@@ -170,9 +172,10 @@
 | M49 | `m49_fixed_assets_depreciation` | PPE registration (204/401) across CITA tax categories I-VII, monthly depreciation entries (603/241) | M48 | DONE |
 | M50 | `m50_corporate_consolidation` | Multi-subsidiary trial balance aggregation, automated intercompany 411/401 elimination entries | M49 | DONE |
 | M51 | `m51_corporate_tax_return` | 10% corporate tax calculation on taxable profit, 609 adjustments & Art. 92 CITA tax return entries (123/454) | M50 | DONE |
+| M52 | `m52_dividend_tax_manager` | 5% dividend tax under Art. 194 CITA / Art. 38 PITA, entries (122/425/454), quarterly Form 55 filing | M51 | DONE |
 
 ## Code Layout
-- `src/audit/`: Autonomous Corporate Income Tax Return Generator (`corporate_tax_return.py`), Autonomous Tax Policy Ingestion Engine (`tax_policy_ingestor.py`), Autonomous Tax Audit Defense Engine (`tax_audit_defense.py`), NRA VAT E-Reporting Adapter (`nra_vat_reporter.py`), OECD SAF-T Exporter (`saft_exporter.py`), SQL verification & TRANSFER.LOG exporter (`generate_transfer_log.py`)
+- `src/audit/`: Dividend Tax Manager (`dividend_tax_manager.py`), Autonomous Corporate Income Tax Return Generator (`corporate_tax_return.py`), Autonomous Tax Policy Ingestion Engine (`tax_policy_ingestor.py`), Autonomous Tax Audit Defense Engine (`tax_audit_defense.py`), NRA VAT E-Reporting Adapter (`nra_vat_reporter.py`), OECD SAF-T Exporter (`saft_exporter.py`), SQL verification & TRANSFER.LOG exporter (`generate_transfer_log.py`)
 - `src/accounting/`: Corporate Consolidation Engine (`corporate_consolidation.py`), Fixed Assets & Depreciation Manager (`fixed_assets_depreciation.py`), Inventory Valuation Engine (`inventory_valuation.py`), EU OSS E-Commerce Invoicing Adapter (`eu_oss_accounting.py`), Customs & Excise Accounting Engine (`customs_excise_accounting.py`), Payroll Accounting Engine (`payroll_accounting.py`), FX Revaluation Engine (`fx_revaluation.py`), Bulgarian double-entry translation & XML generator (`translate_to_delta.py`)
 - `src/ai/`: Voice Accounting Assistant (`voice_accounting_assistant.py`), Financial Solvency Analyzer (`financial_solvency_analyzer.py`), Distributed GPU Cluster Orchestrator (`gpu_cluster_orchestrator.py`), Synthetic Dataset Generator & Stress Harness (`synthetic_stress_harness.py`), Autonomous Agent Swarm (`autonomous_agent_swarm.py`), Multi-Modal Document Reconciler (`multimodal_reconciler.py`), Cash Flow Forecaster (`cashflow_forecaster.py`), Fraud Detector (`fraud_detector.py`), Active Learning Loop (`active_learning_loop.py`), Unsloth AI classifier & fine-tuner (`unsloth_classifier.py`, `unsloth_finetune.py`)
 - `src/dashboard/`: Executive Briefing Generator (`executive_briefing.py`), Prometheus Telemetry Exporter (`prometheus_exporter.py`), Web UI Dashboard server & OpenBalancer client (`dashboard_server.py`, `openbalancer_client.py`)
@@ -185,4 +188,4 @@
 - `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `scripts/`: Microinvest n8n service, DR replication runner, HA cluster deployer, nightly backup scheduler (`microinvest_n8n_service.py`, `run_dr_replication.sh`, `deploy_ha_cluster.sh`, `schedule_nightly_backup.sh`, `deploy_production_stack.sh`)
-- `tests/`: Unit and E2E test suites (273/273 passed)
+- `tests/`: Unit and E2E test suites (277/277 passed)
