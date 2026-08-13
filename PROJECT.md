@@ -2,6 +2,7 @@
 
 ## Architecture
 - **OCR Engine Layer**: PyMuPDF (`fitz`), Pillow (`PIL`), and Tesseract 5 (`-l bul+eng --psm 6`) extracting 100% of transactions from PDF statements with PyMuPDF direct text fallback.
+- **Intelligent AI Voice Assistant & Hands-Free Accounting Query Interface**: `src/ai/voice_accounting_assistant.py` processing speech-to-text (STT) queries in Bulgarian for hands-free lookups of balances, turnover, and missing invoices.
 - **Autonomous Tax Policy & Regulatory Update Ingestion Engine**: `src/audit/tax_policy_ingestor.py` monitoring State Gazette (Държавен вестник) and NRA (НАП) tax amendments for dynamic account mapping rule adjustments.
 - **Multi-Language Executive Financial Briefing Generator Engine**: `src/dashboard/executive_briefing.py` crafting daily localized C-level financial summary reports in Bulgarian, English, and German.
 - **Autonomous Tax Audit Defense & Discrepancy Risk Scoring Engine**: `src/audit/tax_audit_defense.py` evaluating NRA tax audit risk triggers (Art. 92 VATA / Чл. 92 ЗДДС VAT refund threshold), missing invoice numbers, and VIES deregistered counterparties.
@@ -61,7 +62,7 @@
 | 9 | Database SQL Verification | Query SQLEXPRESS tables (Partners, Operations, OperationDetails) via sqlcmd | M4 | DONE |
 | 10 | Persistent Audit Log Export | Export validated C:\TRANSFER.LOG on persistent Windows 11 QEMU VM storage | M4 | DONE |
 | 11 | E2E Test Suite Creation | Create requirement-driven opaque-box E2E test infra (Tiers 1-4) and publish TEST_READY.md | E2E Track | DONE |
-| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (258/258 passed) and complete Tier 5 coverage | M5 | DONE |
+| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (261/261 passed) and complete Tier 5 coverage | M5 | DONE |
 | 13 | Self-Hosted Ecosystem Integration | Connect Infisical, n8n, Supabase, Obsidian Vault, Unsloth AI, OpenBalancer Telemetry | M6 | DONE |
 | 14 | Multi-PDF Batch Queue & ZIP Processing | Directory scanner, ZIP archive ingestion, fault-tolerant batch execution (`POST /process-batch`) | M7 | DONE |
 | 15 | Automated Email Intake Pipeline | IMAP/Gmail fetcher, MIME parser, Cloudflare Email Routing Worker (`POST /email-intake`) | M8 | DONE |
@@ -102,6 +103,7 @@
 | 50 | Autonomous Tax Audit Defense Engine | Assessment of NRA tax audit risk (Art. 92 VATA) & missing invoice / VIES deregistration flags | M43 | DONE |
 | 51 | Multi-Language Executive Briefing Engine | Daily C-level financial briefing report generator in Bulgarian, English, and German | M44 | DONE |
 | 52 | Autonomous Tax Policy Ingestion Engine | State Gazette & NRA tax regulation update monitoring for dynamic account rule updates | M45 | DONE |
+| 53 | Intelligent AI Voice Accounting Assistant | Speech-to-text (STT) Bulgarian voice query processing for balances, turnover & missing invoices | M46 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -111,7 +113,7 @@
 | M3 | `m3_vm_vnc_sql_automation` | Delta Pro Chart of Accounts UI setup, VNC & PowerShell Base64 automated import into SQLEXPRESS | M2 | DONE |
 | M4 | `m4_audit_log_export` | 3-way reconciliation (PDF ↔ Journal ↔ SQL DB), persistent C:\TRANSFER.LOG export on Windows 11 VM | M3 | DONE |
 | E2E | `m_e2e_testing` | E2E Test infrastructure, Tiers 1-4 test suite creation, publish TEST_READY.md | none | DONE |
-| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (258/258 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
+| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (261/261 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
 | M6 | `m6_full_ecosystem_integration` | Integrate Infisical Vault, Obsidian Vault Sync, Unsloth AI Classifier, Supabase, OpenBalancer | M5 | DONE |
 | M7 | `m7_multi_pdf_batch_queue` | Batch processing queue for processing multiple bank PDF statements, ZIP archives, and multi-page statements | M6 | DONE |
 | M8 | `m8_automated_email_intake` | IMAP/Gmail/Cloudflare Worker email intake parser to automatically ingest PDF attachments into n8n webhook | M7 | DONE |
@@ -152,12 +154,13 @@
 | M43 | `m43_tax_audit_defense` | Assessment of NRA tax audit risk (Art. 92 VATA) & missing invoice / VIES deregistration flags | M42 | DONE |
 | M44 | `m44_executive_briefing` | Daily C-level financial briefing report generator in Bulgarian, English, and German | M43 | DONE |
 | M45 | `m45_tax_policy_ingestor` | State Gazette & NRA tax regulation update monitoring for dynamic account rule updates | M44 | DONE |
+| M46 | `m46_voice_accounting_assistant` | Speech-to-text (STT) Bulgarian voice query processing for balances, turnover & missing invoices | M45 | DONE |
 
 ## Code Layout
+- `src/ai/`: Voice Accounting Assistant (`voice_accounting_assistant.py`), Financial Solvency Analyzer (`financial_solvency_analyzer.py`), Distributed GPU Cluster Orchestrator (`gpu_cluster_orchestrator.py`), Synthetic Dataset Generator & Stress Harness (`synthetic_stress_harness.py`), Autonomous Agent Swarm (`autonomous_agent_swarm.py`), Multi-Modal Document Reconciler (`multimodal_reconciler.py`), Cash Flow Forecaster (`cashflow_forecaster.py`), Fraud Detector (`fraud_detector.py`), Active Learning Loop (`active_learning_loop.py`), Unsloth AI classifier & fine-tuner (`unsloth_classifier.py`, `unsloth_finetune.py`)
 - `src/audit/`: Autonomous Tax Policy Ingestion Engine (`tax_policy_ingestor.py`), Autonomous Tax Audit Defense Engine (`tax_audit_defense.py`), NRA VAT E-Reporting Adapter (`nra_vat_reporter.py`), OECD SAF-T Exporter (`saft_exporter.py`), SQL verification & TRANSFER.LOG exporter (`generate_transfer_log.py`)
 - `src/dashboard/`: Executive Briefing Generator (`executive_briefing.py`), Prometheus Telemetry Exporter (`prometheus_exporter.py`), Web UI Dashboard server & OpenBalancer client (`dashboard_server.py`, `openbalancer_client.py`)
 - `src/intake/`: SEPA Instant / BISERA 6 Adapter (`sepa_bisera_instant.py`), Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)
-- `src/ai/`: Financial Solvency Analyzer (`financial_solvency_analyzer.py`), Distributed GPU Cluster Orchestrator (`gpu_cluster_orchestrator.py`), Synthetic Dataset Generator & Stress Harness (`synthetic_stress_harness.py`), Autonomous Agent Swarm (`autonomous_agent_swarm.py`), Multi-Modal Document Reconciler (`multimodal_reconciler.py`), Cash Flow Forecaster (`cashflow_forecaster.py`), Fraud Detector (`fraud_detector.py`), Active Learning Loop (`active_learning_loop.py`), Unsloth AI classifier & fine-tuner (`unsloth_classifier.py`, `unsloth_finetune.py`)
 - `src/backup/`: Active-Active SQL Sync Guard (`active_active_sql_sync.py`), Autonomous Audit Log Cold Storage Archiver (`cold_storage_archiver.py`), DR Multi-Region Replication Manager (`disaster_recovery_replication.py`), Automated Nightly Backup Manager (`nightly_backup.py`)
 - `src/security/`: Zero-Trust HSM Cryptographic Signer & PQC (`hsm_signer.py`), Multi-Tenant RBAC (`tenant_rbac.py`) & Infisical Vault client (`infisical_vault.py`)
 - `src/cluster/`: Rolling Upgrade Controller (`rolling_upgrade_controller.py`), High Availability Cluster Manager (`ha_failover.py`)
@@ -167,4 +170,4 @@
 - `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `scripts/`: Microinvest n8n service, DR replication runner, HA cluster deployer, nightly backup scheduler (`microinvest_n8n_service.py`, `run_dr_replication.sh`, `deploy_ha_cluster.sh`, `schedule_nightly_backup.sh`, `deploy_production_stack.sh`)
-- `tests/`: Unit and E2E test suites (258/258 passed)
+- `tests/`: Unit and E2E test suites (261/261 passed)

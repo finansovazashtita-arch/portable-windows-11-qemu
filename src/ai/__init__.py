@@ -12,6 +12,7 @@ from src.ai.multimodal_reconciler import DocumentType, MultiModalReconciler, Rec
 from src.ai.synthetic_stress_harness import SyntheticStressHarness, SyntheticTransaction
 from src.ai.unsloth_classifier import UnslothTransactionClassifier
 from src.ai.unsloth_finetune import BulgarianAccountingDatasetGenerator, UnslothFineTuner
+from src.ai.voice_accounting_assistant import VoiceAccountingAssistant, VoiceAssistantResponse, VoiceQueryType
 
 __all__ = [
     "UnslothTransactionClassifier",
@@ -41,4 +42,7 @@ __all__ = [
     "CorporateSolvencyAnalyzer",
     "FinancialAnalysisReport",
     "SolvencyRiskLevel",
+    "VoiceAccountingAssistant",
+    "VoiceAssistantResponse",
+    "VoiceQueryType",
 ]
