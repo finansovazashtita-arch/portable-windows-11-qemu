@@ -40,7 +40,7 @@ Phase 26 expands **FinansProtect** into complete CEE (Central & Eastern Europe) 
   - **Interactive Web UI ESG & Carbon Dashboard (`src/dashboard/web_ui/esg.html`)**: Executive sustainability overview with Scope 1-3 emission charts, CBAM tax projections, and CSRD export controls.
 - **Dependencies**: M12, M19, M41, M48, M76, M77
 - **Target Deliverables**: `src/accounting/esg_carbon_accounting.py`, `src/analytics/esg_api.py`, `src/dashboard/web_ui/esg.html`, test suites.
-- **Status**: Planned (Phase 26)
+- **Status**: Completed (Phase 26)
 
 ---
 
