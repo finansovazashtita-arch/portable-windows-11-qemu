@@ -138,9 +138,13 @@
 | 70 | Quantum-Safe Active-Active DR Mesh | Unifying post-quantum signing (M36) and DR orchestrator (M59) into an active multi-cloud K3s mesh (AWS + Hetzner + On-premise Mac Mini) | M63 | DONE |
 | 71 | Dynamic Cash Flow Optimization & Predictive Liquidity Engine | Monte Carlo stochastic liquidity simulations (VaR 95/99%), automated supplier payment scheduling maximizing cash discount yield vs cost of capital | M64 | DONE |
 | 72 | Autonomous Regulatory Compliance & E-Archiving Audit Vault | Full eIDAS 2.0 LTV compatibility, Qualified Electronic Signatures (КЕП), RFC 3161 timestamps & ZK tax audit proofs | M66 | DONE |
+| 73 | Real-Time Audit Compliance & WebSockets Dashboard | Real-time multi-entity audit compliance dashboard with WebSockets telemetry for NRA e-invoicing, PQC mesh status & interactive corrections | M65 | DONE |
 | 74 | Integration Smoke Test Suite | Docker-based automated integration testing framework & CI/CD smoke test suite validating real bank statements & REST APIs | M68 | DONE |
 | 75 | Production Config & Secrets Hardening | Centralized config manager, startup secret validation layer, Infisical Vault key rotation & Docker Compose profiles | M69 | DONE |
 | 76 | ГФО Generator (Годишен Финансов Отчет) | Autonomous Bulgarian Annual Financial Statement generation, balance sheet equality auditing, statutory XML/HTML export & REST APIs | M72 | DONE |
+| 77 | OpenAPI 3.1 Spec & Swagger UI Dashboard | Comprehensive OpenAPI 3.1 YAML/JSON specification, embedded Swagger UI at `/api/docs`, validator middleware & API v1/v2 routing | M70 | DONE |
+| 78 | Enterprise Edge AI & Mobile Receipt Scanner | WebAssembly/On-Device OCR, NRA QR parsing, offline HMAC queue sync & Delta Pro accounting export | M67 | DONE |
+| 79 | AI Smart Invoice Matching & Auto-Reconciliation | AI-powered vector embeddings, Cyrillic/Latin transliteration, fuzzy amount tolerance & 1-click UI confirmation | M71 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -215,6 +219,7 @@
 | M67 | `m67_edge_ai_mobile_suite` | Enterprise Edge AI & Mobile Receipt Scanner Suite with WebAssembly/On-Device OCR, NRA QR validation, offline HMAC queue sync & Delta Pro accounting | M23, M27, M54 | DONE |
 | M68 | `m68_integration_smoke_tests` | End-to-End Integration Smoke Test Suite & GitHub Actions CI/CD pipeline | M5, M12 | DONE |
 | M69 | `m69_config_hardening` | Production Configuration & Secrets Management Hardening (`src/config/config_hardening.py`) | M10, M13 | DONE |
+| M70 | `m70_openapi_docs` | Comprehensive OpenAPI 3.1 YAML/JSON specification, Swagger UI Dashboard at `/api/docs`, validator middleware & API v1/v2 routing | M12, M68 | DONE |
 | M71 | `m71_smart_invoice_matcher` | AI-Powered Smart Invoice Matching & Auto-Reconciliation Engine with vector embeddings, fuzzy amount matching & 1-click UI confirmation | M27, M65 | DONE |
 | M72 | `m72_gfo_generator` | Autonomous Bulgarian Annual Financial Statement (ГФО) Generation, Validation & Multi-Format Regulatory Export | M51, M56, M65 | DONE |
 
@@ -233,4 +238,4 @@
 - `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `scripts/`: Microinvest n8n service, DR replication runner, HA cluster deployer, nightly backup scheduler (`microinvest_n8n_service.py`, `run_dr_replication.sh`, `deploy_ha_cluster.sh`, `schedule_nightly_backup.sh`, `deploy_production_stack.sh`)
-- `tests/`: Unit and E2E test suites (385/385 passed)
+- `tests/`: Unit and E2E test suites (433/433 passed)
