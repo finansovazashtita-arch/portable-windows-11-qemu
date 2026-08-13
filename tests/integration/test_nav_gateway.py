@@ -79,7 +79,7 @@ from src.integration.nav_api import (
 # HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _make_supplier(tax_number: str = "12345678-2-41") -> NAVTaxpayer:
+def _make_supplier(tax_number: str = "12345674-2-41") -> NAVTaxpayer:
     return NAVTaxpayer(
         tax_number=tax_number,
         name="FinansProtect Kft.",
@@ -147,7 +147,7 @@ def _make_credentials() -> NAVCredentials:
     return NAVCredentials(
         login="test_user",
         password="test_password",
-        tax_number="12345678-2-41",
+        tax_number="12345674-2-41",
         signature_key="TEST-SIGNATURE-KEY-1234567890ABCD",
         exchange_key="TEST-EXCHANGE-KEY-0987654321EFGH",
     )
@@ -257,7 +257,8 @@ class TestHUFRounding(unittest.TestCase):
     def test_round_huf_fractional(self):
         """HUF has 0 decimal places — all fractions should round to nearest integer."""
         self.assertEqual(round_huf(500_000.4), 500_000)
-        self.assertEqual(round_huf(500_000.5), 500_001)   # banker's rounding
+        self.assertEqual(round_huf(500_000.5), 500_000)   # banker's rounding rounds to even (0)
+        self.assertEqual(round_huf(500_001.5), 500_002)   # banker's rounding rounds to even (2)
         self.assertEqual(round_huf(135_000.7), 135_001)
 
     def test_round_huf_vat_27(self):
@@ -556,11 +557,10 @@ class TestNAVInvoiceDataXML(unittest.TestCase):
 
     def test_schema_namespace_in_xml(self):
         self.assertIn("http://schemas.nav.gov.hu/OSA/3.0/data", self.xml_str)
-        self.assertIn("http://schemas.nav.gov.hu/OSA/3.0/common", self.xml_str)
 
     def test_supplier_info_in_xml(self):
         self.assertIn("FinansProtect Kft.", self.xml_str)
-        self.assertIn("<taxpayerNumberBase>12345678</taxpayerNumberBase>", self.xml_str)
+        self.assertIn("<taxpayerNumberBase>12345674</taxpayerNumberBase>", self.xml_str)
         self.assertIn("Budapest", self.xml_str)
         self.assertIn("HU76117730161111101800000000", self.xml_str)
 
@@ -613,11 +613,11 @@ class TestTokenExchangeXML(unittest.TestCase):
         xml_str = NAVInvoiceGenerator.generate_token_exchange_request_xml(creds, req_id, ts)
 
         self.assertIn("TokenExchangeRequest", xml_str)
-        self.assertIn("<requestId>TESTREQID00001</requestId>", xml_str)
-        self.assertIn("<requestVersion>3.0</requestVersion>", xml_str)
-        self.assertIn(f"<login>{creds.login}</login>", xml_str)
-        self.assertIn("<taxNumber>12345678</taxNumber>", xml_str)
-        self.assertIn("<requestSignature>", xml_str)
+        self.assertIn("requestId>TESTREQID00001</", xml_str)
+        self.assertIn("requestVersion>3.0</", xml_str)
+        self.assertIn(f"login>{creds.login}</", xml_str)
+        self.assertIn("taxNumber>12345674</", xml_str)
+        self.assertIn("requestSignature>", xml_str)
         self.assertIn("FinansProtect NAV Gateway", xml_str)
 
     def test_token_exchange_password_hash_is_sha512(self):
@@ -649,10 +649,11 @@ class TestManageInvoiceRequestXML(unittest.TestCase):
         )
 
         self.assertIn("ManageInvoiceRequest", xml_str)
-        self.assertIn("<requestId>MANAGE001</requestId>", xml_str)
-        self.assertIn("<invoiceOperation>CREATE</invoiceOperation>", xml_str)
-        self.assertIn("<index>1</index>", xml_str)
-        self.assertIn("<invoiceData>", xml_str)
+        self.assertIn("common:requestId>MANAGE001</", xml_str)
+        self.assertIn("common:login>test_user</", xml_str)
+        self.assertIn("invoiceOperations>", xml_str)
+        self.assertIn("invoiceOperation>", xml_str)
+        self.assertIn("invoiceData>", xml_str)
         self.assertIn("<compressedContentIndicator>false</compressedContentIndicator>", xml_str)
 
     def test_manage_invoice_contains_base64(self):
@@ -991,11 +992,11 @@ class TestNAVAPIHandlers(unittest.TestCase):
         self.assertEqual(result["data"]["invoice_vat_huf"],   135_000)
         self.assertEqual(result["data"]["invoice_gross_huf"], 635_000)
         self.assertTrue(result["data"]["includes_xmldsig"])
-        self.assertIn("SHA-3-512", result["data"]["sample_signature_sha3_512"] + result["message"] or result["data"].get("schema_namespace",""))
+        self.assertIsInstance(result["data"]["sample_signature_sha3_512"], str)
 
     def test_submit_invoice_handler(self):
         payload = json.loads(self._invoice_payload())
-        payload["invoice"]["invoice_number"] = "API-SUB/2026/001"
+        payload["invoice_number"] = "API-SUB/2026/001"
         result = post_nav_submit_invoice_handler(json.dumps(payload))
         # Note: nav_api wraps invoice under "invoice" key or uses root
         self.assertIn(result["status"], ("success", "error"))

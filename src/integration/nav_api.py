@@ -30,7 +30,6 @@ from src.integration.nav_gateway import (
     NAVInvoiceAppearance,
     NAVInvoiceCategory,
     NAVInvoiceGenerator,
-    NAVInvoiceItem,
     NAVInvoiceLineItem,
     NAVInvoiceOperation,
     NAVInvoiceStatus,

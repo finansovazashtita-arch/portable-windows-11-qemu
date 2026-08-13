@@ -333,6 +333,10 @@ class NAVCredentials:
         """Return SHA-512 hash of password (as required by NAV API)."""
         return hashlib.sha512(self.password.encode("utf-8")).hexdigest().upper()
 
+    def clean_tax_number(self) -> str:
+        """Return the first 8 digits of the tax number."""
+        return str(self.tax_number)[:8]
+
 
 @dataclass
 class NAVSession:
@@ -602,9 +606,6 @@ class NAVInvoiceGenerator:
 
         # Root: InvoiceData
         root = ET.Element(f"{{{NS_DATA}}}InvoiceData")
-        root.set("xmlns", NS_DATA)
-        root.set("xmlns:common", NS_COMMON)
-        root.set("xmlns:base", NS_BASE)
 
         # invoiceNumber
         ET.SubElement(root, "invoiceNumber").text = invoice.invoice_number
@@ -802,8 +803,6 @@ class NAVInvoiceGenerator:
         ET.register_namespace("base", NS_BASE)
 
         root = ET.Element(f"{{{NS_API}}}ManageInvoiceRequest")
-        root.set("xmlns", NS_API)
-        root.set("xmlns:common", NS_COMMON)
         root.set("xmlns:base", NS_BASE)
 
         # Header
@@ -861,8 +860,6 @@ class NAVInvoiceGenerator:
         ET.register_namespace("common", NS_COMMON)
 
         root = ET.Element(f"{{{NS_API}}}TokenExchangeRequest")
-        root.set("xmlns", NS_API)
-        root.set("xmlns:common", NS_COMMON)
 
         header = ET.SubElement(root, f"{{{NS_COMMON}}}header")
         ET.SubElement(header, f"{{{NS_COMMON}}}requestId").text = request_id
@@ -909,8 +906,6 @@ class NAVInvoiceGenerator:
         ET.register_namespace("common", NS_COMMON)
 
         root = ET.Element(f"{{{NS_API}}}QueryTaxpayerRequest")
-        root.set("xmlns", NS_API)
-        root.set("xmlns:common", NS_COMMON)
 
         header = ET.SubElement(root, f"{{{NS_COMMON}}}header")
         ET.SubElement(header, f"{{{NS_COMMON}}}requestId").text = request_id
@@ -1325,8 +1320,6 @@ class NAVOnlineSzamlaGateway:
 
             # Build queryInvoiceStatus XML request
             root = ET.Element(f"{{{NS_API}}}QueryInvoiceStatusRequest")
-            root.set("xmlns", NS_API)
-            root.set("xmlns:common", NS_COMMON)
 
             header = ET.SubElement(root, f"{{{NS_COMMON}}}header")
             ET.SubElement(header, f"{{{NS_COMMON}}}requestId").text = request_id
