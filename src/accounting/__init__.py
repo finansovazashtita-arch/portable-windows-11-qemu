@@ -4,6 +4,7 @@ Accounting Package.
 
 from src.accounting.customs_excise_accounting import CustomsDeclaration, CustomsExciseProcessor
 from src.accounting.eu_oss_accounting import EUOSSAccountingAdapter, OSSDeclarationQuarter, OSSSaleTransaction
+from src.accounting.fixed_assets_depreciation import CITATaxCategory, FixedAsset, FixedAssetsDepreciationEngine
 from src.accounting.fx_revaluation import FXRateProvider, FXRevaluationCalculator, FXRevaluationResult
 from src.accounting.inventory_valuation import InventoryItemBatch, InventoryValuationEngine, ValuationMethod
 from src.accounting.payroll_accounting import PayrollProcessor, PayrollSummary
@@ -50,4 +51,7 @@ __all__ = [
     "InventoryValuationEngine",
     "InventoryItemBatch",
     "ValuationMethod",
+    "FixedAssetsDepreciationEngine",
+    "FixedAsset",
+    "CITATaxCategory",
 ]
