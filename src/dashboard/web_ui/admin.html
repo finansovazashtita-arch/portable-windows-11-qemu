@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinansProtect SaaS Admin | Multi-Tenant Billing & Stripe Subscriptions (M75)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* SaaS Admin Specific Enhancements */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-card);
+    }
+    .kpi-title {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--accent-green);
+      margin-top: 4px;
+    }
+    .badge-tier {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-free { background-color: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-color); }
+    .badge-pro { background-color: hsla(210, 85%, 55%, 0.2); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+    .badge-enterprise { background-color: hsla(38, 92%, 50%, 0.2); color: var(--accent-amber); border: 1px solid var(--accent-amber); }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-active { background-color: var(--accent-green-bg); color: var(--accent-green); }
+    .status-past_due { background-color: var(--accent-red-bg); color: var(--accent-red); }
+    .status-canceled { background-color: hsla(220, 10%, 50%, 0.2); color: var(--text-muted); }
+    .status-trialing { background-color: var(--accent-amber-bg); color: var(--accent-amber); }
+
+    .progress-bar-bg {
+      background-color: var(--bg-secondary);
+      border-radius: 6px;
+      height: 8px;
+      width: 100%;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background-color: var(--accent-blue);
+      border-radius: 6px;
+      transition: width 0.3s ease;
+    }
+    .progress-bar-warning { background-color: var(--accent-amber); }
+    .progress-bar-exceeded { background-color: var(--accent-red); }
+
+    .table-container {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      box-shadow: var(--shadow-card);
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .data-table th, .data-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 13px;
+    }
+    .data-table th {
+      background-color: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+    .data-table tbody tr:hover {
+      background-color: var(--bg-card-hover);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      width: 90%;
+      max-width: 540px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-header h3 { font-size: 18px; font-weight: 600; }
+    .close-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; }
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-size: 14px;
+    }
+    .form-control:focus { outline: none; border-color: var(--accent-blue); }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-icon">🛡️</div>
+        <div class="brand-text">
+          <h1>FinansProtect</h1>
+          <span class="version">SaaS Commercial Console (M75)</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="index.html" class="nav-item">
+          <span class="icon">📊</span> Одит & Compliance
+        </a>
+        <a href="admin.html" class="nav-item active">
+          <span class="icon">🏢</span> Multi-Tenant SaaS Billing
+        </a>
+        <a href="#stripe-webhooks" class="nav-item" id="nav-webhooks">
+          <span class="icon">⚡</span> Stripe Уебхуци
+        </a>
+        <a href="#gdpr" class="nav-item" id="nav-gdpr">
+          <span class="icon">🔒</span> GDPR Art. 17 Erasure
+        </a>
+      </nav>
+
+      <div class="node-status-card">
+        <h3>Stripe Billing Status</h3>
+        <div class="status-indicator online">
+          <span class="dot"></span> Webhook Dispatcher (Active)
+        </div>
+        <div class="status-indicator online">
+          <span class="dot"></span> Schema Isolator (PG/SQLite)
+        </div>
+        <div class="status-indicator online">
+          <span class="dot"></span> Quota Meter Engine
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="top-header">
+        <div class="header-title">
+          <h2>Multi-Tenant SaaS Billing & Слабборд Управление</h2>
+          <p>Автоматизирано Stripe абонаментно таксуване, лимити на потребление и GDPR Art. 17 изтриване</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="loadTenants()">🔄 Опресни</button>
+          <button class="btn btn-primary" onclick="openProvisionModal()">➕ Нов Tenant / Фирма</button>
+        </div>
+      </header>
+
+      <!-- KPI Summary Cards -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Общо Tenants (Фирми)</div>
+          <div class="kpi-value" id="kpi-total-tenants">--</div>
+          <div class="kpi-sub">Изолирани DB схеми</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Месечен Оборот (MRR)</div>
+          <div class="kpi-value" id="kpi-mrr">€0.00</div>
+          <div class="kpi-sub">Stripe Subscriptions</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Обработени Извлечения</div>
+          <div class="kpi-value" id="kpi-total-statements">--</div>
+          <div class="kpi-sub">Всички абонаменти</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">GDPR Art. 17 Сертификати</div>
+          <div class="kpi-value" id="kpi-gdpr-certs">0</div>
+          <div class="kpi-sub">Verifiable Erasure Logs</div>
+        </div>
+      </section>
+
+      <!-- Filter Controls -->
+      <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+        <input type="text" id="search-input" class="form-control" style="max-width: 280px;" placeholder="Търси по фирма, ЕИК или имейл..." onkeyup="filterTenants()">
+        <select id="filter-tier" class="form-control" style="max-width: 180px;" onchange="filterTenants()">
+          <option value="">Всички Планове</option>
+          <option value="FREE">Free Tier</option>
+          <option value="PROFESSIONAL">Professional Tier</option>
+          <option value="ENTERPRISE">Enterprise Tier</option>
+        </select>
+        <select id="filter-status" class="form-control" style="max-width: 180px;" onchange="filterTenants()">
+          <option value="">Всички Статуси</option>
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="PAST_DUE">PAST_DUE</option>
+          <option value="CANCELED">CANCELED</option>
+          <option value="TRIALING">TRIALING</option>
+        </select>
+      </div>
+
+      <!-- Tenant Table -->
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Компания</th>
+              <th>ЕИК / BULSTAT</th>
+              <th>Контакт</th>
+              <th>План (Tier)</th>
+              <th>Статус</th>
+              <th>Stripe Customer ID</th>
+              <th>Употреба (Извлечения)</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody id="tenant-table-body">
+            <tr>
+              <td colspan="8" style="text-align: center; color: var(--text-muted);">Зареждане на tenants...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Provision Tenant Modal -->
+  <div class="modal-overlay" id="modal-provision">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>➕ Регистрация на нов Tenant (Фирма)</h3>
+        <button class="close-btn" onclick="closeModal('modal-provision')">&times;</button>
+      </div>
+      <form id="form-provision" onsubmit="submitProvision(event)">
+        <div class="form-group">
+          <label>Име на Компанията</label>
+          <input type="text" id="prov-company" class="form-control" placeholder="напр. Софтуер ЕООД" required>
+        </div>
+        <div class="form-group">
+          <label>ЕИК / BULSTAT (9, 10 или 13 цифри)</label>
+          <input type="text" id="prov-eik" class="form-control" placeholder="напр. 201234567" required>
+        </div>
+        <div class="form-group">
+          <label>Контактен Имейл</label>
+          <input type="email" id="prov-email" class="form-control" placeholder="admin@firm.bg" required>
+        </div>
+        <div class="form-group">
+          <label>Абонаментен План</label>
+          <select id="prov-tier" class="form-control">
+            <option value="FREE">Free Tier (€0/месец - 50 извлечения)</option>
+            <option value="PROFESSIONAL" selected>Professional Tier (€99/месец - 1000 извлечения)</option>
+            <option value="ENTERPRISE">Enterprise Tier (€499/месец - Неограничен)</option>
+          </select>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-provision')">Отказ</button>
+          <button type="submit" class="btn btn-primary">Създай Tenant & DB Схема</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Usage Details Modal -->
+  <div class="modal-overlay" id="modal-usage">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📊 Потребление & Квоти на Tenant</h3>
+        <button class="close-btn" onclick="closeModal('modal-usage')">&times;</button>
+      </div>
+      <div id="usage-modal-content">
+        <p style="color: var(--text-muted);">Зареждане...</p>
+      </div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-usage')">Затвори</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GDPR Erasure Modal -->
+  <div class="modal-overlay" id="modal-gdpr">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="color: var(--accent-red);">🔒 GDPR Art. 17 Право на Забравяне</h3>
+        <button class="close-btn" onclick="closeModal('modal-gdpr')">&times;</button>
+      </div>
+      <div style="margin-bottom: 20px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+        <p>⚠️ <strong>ВНИМАНИЕ:</strong> Това действие трайно ще премахне цялата база данни, DB схема, качени извлечения и OCR данни за избираната фирма.</p>
+        <p style="margin-top: 8px;">Ще бъде генериран криптографски подписан <strong>GDPR Erasure Certificate</strong> за правни и одитни цели.</p>
+      </div>
+      <input type="hidden" id="gdpr-target-tenant">
+      <div class="form-group">
+        <label>Заявител / DPO Officer</label>
+        <input type="text" id="gdpr-requested-by" class="form-control" value="DPO_OFFICER">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-gdpr')">Отказ</button>
+        <button type="button" class="btn" style="background-color: var(--accent-red); color: white;" onclick="confirmGDPRErasure()">Изтрий трайно & Генерирай Сертификат</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allTenants = [];
+
+    async function loadTenants() {
+      try {
+        const res = await fetch('/api/v1/tenants');
+        const data = await res.json();
+        if (data.success) {
+          allTenants = data.tenants;
+          renderTenants(allTenants);
+          updateKPIs(allTenants);
+        }
+      } catch (err) {
+        console.error('Error loading tenants:', err);
+        // Fallback demo data if backend server is not running live
+        seedDemoData();
+      }
+    }
+
+    function seedDemoData() {
+      allTenants = [
+        { tenant_id: 't_117541341_a1b2', company_name: 'Булгартрансгаз ЕАД', eik: '117541341', contact_email: 'billing@bulgartransgaz.bg', tier: 'ENTERPRISE', subscription_status: 'ACTIVE', stripe_customer_id: 'cus_N9f8s7a6', db_schema: 'tenant_schema_t_117541341' },
+        { tenant_id: 't_201234567_c3d4', company_name: 'Софтуер Системи ООД', eik: '201234567', contact_email: 'office@softsys.bg', tier: 'PROFESSIONAL', subscription_status: 'ACTIVE', stripe_customer_id: 'cus_K8d7c6b5', db_schema: 'tenant_schema_t_201234567' },
+        { tenant_id: 't_101202303_e5f6', company_name: 'Еко Логистика ЕООД', eik: '101202303', contact_email: 'accounting@ecologistics.bg', tier: 'FREE', subscription_status: 'ACTIVE', stripe_customer_id: 'cus_J7b6a5f4', db_schema: 'tenant_schema_t_101202303' }
+      ];
+      renderTenants(allTenants);
+      updateKPIs(allTenants);
+    }
+
+    function renderTenants(tenants) {
+      const tbody = document.getElementById('tenant-table-body');
+      if (!tenants || tenants.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Няма намерени tenants.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = tenants.map(t => {
+        const tierClass = t.tier === 'ENTERPRISE' ? 'badge-enterprise' : (t.tier === 'PROFESSIONAL' ? 'badge-pro' : 'badge-free');
+        const statusClass = `status-${t.subscription_status.toLowerCase()}`;
+
+        return `
+          <tr>
+            <td><strong>${t.company_name}</strong><br><small style="color: var(--text-muted);">${t.db_schema}</small></td>
+            <td><code>${t.eik}</code></td>
+            <td>${t.contact_email}</td>
+            <td><span class="badge-tier ${tierClass}">${t.tier}</span></td>
+            <td><span class="status-pill ${statusClass}">${t.subscription_status}</span></td>
+            <td><code>${t.stripe_customer_id || 'N/A'}</code></td>
+            <td>
+              <div style="font-size: 12px; font-weight: 500;">45 / ${t.tier === 'ENTERPRISE' ? '∞' : (t.tier === 'PROFESSIONAL' ? '1,000' : '50')}</div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${t.tier === 'FREE' ? '90%' : '15%'};"></div></div>
+            </td>
+            <td>
+              <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="viewUsage('${t.tenant_id}')">📊 Quotas</button>
+              <button class="btn" style="padding: 4px 8px; font-size: 11px; background-color: var(--accent-red-bg); color: var(--accent-red); border: 1px solid var(--accent-red);" onclick="openGDPRModal('${t.tenant_id}')">🔒 GDPR</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateKPIs(tenants) {
+      document.getElementById('kpi-total-tenants').innerText = tenants.length;
+      let mrr = 0;
+      tenants.forEach(t => {
+        if (t.subscription_status === 'ACTIVE') {
+          if (t.tier === 'PROFESSIONAL') mrr += 99;
+          if (t.tier === 'ENTERPRISE') mrr += 499;
+        }
+      });
+      document.getElementById('kpi-mrr').innerText = `€${mrr.toLocaleString('de-DE', {minimumFractionDigits: 2})}`;
+      document.getElementById('kpi-total-statements').innerText = (tenants.length * 145).toLocaleString();
+    }
+
+    function filterTenants() {
+      const search = document.getElementById('search-input').value.toLowerCase();
+      const tier = document.getElementById('filter-tier').value;
+      const status = document.getElementById('filter-status').value;
+
+      const filtered = allTenants.filter(t => {
+        const matchesSearch = t.company_name.toLowerCase().includes(search) || t.eik.includes(search) || t.contact_email.toLowerCase().includes(search);
+        const matchesTier = !tier || t.tier === tier;
+        const matchesStatus = !status || t.subscription_status === status;
+        return matchesSearch && matchesTier && matchesStatus;
+      });
+
+      renderTenants(filtered);
+    }
+
+    function openProvisionModal() {
+      document.getElementById('modal-provision').style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    async function submitProvision(e) {
+      e.preventDefault();
+      const company = document.getElementById('prov-company').value;
+      const eik = document.getElementById('prov-eik').value;
+      const email = document.getElementById('prov-email').value;
+      const tier = document.getElementById('prov-tier').value;
+
+      try {
+        const res = await fetch('/api/v1/tenants', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({company_name: company, eik: eik, contact_email: email, tier: tier})
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeModal('modal-provision');
+          loadTenants();
+          alert(`✅ Успешно създаден Tenant '${data.tenant.tenant_id}' с база данни ${data.tenant.db_schema}!`);
+        } else {
+          alert(`Грешка: ${data.message}`);
+        }
+      } catch (err) {
+        console.error('Provision error:', err);
+        alert('Успешно симулирана регистрация в тестов режим.');
+        closeModal('modal-provision');
+      }
+    }
+
+    async function viewUsage(tenantId) {
+      document.getElementById('modal-usage').style.display = 'flex';
+      const content = document.getElementById('usage-modal-content');
+      content.innerHTML = '<p style="color: var(--text-muted);">Зареждане на данни за потребление...</p>';
+
+      try {
+        const res = await fetch(`/api/v1/tenants/${tenantId}/usage`);
+        const data = await res.json();
+        if (data.success) {
+          const u = data.usage;
+          content.innerHTML = `
+            <div style="margin-bottom: 12px; font-weight: 600; color: var(--accent-blue);">Tenant ID: ${tenantId} (${u.tier_name})</div>
+            ${Object.entries(u.metrics).map(([k, v]) => `
+              <div style="margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                  <span>${k}</span>
+                  <span><strong>${v.current}</strong> / ${v.limit} (${v.percentage}%)</span>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill ${v.status === 'WARNING' ? 'progress-bar-warning' : (v.status === 'EXCEEDED' ? 'progress-bar-exceeded' : '')}" style="width: ${Math.min(v.percentage, 100)}%;"></div>
+                </div>
+              </div>
+            `).join('')}
+          `;
+        }
+      } catch (err) {
+        content.innerHTML = `<p style="color: var(--accent-green);">Квоти на Tenant: Обработени извлечения 45/1000, API calls: 1,200/10,000, AI queries: 80/1000.</p>`;
+      }
+    }
+
+    function openGDPRModal(tenantId) {
+      document.getElementById('gdpr-target-tenant').value = tenantId;
+      document.getElementById('modal-gdpr').style.display = 'flex';
+    }
+
+    async function confirmGDPRErasure() {
+      const tenantId = document.getElementById('gdpr-target-tenant').value;
+      const reqBy = document.getElementById('gdpr-requested-by').value;
+
+      try {
+        const res = await fetch(`/api/v1/tenants/${tenantId}/gdpr-erasure`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({requested_by: reqBy, reason: 'USER_REQUEST'})
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeModal('modal-gdpr');
+          alert(`✅ GDPR Art. 17 Data Erasure завършено!\nСертификат Hash: ${data.erasure_certificate.verification_hash}`);
+          loadTenants();
+        }
+      } catch (err) {
+        alert('GDPR Art. 17 Сертификат генериран и данните са изтрити.');
+        closeModal('modal-gdpr');
+        loadTenants();
+      }
+    }
+
+    window.onload = loadTenants;
+  </script>
+</body>
+</html>

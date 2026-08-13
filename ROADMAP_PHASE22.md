@@ -53,7 +53,8 @@ Phase 22 transitions the FinansProtect platform from feature-complete developmen
   - Webhook-driven billing event processing (invoice.paid, subscription.cancelled).
 - **Dependencies**: M15, M69, M73
 - **Target Deliverables**: `src/billing/`, `tests/billing/`, `src/dashboard/web_ui/admin.html`
-- **Status**: Planned (after M73)
+- **Status**: Completed
+
 
 ---
 

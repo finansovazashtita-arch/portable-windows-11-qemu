@@ -60,9 +60,11 @@ OPENAPI_SPEC: Dict[str, Any] = {
         {"name": "Compliance", "description": "Real-time compliance summary, discrepancy corrections & NRA E-Invoicing"},
         {"name": "Smart Reconciliation", "description": "M71 AI-powered narrative vector embedding matching, fuzzy amount auto-reconciliation, and 1-click accountant confirmation"},
         {"name": "Mobile Suite", "description": "Edge-AI fiscal receipt processing, WASM OCR status, and offline queue sync"},
+        {"name": "SaaS Billing", "description": "M75 Stripe subscription management, multi-tenant provisioning, usage metering, and GDPR Art. 17 data erasure"},
         {"name": "Documentation", "description": "OpenAPI specifications & interactive UI endpoints"}
     ],
     "paths": {
+
         "/api/docs": {
             "get": {
                 "tags": ["Documentation"],
@@ -430,9 +432,119 @@ OPENAPI_SPEC: Dict[str, Any] = {
                     }
                 }
             }
+        },
+        "/api/v1/tenants": {
+            "get": {
+                "tags": ["SaaS Billing"],
+                "summary": "List Tenants",
+                "description": "Retrieves paginated list of multi-tenant accounts with tier and status filtering.",
+                "parameters": [
+                    {"name": "tier", "in": "query", "schema": {"type": "string", "enum": ["FREE", "PROFESSIONAL", "ENTERPRISE"]}},
+                    {"name": "status", "in": "query", "schema": {"type": "string"}},
+                    {"name": "search", "in": "query", "schema": {"type": "string"}},
+                    {"name": "limit", "in": "query", "schema": {"type": "integer", "default": 50}},
+                    {"name": "offset", "in": "query", "schema": {"type": "integer", "default": 0}}
+                ],
+                "responses": {
+                    "200": {"description": "List of tenant records"}
+                }
+            },
+            "post": {
+                "tags": ["SaaS Billing"],
+                "summary": "Provision New Tenant",
+                "description": "Provisions isolated database schema, Stripe customer account, and default quota meters for a new tenant.",
+                "requestBody": {
+                    "required": True,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["company_name", "eik", "contact_email"],
+                                "properties": {
+                                    "company_name": {"type": "string", "example": "Булгартрансгаз ЕАД"},
+                                    "eik": {"type": "string", "example": "117541341"},
+                                    "contact_email": {"type": "string", "example": "billing@bulgartransgaz.bg"},
+                                    "tier": {"type": "string", "enum": ["FREE", "PROFESSIONAL", "ENTERPRISE"], "default": "FREE"}
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {"description": "Tenant successfully provisioned"},
+                    "400": {"description": "Invalid UIC/EIK or missing parameters"}
+                }
+            }
+        },
+        "/api/v1/tenants/{tenant_id}": {
+            "get": {
+                "tags": ["SaaS Billing"],
+                "summary": "Get Tenant Details & Quota Status",
+                "description": "Returns tenant metadata, schema info, and current quota consumption.",
+                "parameters": [
+                    {"name": "tenant_id", "in": "path", "required": True, "schema": {"type": "string"}}
+                ],
+                "responses": {
+                    "200": {"description": "Tenant details and usage snapshot"},
+                    "404": {"description": "Tenant not found"}
+                }
+            },
+            "put": {
+                "tags": ["SaaS Billing"],
+                "summary": "Update Tenant Metadata",
+                "parameters": [
+                    {"name": "tenant_id", "in": "path", "required": True, "schema": {"type": "string"}}
+                ],
+                "responses": {"200": {"description": "Tenant updated"}}
+            },
+            "delete": {
+                "tags": ["SaaS Billing"],
+                "summary": "Delete Tenant Account",
+                "parameters": [
+                    {"name": "tenant_id", "in": "path", "required": True, "schema": {"type": "string"}},
+                    {"name": "purge", "in": "query", "schema": {"type": "boolean", "default": True}}
+                ],
+                "responses": {"200": {"description": "Tenant deleted and purged"}}
+            }
+        },
+        "/api/v1/tenants/{tenant_id}/gdpr-erasure": {
+            "post": {
+                "tags": ["SaaS Billing"],
+                "summary": "GDPR Article 17 Right-to-Erasure",
+                "description": "Executes complete data wipe, schema drop, audit log anonymization, and generates signed Erasure Certificate.",
+                "parameters": [
+                    {"name": "tenant_id", "in": "path", "required": True, "schema": {"type": "string"}}
+                ],
+                "responses": {
+                    "200": {"description": "Erasure certificate generated and data purged"}
+                }
+            }
+        },
+        "/api/v1/billing/checkout-session": {
+            "post": {
+                "tags": ["SaaS Billing"],
+                "summary": "Create Stripe Checkout Session",
+                "responses": {"200": {"description": "Checkout session created"}}
+            }
+        },
+        "/api/v1/billing/portal-session": {
+            "post": {
+                "tags": ["SaaS Billing"],
+                "summary": "Create Stripe Customer Portal Session",
+                "responses": {"200": {"description": "Portal session URL generated"}}
+            }
+        },
+        "/api/v1/billing/webhooks/stripe": {
+            "post": {
+                "tags": ["SaaS Billing"],
+                "summary": "Stripe Webhook Handler",
+                "description": "Processes subscription created/updated/deleted and invoice.paid events with signature verification and idempotency protection.",
+                "responses": {"200": {"description": "Webhook processed"}}
+            }
         }
     },
     "components": {
+
         "securitySchemes": {
             "BearerAuth": {
                 "type": "http",

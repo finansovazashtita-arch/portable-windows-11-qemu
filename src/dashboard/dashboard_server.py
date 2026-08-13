@@ -33,6 +33,7 @@ from src.api.openapi_docs import (
     get_openapi_yaml,
     get_swagger_ui_html,
 )
+from src.billing.tenant_api import TenantAPIHandler
 
 PORT = 8095
 WEB_UI_DIR = os.path.join(os.path.dirname(__file__), "web_ui")
@@ -40,9 +41,12 @@ WEB_UI_DIR = os.path.join(os.path.dirname(__file__), "web_ui")
 logger = logging.getLogger("dashboard_server")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
+TENANT_API = TenantAPIHandler()
+
 # Global registry of active WebSockets client sockets
 CONNECTED_WS_LOCK = threading.Lock()
 CONNECTED_WS_CLIENTS: Set[socket.socket] = set()
+
 
 
 def broadcast_telemetry_frame():
@@ -164,7 +168,16 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             })
             return
 
+        elif canonical_path.startswith("/api/v1/tenants") or canonical_path.startswith("/api/v1/billing") or canonical_path.startswith("/api/tenants") or canonical_path.startswith("/api/billing"):
+            from urllib.parse import parse_qs, urlparse
+            parsed_url = urlparse(self.path)
+            q_params = {k: v[0] for k, v in parse_qs(parsed_url.query).items()}
+            status_code, response_payload = TENANT_API.handle_get(canonical_path, query_params=q_params)
+            self._send_json_response(response_payload, status=status_code)
+            return
+
         elif canonical_path in ("/api/v1/reconciliation/pending-matches", "/api/reconciliation/pending-matches"):
+
             payload = COMPLIANCE_ENGINE.get_telemetry_payload()
             self._send_json_response({
                 "success": True,
@@ -217,7 +230,14 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             }, status=400)
             return
 
-        if canonical_path in ("/api/v1/mobile/scan", "/api/mobile/scan"):
+        if canonical_path.startswith("/api/v1/tenants") or canonical_path.startswith("/api/v1/billing") or canonical_path.startswith("/api/tenants") or canonical_path.startswith("/api/billing"):
+            req_headers = {k: v for k, v in self.headers.items()}
+            status_code, response_payload = TENANT_API.handle_post(canonical_path, req_data, headers=req_headers)
+            self._send_json_response(response_payload, status=status_code)
+            return
+
+        elif canonical_path in ("/api/v1/mobile/scan", "/api/mobile/scan"):
+
             from src.ocr.edge_ai_mobile_suite import (
                 EdgeAIReceiptScanner,
                 DeltaProReceiptAccountingMapper,
@@ -375,6 +395,40 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
 
         else:
             self.send_error(404, "Endpoint Not Found")
+
+    def do_PUT(self):
+        content_length = int(self.headers.get("Content-Length", 0))
+        body = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"
+        try:
+            req_data = json.loads(body)
+        except Exception:
+            req_data = {}
+
+        header_version = self.headers.get("X-API-Version")
+        canonical_path, _ = APIVersionRouter.resolve_version_and_route(self.path, header_version)
+
+        if canonical_path.startswith("/api/v1/tenants") or canonical_path.startswith("/api/tenants"):
+            status_code, response_payload = TENANT_API.handle_put(canonical_path, req_data)
+            self._send_json_response(response_payload, status=status_code)
+            return
+
+        self.send_error(404, "Endpoint Not Found")
+
+    def do_DELETE(self):
+        from urllib.parse import parse_qs, urlparse
+        parsed_url = urlparse(self.path)
+        q_params = {k: v[0] for k, v in parse_qs(parsed_url.query).items()}
+
+        header_version = self.headers.get("X-API-Version")
+        canonical_path, _ = APIVersionRouter.resolve_version_and_route(self.path, header_version)
+
+        if canonical_path.startswith("/api/v1/tenants") or canonical_path.startswith("/api/tenants"):
+            status_code, response_payload = TENANT_API.handle_delete(canonical_path, query_params=q_params)
+            self._send_json_response(response_payload, status=status_code)
+            return
+
+        self.send_error(404, "Endpoint Not Found")
+
 
 
     def _send_json_response(self, data: Dict[str, Any], status: int = 200):

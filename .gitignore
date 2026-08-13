@@ -24,7 +24,10 @@ C:\TRANSFER.LOG
 *.ppm
 *.png
 /tmp/
+# Database & state files
+*.db
 data/mobile_offline_queue.json
 
 # OS metadata
 .DS_Store
+
