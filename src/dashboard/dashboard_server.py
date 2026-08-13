@@ -8,6 +8,7 @@ and processes interactive audit corrections in real time.
 """
 
 import base64
+import dataclasses
 import hashlib
 import http.server
 import json

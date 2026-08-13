@@ -24,6 +24,7 @@ C:\TRANSFER.LOG
 *.ppm
 *.png
 /tmp/
+data/mobile_offline_queue.json
 
 # OS metadata
 .DS_Store

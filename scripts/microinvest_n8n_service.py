@@ -49,6 +49,25 @@ EMAIL_PARSER = EmailStatementParser()
 
 
 class StatementHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        path = self.path.split("?")[0]
+        if path in ("/", "/health", "/api/health"):
+            res_payload = {
+                "status": "HEALTHY",
+                "service": "microinvest-ocr-service",
+                "version": "1.0.0",
+                "vault": "CONNECTED" if VAULT_CLIENT else "OFFLINE",
+            }
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(res_payload, indent=2, ensure_ascii=False).encode("utf-8"))
+        else:
+            self.send_response(404)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "ERROR", "message": "Endpoint Not Found"}).encode("utf-8"))
+
     def do_POST(self):
         content_length = int(self.headers.get("Content-Length", 0))
         post_data = self.rfile.read(content_length)

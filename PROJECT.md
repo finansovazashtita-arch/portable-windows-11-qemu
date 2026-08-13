@@ -138,7 +138,7 @@
 | 70 | Quantum-Safe Active-Active DR Mesh | Unifying post-quantum signing (M36) and DR orchestrator (M59) into an active multi-cloud K3s mesh (AWS + Hetzner + On-premise Mac Mini) | M63 | DONE |
 | 71 | Dynamic Cash Flow Optimization & Predictive Liquidity Engine | Monte Carlo stochastic liquidity simulations (VaR 95/99%), automated supplier payment scheduling maximizing cash discount yield vs cost of capital | M64 | DONE |
 | 72 | Autonomous Regulatory Compliance & E-Archiving Audit Vault | Full eIDAS 2.0 LTV compatibility, Qualified Electronic Signatures (КЕП), RFC 3161 timestamps & ZK tax audit proofs | M66 | DONE |
-| 73 | Enterprise Edge AI & Mobile Receipt Scanner Suite | Local WebAssembly/On-Device OCR for mobile devices, NRA QR validation, offline HMAC queue sync & Delta Pro accounting | M67 | DONE |
+| 74 | Integration Smoke Test Suite | Docker-based automated integration testing framework & CI/CD smoke test suite validating real bank statements & REST APIs | M68 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -211,6 +211,7 @@
 | M65 | `m65_realtime_compliance_ui` | Real-Time Multi-Entity Audit Compliance & WebSockets Telemetry Dashboard for NRA e-invoicing status, PQC replication mesh & interactive corrections | M60, M62, M63 | DONE |
 | M66 | `m66_e_archiving_compliance_vault` | Autonomous Regulatory Compliance & E-Archiving Audit Vault with eIDAS 2.0 LTV preservation, QES validation, RFC 3161 timestamps & ZK proofs for tax audits | M33, M36, M56, M60 | DONE |
 | M67 | `m67_edge_ai_mobile_suite` | Enterprise Edge AI & Mobile Receipt Scanner Suite with WebAssembly/On-Device OCR, NRA QR validation, offline HMAC queue sync & Delta Pro accounting | M23, M27, M54 | DONE |
+| M68 | `m68_integration_smoke_tests` | End-to-End Integration Smoke Test Suite & GitHub Actions CI/CD pipeline | M5, M12 | DONE |
 
 ## Code Layout
 - `src/intake/`: Open Banking PISP Aggregator (`open_banking_pisp.py`), Bank Feed Guard (`bank_feed_guard.py`), SEPA Instant / BISERA 6 Adapter (`sepa_bisera_instant.py`), Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)

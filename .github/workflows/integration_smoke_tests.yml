@@ -1,0 +1,60 @@
+name: Integration Smoke Tests
+
+on:
+  push:
+    branches: [ "main", "master", "работно-пространство" ]
+  pull_request:
+    branches: [ "main", "master", "работно-пространство" ]
+  workflow_dispatch:
+
+jobs:
+  smoke-tests:
+    name: Run End-to-End Integration Smoke Test Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Dependencies & Tesseract OCR
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            tesseract-ocr \
+            tesseract-ocr-bul \
+            tesseract-ocr-eng \
+            poppler-utils \
+            curl
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest jsonschema PyMuPDF pillow pytesseract requests
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Validate Dockerfile & Docker Compose Configuration
+        run: |
+          docker compose config
+          docker build -t microinvest-ocr-service:test .
+
+      - name: Run Integration Smoke Test Suite
+        run: |
+          python3 -m pytest tests/integration/test_smoke_suite.py -v --tb=short
+
+      - name: Upload Smoke Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results
+          path: |
+            /tmp/*.json
+            /tmp/*.xml
+            /tmp/*.LOG
+          if-no-files-found: ignore
