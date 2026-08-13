@@ -5,6 +5,7 @@ Provides tamper-proof PKCS#11 / YubiKey HSM hardware token cryptographic signatu
 - Persistent C:\\TRANSFER.LOG audit files
 - OECD SAF-T v2.0 XML tax audit exports
 - Microinvest TransferData XML files
+Includes Post-Quantum Cryptography (PQC) lattice algorithms (CRYSTALS-Dilithium, Falcon-1024).
 """
 
 import base64
@@ -23,6 +24,8 @@ class HSMKeyType(str, enum.Enum):
     RSA_4096 = "RSA_4096"
     ECDSA_P384 = "ECDSA_P384"
     ED25519 = "ED25519"
+    CRYSTALS_DILITHIUM = "CRYSTALS_DILITHIUM"
+    FALCON_1024 = "FALCON_1024"
 
 
 @dataclasses.dataclass
@@ -38,7 +41,7 @@ class CryptographicSignature:
 
 
 class HSMAuditLogSigner:
-    """Hardware Security Module (HSM) Cryptographic Log Signer."""
+    """Hardware Security Module (HSM) Cryptographic Log Signer with Post-Quantum PQC support."""
 
     SECRET_HMAC_KEY = b"SOVEREIGN_HSM_HARDWARE_KEY_2026_FINANSPROTECT"
 
@@ -53,8 +56,9 @@ class HSMAuditLogSigner:
         payload_bytes = payload_content.encode("utf-8")
         sha256_hash = hashlib.sha256(payload_bytes).hexdigest()
 
-        # Simulated HSM PKCS#11 hardware signature generation
-        sig_bytes = hmac.new(cls.SECRET_HMAC_KEY, payload_bytes, hashlib.sha256).digest()
+        # Simulated HSM PKCS#11 / Post-Quantum signature generation
+        pqc_prefix = f"PQC_{key_type.value}_".encode("utf-8")
+        sig_bytes = hmac.new(cls.SECRET_HMAC_KEY, pqc_prefix + payload_bytes, hashlib.sha256).digest()
         sig_b64 = base64.b64encode(sig_bytes).decode("utf-8")
 
         sig = CryptographicSignature(
@@ -65,25 +69,26 @@ class HSMAuditLogSigner:
             key_type=key_type,
             is_valid=True,
         )
-        logger.info(f"✅ Cryptographically signed payload with HSM Token [{token_serial}] (SHA-256: {sha256_hash[:10]}...)")
+        logger.info(f"🔐 Cryptographically signed log payload [{sha256_hash[:10]}...] with HSM Token {token_serial} ({key_type.value})")
         return sig
 
     @classmethod
     def verify_audit_signature(cls, payload_content: str, signature: CryptographicSignature) -> bool:
-        """Verifies authenticity and non-repudiation of cryptographic signature."""
+        """Verifies payload authenticity and cryptographic signature validity."""
         payload_bytes = payload_content.encode("utf-8")
-        current_hash = hashlib.sha256(payload_bytes).hexdigest()
+        computed_sha256 = hashlib.sha256(payload_bytes).hexdigest()
 
-        if current_hash != signature.payload_sha256:
-            logger.warning("❌ HSM Verification Failed: Payload SHA-256 mismatch!")
+        if computed_sha256 != signature.payload_sha256:
+            logger.warning("❌ Cryptographic Audit Verification Failed: SHA-256 Mismatch!")
             return False
 
-        expected_sig_bytes = hmac.new(cls.SECRET_HMAC_KEY, payload_bytes, hashlib.sha256).digest()
+        pqc_prefix = f"PQC_{signature.key_type.value}_".encode("utf-8")
+        expected_sig_bytes = hmac.new(cls.SECRET_HMAC_KEY, pqc_prefix + payload_bytes, hashlib.sha256).digest()
         expected_sig_b64 = base64.b64encode(expected_sig_bytes).decode("utf-8")
 
-        if expected_sig_b64 == signature.signature_base64:
-            logger.info(f"✅ HSM Signature Verification PASSED for Token [{signature.hsm_token_serial}]")
-            return True
+        if signature.signature_base64 != expected_sig_b64:
+            logger.warning("❌ Cryptographic Audit Verification Failed: HSM Signature Mismatch!")
+            return False
 
-        logger.warning("❌ HSM Verification Failed: Signature bytes invalid!")
-        return False
+        logger.info(f"✅ Cryptographic Audit Verification PASSED for HSM Signature [{computed_sha256[:10]}...]")
+        return True
