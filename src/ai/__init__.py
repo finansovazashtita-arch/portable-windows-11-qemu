@@ -5,6 +5,7 @@ AI & Unsloth Intelligence Package.
 from src.ai.active_learning_loop import ActiveLearningManager, CorrectionFeedback
 from src.ai.autonomous_agent_swarm import AgentRole, AgentStatus, AutonomousAgentSwarm
 from src.ai.cashflow_forecaster import CashFlowForecaster, LiquidityForecastResult, LiquidityStatus
+from src.ai.financial_solvency_analyzer import CorporateSolvencyAnalyzer, FinancialAnalysisReport, SolvencyRiskLevel
 from src.ai.fraud_detector import AnomalyRiskLevel, FraudFlag, FraudGuardrailEngine, TransactionRiskEvaluation
 from src.ai.gpu_cluster_orchestrator import DistributedGPUClusterOrchestrator, GPUNode, InferenceBackend
 from src.ai.multimodal_reconciler import DocumentType, MultiModalReconciler, ReconciliationMatch, ReconciliationStatus
@@ -37,4 +38,7 @@ __all__ = [
     "DistributedGPUClusterOrchestrator",
     "GPUNode",
     "InferenceBackend",
+    "CorporateSolvencyAnalyzer",
+    "FinancialAnalysisReport",
+    "SolvencyRiskLevel",
 ]
