@@ -16,7 +16,7 @@ Phase 26 expands **FinansProtect** into complete CEE (Central & Eastern Europe) 
   - **Interactive Web UI KSeF Dashboard (`src/dashboard/web_ui/ksef.html`)**: Responsive management UI with invoice creation, XML preview, UPO verification table, and GUS company lookup tool.
 - **Dependencies**: M12, M19, M41, M60, M77, M78
 - **Target Deliverables**: `src/integration/ksef_gateway.py`, `src/integration/gus_bir_api.py`, `src/integration/ksef_api.py`, `src/dashboard/web_ui/ksef.html`, test suites.
-- **Status**: Planned (Phase 26)
+- **Status**: Completed (Phase 26)
 
 ---
 

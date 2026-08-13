@@ -49,6 +49,8 @@ FinansProtect integrates over 67+ autonomous modules, categorized into the follo
 - **eIDAS 2.0 Compliance Vault**: RFC 3161 timestamps and ZK tax audit proofs.
 
 ### 🌐 Integration
+- **Poland KSeF Gateway**: Polish Ministry of Finance KSeF e-Fakturowanie FA(2)/FA(3) XML generation, NIP validation, XAdES digital signatures, UPO receipt archiving, and GUS BIR1.1 API lookup.
+- **Romania ANAF e-Factura**: Romanian ANAF e-Factura UBL 2.1 RO-CIUS XML generation, OAuth 2.0 SPV authentication, and ANAF VAT Registry API.
 - **Peppol EU E-Invoicing**: Peppol BIS Billing v3.0 UBL v2.1 XML generation.
 - **Telegram & Mobile Push**: Real-time Telegram and native mobile alerts for HA failover and audit discrepancies.
 - **Obsidian & Supabase**: Markdown accounting notes sync and Supabase database logging.

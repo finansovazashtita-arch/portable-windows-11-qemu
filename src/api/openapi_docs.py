@@ -714,6 +714,76 @@ OPENAPI_SPEC: Dict[str, Any] = {
                 "description": "Exports comprehensive executive advisory brief in PDF, JSON, or CSV format.",
                 "responses": {"200": {"description": "Advisory report export payload"}}
             }
+        },
+        "/api/v1/ksef/health": {
+            "get": {
+                "tags": ["Poland KSeF Gateway"],
+                "summary": "Check Poland KSeF Gateway Health",
+                "description": "Returns operational health, session status, supported XML schemas, and GUS BIR service connectivity.",
+                "responses": {"200": {"description": "Gateway health status payload"}}
+            }
+        },
+        "/api/v1/ksef/auth/session": {
+            "post": {
+                "tags": ["Poland KSeF Gateway"],
+                "summary": "Authenticate KSeF Session",
+                "description": "Initiates authorisation challenge and obtains Session Token from Polish Ministry of Finance.",
+                "responses": {"200": {"description": "Session token and reference number"}}
+            }
+        },
+        "/api/v1/ksef/invoices/generate-xml": {
+            "post": {
+                "tags": ["Poland KSeF Gateway"],
+                "summary": "Generate FA(2)/FA(3) XML Invoice",
+                "description": "Generates structured Polish FA(2) or FA(3) XML invoice document.",
+                "responses": {"200": {"description": "Generated XML and validation status"}}
+            }
+        },
+        "/api/v1/ksef/invoices/submit": {
+            "post": {
+                "tags": ["Poland KSeF Gateway"],
+                "summary": "Submit Invoice to KSeF",
+                "description": "Validates, signs XAdES digital envelope, and submits invoice to Polish KSeF platform.",
+                "responses": {"200": {"description": "Assigned KSeF reference number and status"}}
+            }
+        },
+        "/api/v1/ksef/invoices/status/{reference_number}": {
+            "get": {
+                "tags": ["Poland KSeF Gateway"],
+                "summary": "Poll KSeF Processing Status",
+                "description": "Queries processing status for a submitted KSeF reference number.",
+                "parameters": [
+                    {"name": "reference_number", "in": "path", "required": True, "schema": {"type": "string"}}
+                ],
+                "responses": {"200": {"description": "KSeF processing status details"}}
+            }
+        },
+        "/api/v1/ksef/invoices/upo/{ksef_number}": {
+            "get": {
+                "tags": ["Poland KSeF Gateway"],
+                "summary": "Download Official UPO Receipt XML",
+                "description": "Downloads official Urzędowe Poświadczenie Odbioru (UPO) receipt XML document.",
+                "parameters": [
+                    {"name": "ksef_number", "in": "path", "required": True, "schema": {"type": "string"}}
+                ],
+                "responses": {"200": {"description": "Official UPO receipt XML"}}
+            }
+        },
+        "/api/v1/ksef/gus/check": {
+            "post": {
+                "tags": ["Poland KSeF Gateway"],
+                "summary": "Verify Company via Polish GUS BIR",
+                "description": "Real-time company verification, address parsing, REGON/KRS lookup, and active VAT status via Polish GUS BIR API.",
+                "responses": {"200": {"description": "GUS company metadata payload"}}
+            }
+        },
+        "/api/v1/ksef/invoices": {
+            "get": {
+                "tags": ["Poland KSeF Gateway"],
+                "summary": "List Stored KSeF Invoices",
+                "description": "Returns list of submitted KSeF invoices and processing statuses.",
+                "responses": {"200": {"description": "List of KSeF invoices"}}
+            }
         }
     },
     "components": {
@@ -1106,6 +1176,30 @@ class APIVersionRouter:
         "/api/compliance/einvoice/submit": "/api/v1/compliance/einvoice/submit",
         "/api/v1/compliance/mesh/sync": "/api/v1/compliance/mesh/sync",
         "/api/compliance/mesh/sync": "/api/v1/compliance/mesh/sync",
+        "/api/v1/ksef/health": "/api/v1/ksef/health",
+        "/api/ksef/health": "/api/v1/ksef/health",
+        "/api/v1/ksef/auth/session": "/api/v1/ksef/auth/session",
+        "/api/ksef/auth/session": "/api/v1/ksef/auth/session",
+        "/api/v1/ksef/invoices/generate-xml": "/api/v1/ksef/invoices/generate-xml",
+        "/api/ksef/invoices/generate-xml": "/api/v1/ksef/invoices/generate-xml",
+        "/api/v1/ksef/invoices/submit": "/api/v1/ksef/invoices/submit",
+        "/api/ksef/invoices/submit": "/api/v1/ksef/invoices/submit",
+        "/api/v1/ksef/gus/check": "/api/v1/ksef/gus/check",
+        "/api/ksef/gus/check": "/api/v1/ksef/gus/check",
+        "/api/v1/ksef/nip/validate": "/api/v1/ksef/nip/validate",
+        "/api/ksef/nip/validate": "/api/v1/ksef/nip/validate",
+        "/api/v1/ksef/invoices": "/api/v1/ksef/invoices",
+        "/api/ksef/invoices": "/api/v1/ksef/invoices",
+        "/api/v1/esg/health": "/api/v1/esg/health",
+        "/api/esg/health": "/api/v1/esg/health",
+        "/api/v1/esg/footprint/calculate": "/api/v1/esg/footprint/calculate",
+        "/api/esg/footprint/calculate": "/api/v1/esg/footprint/calculate",
+        "/api/v1/esg/cbam/report": "/api/v1/esg/cbam/report",
+        "/api/esg/cbam/report": "/api/v1/esg/cbam/report",
+        "/api/v1/esg/journals/post": "/api/v1/esg/journals/post",
+        "/api/esg/journals/post": "/api/v1/esg/journals/post",
+        "/api/v1/esg/csrd/export": "/api/v1/esg/csrd/export",
+        "/api/esg/csrd/export": "/api/v1/esg/csrd/export",
     }
 
     @classmethod

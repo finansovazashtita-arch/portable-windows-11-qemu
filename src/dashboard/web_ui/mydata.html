@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinansProtect | Greece myDATA (AADE) Compliance Gateway (M80)</title>
+  <meta name="description" content="Greece AADE myDATA e-bookkeeping gateway: send invoices, validate AFM, generate XML, track MARK numbers, and sync with Greek double-entry journals.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070b13;
+      --surface: #0f1623;
+      --surface-raised: #151e2e;
+      --border: #1c2a3f;
+      --border-hover: #2e4160;
+      --accent: #3b82f6;
+      --accent-dim: rgba(59,130,246,0.15);
+      --accent-glow: rgba(59,130,246,0.08);
+      --gr-blue: #003476;
+      --gr-white: #f8fafc;
+      --gr-blue-light: #0070c0;
+      --success: #10b981;
+      --success-dim: rgba(16,185,129,0.12);
+      --warning: #f59e0b;
+      --warning-dim: rgba(245,158,11,0.12);
+      --danger: #ef4444;
+      --danger-dim: rgba(239,68,68,0.12);
+      --text: #e2e8f0;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 3px; }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .gr-flag {
+      display: flex;
+      width: 28px;
+      height: 19px;
+      border-radius: 3px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+      flex-direction: column;
+    }
+    .gr-flag-stripe { flex: 1; }
+    .gr-flag-stripe.blue { background: #003476; }
+    .gr-flag-stripe.white { background: #f8fafc; }
+
+    .brand-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .header-badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      border: 1px solid transparent;
+    }
+    .badge-blue { background: var(--accent-dim); color: var(--accent); border-color: rgba(59,130,246,0.2); }
+    .badge-green { background: var(--success-dim); color: var(--success); border-color: rgba(16,185,129,0.2); }
+    .badge-amber { background: var(--warning-dim); color: var(--warning); border-color: rgba(245,158,11,0.2); }
+    .badge-red { background: var(--danger-dim); color: var(--danger); border-color: rgba(239,68,68,0.2); }
+
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .dot.pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ── LAYOUT ── */
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      gap: 24px;
+    }
+
+    /* ── STAT BAR ── */
+    .stat-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .stat-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+
+    .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 500; }
+    .stat-value { font-size: 28px; font-weight: 700; line-height: 1; color: var(--text); }
+    .stat-value.accent { color: var(--accent); }
+    .stat-value.success { color: var(--success); }
+    .stat-value.warning { color: var(--warning); }
+    .stat-detail { font-size: 11px; color: var(--text-muted); }
+
+    /* ── TABS ── */
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+      font-family: inherit;
+    }
+    .tab-btn:hover { color: var(--text-dim); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-body { padding: 20px; }
+
+    /* ── GRID LAYOUTS ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+    /* ── FORM ELEMENTS ── */
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .form-label { font-size: 12px; font-weight: 500; color: var(--text-dim); }
+
+    .form-control {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 9px 12px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      width: 100%;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    select.form-control { cursor: pointer; }
+    textarea.form-control { resize: vertical; min-height: 90px; font-family: var(--mono); font-size: 12px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-warning { background: var(--warning); color: #000; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-outline { background: transparent; border-color: var(--border); color: var(--text-dim); }
+    .btn-outline:hover { border-color: var(--border-hover); color: var(--text); background: var(--surface-raised); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    /* ── RESULT BOX ── */
+    .result-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.7;
+      overflow: auto;
+      max-height: 380px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--text-dim);
+    }
+    .result-box.xml { color: #7dd3fc; }
+    .result-box.success { border-color: rgba(16,185,129,0.3); color: var(--success); }
+    .result-box.error { border-color: rgba(239,68,68,0.3); color: var(--danger); }
+
+    /* ── MARK TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead th {
+      background: var(--bg);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-raised); }
+    td { padding: 10px 12px; vertical-align: middle; color: var(--text-dim); }
+    td.mono { font-family: var(--mono); font-size: 11px; }
+    td:first-child { color: var(--text); font-weight: 500; }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .status-accepted { background: var(--success-dim); color: var(--success); }
+    .status-cancelled { background: var(--danger-dim); color: var(--danger); }
+    .status-pending { background: var(--warning-dim); color: var(--warning); }
+    .status-draft { background: rgba(100,116,139,0.12); color: var(--text-muted); }
+
+    /* ── AFM VALIDATOR ── */
+    .afm-result {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-top: 10px;
+      border: 1px solid;
+      transition: all 0.3s;
+    }
+    .afm-valid { background: var(--success-dim); border-color: rgba(16,185,129,0.3); color: var(--success); }
+    .afm-invalid { background: var(--danger-dim); border-color: rgba(239,68,68,0.3); color: var(--danger); }
+    .afm-icon { font-size: 20px; }
+    .afm-details { flex: 1; }
+    .afm-details .afm-num { font-family: var(--mono); font-size: 16px; font-weight: 600; }
+    .afm-details .afm-msg { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+
+    /* ── LINE ITEMS EDITOR ── */
+    .line-items-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .line-items-table th {
+      background: var(--bg);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    .line-items-table td { padding: 6px 4px; }
+    .line-items-table input, .line-items-table select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text);
+      font-size: 12px;
+      padding: 6px 8px;
+      width: 100%;
+      font-family: inherit;
+    }
+    .line-items-table input:focus, .line-items-table select:focus {
+      outline: none; border-color: var(--accent);
+    }
+
+    /* ── JOURNAL ENTRIES ── */
+    .journal-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .journal-entry:last-child { border-bottom: none; }
+    .journal-account { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent); min-width: 50px; }
+    .journal-name { flex: 1; font-size: 12px; color: var(--text-dim); }
+    .journal-amount { font-family: var(--mono); font-size: 13px; font-weight: 600; min-width: 90px; text-align: right; }
+    .journal-debit { color: var(--danger); }
+    .journal-credit { color: var(--success); }
+
+    /* ── SPINNER ── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TOAST ── */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 9999;
+    }
+    .toast {
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #fff;
+      max-width: 340px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      animation: toast-in 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    @keyframes toast-in { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+    .toast-success { background: #065f46; border-color: rgba(16,185,129,0.3); }
+    .toast-error { background: #7f1d1d; border-color: rgba(239,68,68,0.3); }
+    .toast-info { background: #1e3a5f; border-color: rgba(59,130,246,0.3); }
+
+    /* ── DIVIDER ── */
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    /* ── COPYABLE ── */
+    .copyable {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+    .copyable:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="brand">
+    <div class="gr-flag" aria-label="Ελληνική σημαία">
+      <div class="gr-flag-stripe blue"></div>
+      <div class="gr-flag-stripe white"></div>
+      <div class="gr-flag-stripe blue"></div>
+      <div class="gr-flag-stripe white"></div>
+      <div class="gr-flag-stripe blue"></div>
+      <div class="gr-flag-stripe white"></div>
+      <div class="gr-flag-stripe blue"></div>
+      <div class="gr-flag-stripe white"></div>
+      <div class="gr-flag-stripe blue"></div>
+    </div>
+    <div>
+      <div class="brand-name">Greece myDATA · AADE</div>
+      <div class="brand-sub">FinansProtect · Milestone M80</div>
+    </div>
+  </div>
+  <div class="header-badges">
+    <span class="badge badge-blue"><span class="dot pulse"></span>myDATA v1.0.7</span>
+    <span id="env-badge" class="badge badge-amber">SANDBOX</span>
+    <a href="/dashboard" class="badge badge-blue" style="text-decoration:none;">← Dashboard</a>
+  </div>
+</header>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- STAT BAR -->
+  <div class="stat-bar">
+    <div class="stat-card">
+      <div class="stat-label">MARK Εγγεγραμμένα</div>
+      <div class="stat-value accent" id="stat-marks">0</div>
+      <div class="stat-detail">Μοναδικοί Αριθμοί Καταχώρισης</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Αποστολές</div>
+      <div class="stat-value success" id="stat-submitted">0</div>
+      <div class="stat-detail">Παραστατικά σε AADE</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Απορρίψεις</div>
+      <div class="stat-value warning" id="stat-rejected">0</div>
+      <div class="stat-detail">Αποτυχημένες αποστολές</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ακυρώσεις</div>
+      <div class="stat-value" id="stat-cancelled">0</div>
+      <div class="stat-detail">Ακυρωμένα MARK</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Περιβάλλον</div>
+      <div class="stat-value" id="stat-env" style="font-size:16px;margin-top:4px;">SANDBOX</div>
+      <div class="stat-detail">Λειτουργία Gateway</div>
+    </div>
+  </div>
+
+  <!-- TAB NAV -->
+  <div>
+    <nav class="tab-nav" role="tablist">
+      <button class="tab-btn active" role="tab" onclick="switchTab('send-invoices', this)" id="tab-send-invoices">📤 Αποστολή Εσόδων</button>
+      <button class="tab-btn" role="tab" onclick="switchTab('send-expenses', this)" id="tab-send-expenses">📥 Αποστολή Εξόδων</button>
+      <button class="tab-btn" role="tab" onclick="switchTab('afm-validator', this)" id="tab-afm">🔍 Επικύρωση ΑΦΜ</button>
+      <button class="tab-btn" role="tab" onclick="switchTab('xml-generator', this)" id="tab-xml">📄 Γεννήτρια XML</button>
+      <button class="tab-btn" role="tab" onclick="switchTab('marks', this)" id="tab-marks">📋 Μητρώο MARK</button>
+      <button class="tab-btn" role="tab" onclick="switchTab('cancel', this)" id="tab-cancel">🚫 Ακύρωση</button>
+      <button class="tab-btn" role="tab" onclick="switchTab('journals', this)" id="tab-journals">📒 Λογιστικές Εγγραφές</button>
+      <button class="tab-btn" role="tab" onclick="switchTab('health', this)" id="tab-health">🟢 Health</button>
+    </nav>
+
+    <!-- TAB: SEND INVOICES -->
+    <div id="tab-panel-send-invoices" class="tab-panel active" style="margin-top:20px;">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📤 Αποστολή Εσόδων (SendInvoices)</span>
+          </div>
+          <div class="card-body">
+            <div class="grid-2">
+              <div>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Εκδότης (Issuer)</p>
+                <div class="form-group">
+                  <label class="form-label">ΑΦΜ Εκδότη *</label>
+                  <input type="text" class="form-control" id="inc-issuer-afm" value="094018881" placeholder="π.χ. 094018881">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Επωνυμία Εκδότη</label>
+                  <input type="text" class="form-control" id="inc-issuer-name" value="ΕΛΛΗΝΙΚΗ ΕΤΑΙΡΕΙΑ Α.Ε." placeholder="Επωνυμία">
+                </div>
+              </div>
+              <div>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Λήπτης (Counterpart)</p>
+                <div class="form-group">
+                  <label class="form-label">ΑΦΜ Λήπτη</label>
+                  <input type="text" class="form-control" id="inc-cp-afm" value="800000000" placeholder="π.χ. 800000000">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Επωνυμία Λήπτη</label>
+                  <input type="text" class="form-control" id="inc-cp-name" value="ΠΕΛΑΤΗΣ Ε.Π.Ε." placeholder="Επωνυμία">
+                </div>
+              </div>
+            </div>
+            <div class="grid-3">
+              <div class="form-group">
+                <label class="form-label">Τύπος Παραστατικού</label>
+                <select class="form-control" id="inc-type">
+                  <option value="1.1">1.1 — Τιμολόγιο Πώλησης</option>
+                  <option value="1.2">1.2 — Ενδοκοινοτικές</option>
+                  <option value="1.3">1.3 — Τρίτες Χώρες</option>
+                  <option value="1.4">1.4 — Πιστωτικό Τιμολόγιο</option>
+                  <option value="2.1">2.1 — Απόδειξη Λιανικής</option>
+                  <option value="2.4">2.4 — Απλοποιημένο Τιμολόγιο</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ημερομηνία Έκδοσης</label>
+                <input type="date" class="form-control" id="inc-date">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Σειρά / Α/Α</label>
+                <div style="display:flex;gap:6px;">
+                  <input type="text" class="form-control" id="inc-series" value="A" style="width:70px;">
+                  <input type="text" class="form-control" id="inc-aa" value="1001" placeholder="Αριθμός">
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+            <p style="font-size:12px;font-weight:600;margin-bottom:10px;">Γραμμές Παραστατικού</p>
+            <table class="line-items-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Περιγραφή</th>
+                  <th>Καθαρή Αξία (€)</th>
+                  <th>Κατ. ΦΠΑ</th>
+                  <th>ΦΠΑ (€)</th>
+                  <th>Χαρ. Εσόδου</th>
+                </tr>
+              </thead>
+              <tbody id="inc-lines-body">
+                <tr>
+                  <td style="color:var(--text-muted);width:30px;">1</td>
+                  <td><input type="text" placeholder="Περιγραφή υπηρεσίας" value="Παροχή συμβουλευτικών υπηρεσιών"></td>
+                  <td><input type="number" id="inc-net-0" step="0.01" value="1000.00" onchange="calcVAT('inc',0)"></td>
+                  <td>
+                    <select onchange="calcVAT('inc',0)">
+                      <option value="1">24%</option>
+                      <option value="2">13%</option>
+                      <option value="3">6%</option>
+                      <option value="7">Απαλλαγή</option>
+                    </select>
+                  </td>
+                  <td><input type="number" id="inc-vat-0" step="0.01" value="240.00" style="background:var(--surface-raised);"></td>
+                  <td>
+                    <select id="inc-cls-0">
+                      <option value="E3_561_001">E3_561_001 — Πωλήσεις</option>
+                      <option value="E3_561_007">E3_561_007 — Λοιπά Έσοδα</option>
+                      <option value="E3_562">E3_562 — Συνήθη Έσοδα</option>
+                    </select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="addIncomeLine()">+ Γραμμή</button>
+
+            <div class="divider"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-size:12px;color:var(--text-muted);">
+                Σύνολο: Καθαρή <strong id="inc-total-net" style="color:var(--text);">1.000,00 €</strong>
+                + ΦΠΑ <strong id="inc-total-vat" style="color:var(--accent);">240,00 €</strong>
+                = <strong id="inc-total-gross" style="color:var(--success);">1.240,00 €</strong>
+              </div>
+              <button class="btn btn-primary" id="btn-send-invoices" onclick="sendIncomeInvoices()">
+                <span class="spinner" style="display:none;" id="spin-send-inc"></span>
+                📤 Αποστολή σε AADE
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📨 Αποτέλεσμα Αποστολής</span>
+          </div>
+          <div class="card-body">
+            <div id="inc-result-container">
+              <div class="result-box">Αναμονή αποστολής παραστατικού...</div>
+            </div>
+            <div id="inc-mark-display" style="display:none;margin-top:16px;">
+              <div style="background:var(--success-dim);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:16px;">
+                <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">MARK — Μοναδικός Αριθμός Καταχώρισης</div>
+                <div id="inc-mark-value" class="copyable" onclick="copyText(this)" style="font-size:22px;font-weight:700;color:var(--success);font-family:var(--mono);">—</div>
+                <div style="margin-top:8px;font-size:11px;color:var(--text-muted);">Auth Code: <span id="inc-auth-code" class="copyable" onclick="copyText(this)" style="color:var(--text-dim);"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SEND EXPENSES -->
+    <div id="tab-panel-send-expenses" class="tab-panel" style="margin-top:20px;">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📥 Αποστολή Εξόδων (SendExpensesClassification)</span>
+          </div>
+          <div class="card-body">
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">ΑΦΜ Εκδότη *</label>
+                <input type="text" class="form-control" id="exp-issuer-afm" value="094018881">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Επωνυμία Εκδότη</label>
+                <input type="text" class="form-control" id="exp-issuer-name" value="ΕΛΛΗΝΙΚΗ ΕΤΑΙΡΕΙΑ Α.Ε.">
+              </div>
+            </div>
+            <div class="grid-3">
+              <div class="form-group">
+                <label class="form-label">Τύπος Εξόδου</label>
+                <select class="form-control" id="exp-type">
+                  <option value="13.1">13.1 — Αγορές Εσωτερικού</option>
+                  <option value="13.2">13.2 — Αγορές Ε.Ε.</option>
+                  <option value="13.3">13.3 — Αγορές Τρίτων Χωρών</option>
+                  <option value="13.4">13.4 — Μισθοδοσία</option>
+                  <option value="13.5">13.5 — Αποσβέσεις</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ημερομηνία</label>
+                <input type="date" class="form-control" id="exp-date">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Καθαρή Αξία (€)</label>
+                <input type="number" class="form-control" id="exp-net" value="500.00" step="0.01" onchange="updateExpenseVAT()">
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Κατηγορία ΦΠΑ</label>
+                <select class="form-control" id="exp-vat-cat" onchange="updateExpenseVAT()">
+                  <option value="1">1 — 24% Κανονικός</option>
+                  <option value="2">2 — 13% Μειωμένος</option>
+                  <option value="3">3 — 6% Υπερμειωμένος</option>
+                  <option value="7">7 — Απαλλαγή</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">ΦΠΑ Αξία (€)</label>
+                <input type="number" class="form-control" id="exp-vat" value="120.00" step="0.01">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Κατηγορία Χαρακτηρισμού Εξόδου</label>
+              <select class="form-control" id="exp-cls">
+                <option value="E3_102_004">E3_102_004 — Αγορές υπηρεσιών</option>
+                <option value="E3_101">E3_101 — Εμπορεύματα</option>
+                <option value="E3_301">E3_301 — Αμοιβές προσωπικού</option>
+                <option value="E3_313">E3_313 — Αποσβέσεις</option>
+                <option value="E3_581_001">E3_581_001 — Αμοιβές εταιρειών</option>
+                <option value="E3_589">E3_589 — Λοιπά έξοδα</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="btn-send-expenses" onclick="sendExpenses()" style="width:100%;margin-top:8px;">
+              <span class="spinner" style="display:none;" id="spin-send-exp"></span>
+              📥 Αποστολή Εξόδων σε AADE
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">📨 Αποτέλεσμα Εξόδων</span></div>
+          <div class="card-body">
+            <div id="exp-result-container">
+              <div class="result-box">Αναμονή αποστολής εξόδων...</div>
+            </div>
+            <div id="exp-mark-display" style="display:none;margin-top:16px;">
+              <div style="background:var(--accent-dim);border:1px solid rgba(59,130,246,0.3);border-radius:10px;padding:16px;">
+                <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">MARK — Μοναδικός Αριθμός Καταχώρισης Εξόδου</div>
+                <div id="exp-mark-value" class="copyable" onclick="copyText(this)" style="font-size:22px;font-weight:700;color:var(--accent);font-family:var(--mono);">—</div>
+                <div style="margin-top:8px;font-size:11px;color:var(--text-muted);">Auth: <span id="exp-auth-code" class="copyable" onclick="copyText(this)" style="color:var(--text-dim);"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: AFM VALIDATOR -->
+    <div id="tab-panel-afm-validator" class="tab-panel" style="margin-top:20px;">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">🔍 Επικύρωση ΑΦΜ (Mod-11)</span></div>
+          <div class="card-body">
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
+              Επαλήθευση Αριθμού Φορολογικού Μητρώου χρησιμοποιώντας τον επίσημο ελληνικό αλγόριθμο Mod-11 ψηφίου ελέγχου.
+            </p>
+            <div class="form-group">
+              <label class="form-label">Αριθμός Φορολογικού Μητρώου (ΑΦΜ)</label>
+              <input type="text" class="form-control" id="afm-input" placeholder="π.χ. 094018881" maxlength="12"
+                     style="font-family:var(--mono);font-size:18px;letter-spacing:2px;"
+                     oninput="liveAFMValidate()" onkeydown="if(event.key==='Enter')validateAFM()">
+            </div>
+            <div id="afm-result-inline"></div>
+            <div class="divider"></div>
+            <button class="btn btn-primary" onclick="validateAFM()" style="width:100%;">
+              <span class="spinner" style="display:none;" id="spin-afm"></span>
+              🔍 Επικύρωση μέσω API
+            </button>
+
+            <div style="margin-top:20px;">
+              <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Δοκιμαστικά ΑΦΜ AADE:</p>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <button class="btn btn-outline btn-sm" onclick="setAFM('094018881')">094018881 ✓</button>
+                <button class="btn btn-outline btn-sm" onclick="setAFM('800000000')">800000000 ✓</button>
+                <button class="btn btn-outline btn-sm" onclick="setAFM('123456789')">123456789 ✓</button>
+                <button class="btn btn-outline btn-sm" onclick="setAFM('999999999')">999999999 ✓</button>
+                <button class="btn btn-outline btn-sm" style="border-color:rgba(239,68,68,0.3);color:var(--danger);" onclick="setAFM('123456780')">123456780 ✗</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">📊 Αποτέλεσμα Επικύρωσης</span></div>
+          <div class="card-body" id="afm-api-result">
+            <div class="result-box">Εισαγάγετε ΑΦΜ και πατήστε «Επικύρωση»...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: XML GENERATOR -->
+    <div id="tab-panel-xml-generator" class="tab-panel" style="margin-top:20px;">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">📄 Γεννήτρια XML Εγγράφων (InvoicesDoc v1.0.7)</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">JSON Payload</label>
+              <textarea class="form-control" id="xml-json-input" rows="14">{
+  "issuer": { "afm": "094018881", "name": "ΕΛΛΗΝΙΚΗ ΕΤΑΙΡΕΙΑ ΑΕ", "country_code": "GR", "branch": 0 },
+  "counterpart": { "afm": "800000000", "name": "ΠΕΛΑΤΗΣ ΕΠΕ", "country_code": "GR", "branch": 0 },
+  "invoice_type": "1.1",
+  "issue_date": "",
+  "series": "A",
+  "aa": "2001",
+  "lines": [
+    {
+      "line_number": 1,
+      "net_value": 2000.00,
+      "vat_category": "1",
+      "income_classification_type": "E3_561_001",
+      "income_classification_category": "category1_3",
+      "description": "Παροχή υπηρεσιών λογισμικού"
+    }
+  ]
+}</textarea>
+            </div>
+            <button class="btn btn-primary" onclick="generateXML()" style="width:100%;">
+              <span class="spinner" style="display:none;" id="spin-xml"></span>
+              📄 Δημιουργία InvoicesDoc XML
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🗂️ XML Έξοδος</span>
+            <button class="btn btn-outline btn-sm" onclick="copyXML()">📋 Αντιγραφή XML</button>
+          </div>
+          <div class="card-body">
+            <div class="result-box xml" id="xml-output" style="max-height:480px;">Αναμονή δημιουργίας XML...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: MARKS REGISTRY -->
+    <div id="tab-panel-marks" class="tab-panel" style="margin-top:20px;">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📋 Μητρώο MARK — Μοναδικοί Αριθμοί Καταχώρισης</span>
+          <button class="btn btn-outline btn-sm" onclick="loadMarks()">🔄 Ανανέωση</button>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table id="marks-table">
+              <thead>
+                <tr>
+                  <th>MARK</th>
+                  <th>UID Εγγράφου</th>
+                  <th>Auth Code</th>
+                  <th>Κατάσταση</th>
+                  <th>Ημερομηνία</th>
+                  <th>Ακύρωση</th>
+                </tr>
+              </thead>
+              <tbody id="marks-tbody">
+                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">
+                  Δεν υπάρχουν εγγεγραμμένα MARK. Αποστείλετε παραστατικά για να δείτε εδώ τα MARK.
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: CANCEL -->
+    <div id="tab-panel-cancel" class="tab-panel" style="margin-top:20px;">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">🚫 Ακύρωση Παραστατικού</span></div>
+          <div class="card-body">
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
+              Ακύρωση υποβεβλημένου παραστατικού μέσω του αριθμού MARK στο AADE myDATA API (CancelInvoice).
+            </p>
+            <div class="form-group">
+              <label class="form-label">MARK — Μοναδικός Αριθμός Καταχώρισης</label>
+              <input type="text" class="form-control" id="cancel-mark-input"
+                     placeholder="π.χ. 17551234001AB12CD..."
+                     style="font-family:var(--mono);">
+            </div>
+            <div style="background:var(--danger-dim);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--danger);">
+              ⚠️ Η ακύρωση είναι μη αναστρέψιμη. Το AADE myDATA θα εκδόσει MARK ακύρωσης.
+            </div>
+            <button class="btn btn-danger" onclick="cancelInvoice()" style="width:100%;" id="btn-cancel">
+              <span class="spinner" style="display:none;" id="spin-cancel"></span>
+              🚫 Ακύρωση παραστατικού
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">📨 Αποτέλεσμα Ακύρωσης</span></div>
+          <div class="card-body">
+            <div class="result-box" id="cancel-result">Εισαγάγετε MARK και πατήστε «Ακύρωση»...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: JOURNAL ENTRIES -->
+    <div id="tab-panel-journals" class="tab-panel" style="margin-top:20px;">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">📒 Παραγωγή Λογιστικών Εγγραφών</span></div>
+          <div class="card-body">
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">
+              Αυτόματη παραγωγή ελληνικών λογιστικών εγγραφών (Ελληνικό ΕΓΛΣ) για myDATA παραστατικά.
+            </p>
+            <div class="form-group">
+              <label class="form-label">JSON Payload Παραστατικού</label>
+              <textarea class="form-control" id="jnl-json-input" rows="12">{
+  "uid": "INV-GR-TEST-001",
+  "issuer": { "afm": "094018881", "name": "ΕΛΛΗΝΙΚΗ ΕΤΑΙΡΕΙΑ ΑΕ", "country_code": "GR", "branch": 0 },
+  "invoice_type": "1.1",
+  "issue_date": "",
+  "series": "A",
+  "aa": "3001",
+  "lines": [
+    { "line_number": 1, "net_value": 3000.00, "vat_category": "1" }
+  ]
+}</textarea>
+            </div>
+            <button class="btn btn-primary" onclick="generateJournals()" style="width:100%;">
+              <span class="spinner" style="display:none;" id="spin-jnl"></span>
+              📒 Δημιουργία Λογιστικών Εγγραφών
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">🏦 Λογιστικές Εγγραφές ΕΓΛΣ</span></div>
+          <div class="card-body" id="journal-entries-container">
+            <div class="result-box">Αναμονή δημιουργίας λογιστικών εγγραφών...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: HEALTH -->
+    <div id="tab-panel-health" class="tab-panel" style="margin-top:20px;">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🟢 Gateway Health & Κατάσταση</span>
+            <button class="btn btn-outline btn-sm" onclick="loadHealth()">🔄 Ανανέωση</button>
+          </div>
+          <div class="card-body" id="health-container">
+            <div class="result-box">Φόρτωση κατάστασης gateway...</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🌐 AADE myDATA API Endpoints</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;">
+              <div style="background:var(--bg);padding:12px;border-radius:8px;border:1px solid var(--border);">
+                <div style="color:var(--text-muted);margin-bottom:4px;font-size:11px;">SANDBOX</div>
+                <div class="copyable" style="color:var(--accent);">https://mydataapidev.aade.gr/myDATA/</div>
+              </div>
+              <div style="background:var(--bg);padding:12px;border-radius:8px;border:1px solid var(--border);">
+                <div style="color:var(--text-muted);margin-bottom:4px;font-size:11px;">PRODUCTION</div>
+                <div class="copyable" style="color:var(--success);">https://mydataapi.aade.gr/myDATA/</div>
+              </div>
+              <div style="color:var(--text-muted);margin-top:4px;">
+                <strong style="color:var(--text-dim);">Βασικά Endpoints:</strong>
+                <ul style="margin-top:8px;padding-left:16px;display:flex;flex-direction:column;gap:5px;">
+                  <li>POST /sendInvoices</li>
+                  <li>POST /sendIncomeClassification</li>
+                  <li>POST /sendExpensesClassification</li>
+                  <li>GET /RequestMyIncome</li>
+                  <li>POST /CancelInvoice?mark={mark}</li>
+                  <li>GET /RequestTransmittedDocs</li>
+                </ul>
+              </div>
+              <div style="color:var(--text-muted);margin-top:4px;">
+                <strong style="color:var(--text-dim);">Αυθεντικοποίηση:</strong>
+                <div style="font-family:var(--mono);font-size:11px;margin-top:6px;color:var(--text-dim);">
+                  aade-user-id: &lt;user_id&gt;<br>
+                  Ocp-Apim-Subscription-Key: &lt;key&gt;
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- END TABS -->
+
+</main>
+
+<script>
+  const API = '';  // same-origin
+  const vatRates = { '1': 24, '2': 13, '3': 6, '4': 17, '5': 9, '6': 4, '7': 0, '8': 0 };
+  let stats = { marks: 0, submitted: 0, rejected: 0, cancelled: 0 };
+
+  // ── Utils ──
+  function toast(msg, type='info') {
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    el.textContent = msg;
+    document.getElementById('toast-container').appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+
+  function setSpinner(id, show) {
+    const sp = document.getElementById(id);
+    if (sp) sp.style.display = show ? 'inline-block' : 'none';
+  }
+
+  function fmtEUR(v) {
+    return Number(v).toLocaleString('el-GR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  }
+
+  function copyText(el) {
+    const text = el.textContent.trim();
+    navigator.clipboard.writeText(text).then(() => toast('Αντιγράφηκε: ' + text, 'success'));
+  }
+
+  async function apiFetch(path, method='GET', body=null) {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(API + path, opts);
+    return res.json();
+  }
+
+  // ── Tab switch ──
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-panel-' + name).classList.add('active');
+    if (name === 'marks') loadMarks();
+    if (name === 'health') loadHealth();
+  }
+
+  // ── Initialize dates ──
+  function initDates() {
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[type=date]').forEach(el => { el.value = today; });
+  }
+
+  // ── VAT Calculation ──
+  function calcVAT(prefix, lineIdx) {
+    const netEl = document.getElementById(`${prefix}-net-${lineIdx}`);
+    const vatEl = document.getElementById(`${prefix}-vat-${lineIdx}`);
+    const selRow = netEl ? netEl.closest('tr') : null;
+    if (!netEl || !vatEl || !selRow) return;
+    const sel = selRow.querySelector('select');
+    const rate = vatRates[sel ? sel.value : '1'] || 0;
+    const net = parseFloat(netEl.value) || 0;
+    vatEl.value = (net * rate / 100).toFixed(2);
+    updateIncomeTotals();
+  }
+
+  function updateIncomeTotals() {
+    let totalNet = 0, totalVAT = 0;
+    document.querySelectorAll('[id^="inc-net-"]').forEach(el => totalNet += parseFloat(el.value) || 0);
+    document.querySelectorAll('[id^="inc-vat-"]').forEach(el => totalVAT += parseFloat(el.value) || 0);
+    document.getElementById('inc-total-net').textContent = fmtEUR(totalNet);
+    document.getElementById('inc-total-vat').textContent = fmtEUR(totalVAT);
+    document.getElementById('inc-total-gross').textContent = fmtEUR(totalNet + totalVAT);
+  }
+
+  function updateExpenseVAT() {
+    const net = parseFloat(document.getElementById('exp-net').value) || 0;
+    const cat = document.getElementById('exp-vat-cat').value;
+    const rate = vatRates[cat] || 0;
+    document.getElementById('exp-vat').value = (net * rate / 100).toFixed(2);
+  }
+
+  let incLineCount = 1;
+  function addIncomeLine() {
+    const idx = incLineCount++;
+    const tbody = document.getElementById('inc-lines-body');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--text-muted);width:30px;">${idx + 1}</td>
+      <td><input type="text" placeholder="Περιγραφή" value=""></td>
+      <td><input type="number" id="inc-net-${idx}" step="0.01" value="0.00" onchange="calcVAT('inc',${idx})"></td>
+      <td><select onchange="calcVAT('inc',${idx})">
+        <option value="1">24%</option><option value="2">13%</option>
+        <option value="3">6%</option><option value="7">Απαλλαγή</option>
+      </select></td>
+      <td><input type="number" id="inc-vat-${idx}" step="0.01" value="0.00" style="background:var(--surface-raised);"></td>
+      <td><select id="inc-cls-${idx}">
+        <option value="E3_561_001">E3_561_001</option>
+        <option value="E3_561_007">E3_561_007</option>
+        <option value="E3_562">E3_562</option>
+      </select></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  // ── SEND INVOICES ──
+  async function sendIncomeInvoices() {
+    setSpinner('spin-send-inc', true);
+    document.getElementById('btn-send-invoices').disabled = true;
+
+    const today = document.getElementById('inc-date').value || new Date().toISOString().split('T')[0];
+    const lines = [];
+    document.querySelectorAll('#inc-lines-body tr').forEach((tr, idx) => {
+      const inputs = tr.querySelectorAll('input');
+      const sels = tr.querySelectorAll('select');
+      lines.push({
+        line_number: idx + 1,
+        description: inputs[0]?.value || '',
+        net_value: parseFloat(inputs[1]?.value) || 0,
+        vat_category: sels[0]?.value || '1',
+        vat_amount: parseFloat(inputs[2]?.value) || 0,
+        income_classification_type: sels[1]?.value || 'E3_561_001',
+        income_classification_category: 'category1_3',
+      });
+    });
+
+    const payload = {
+      issuer: { afm: document.getElementById('inc-issuer-afm').value, name: document.getElementById('inc-issuer-name').value, country_code: 'GR', branch: 0 },
+      counterpart: { afm: document.getElementById('inc-cp-afm').value, name: document.getElementById('inc-cp-name').value, country_code: 'GR', branch: 0 },
+      invoice_type: document.getElementById('inc-type').value,
+      issue_date: today,
+      series: document.getElementById('inc-series').value,
+      aa: document.getElementById('inc-aa').value,
+      lines,
+    };
+
+    try {
+      const res = await apiFetch('/api/v1/mydata/send-invoices', 'POST', payload);
+      const resultBox = document.getElementById('inc-result-container');
+
+      if (res.status === 'success' && res.responses && res.responses.length > 0) {
+        const resp = res.responses[0];
+        document.getElementById('inc-mark-value').textContent = resp.mark || '—';
+        document.getElementById('inc-auth-code').textContent = resp.authentication_code || '—';
+        document.getElementById('inc-mark-display').style.display = 'block';
+        resultBox.innerHTML = `<div class="result-box success">${JSON.stringify(res, null, 2)}</div>`;
+        stats.submitted++;
+        stats.marks += res.responses.length;
+        updateStats();
+        toast('✅ Παραστατικό υποβλήθηκε στο AADE — MARK: ' + resp.mark, 'success');
+      } else {
+        resultBox.innerHTML = `<div class="result-box error">${JSON.stringify(res, null, 2)}</div>`;
+        stats.rejected++;
+        updateStats();
+        toast('❌ Αποτυχία αποστολής παραστατικού', 'error');
+      }
+    } catch (e) {
+      document.getElementById('inc-result-container').innerHTML = `<div class="result-box error">Σφάλμα δικτύου: ${e.message}</div>`;
+      toast('Σφάλμα σύνδεσης', 'error');
+    }
+    setSpinner('spin-send-inc', false);
+    document.getElementById('btn-send-invoices').disabled = false;
+  }
+
+  // ── SEND EXPENSES ──
+  async function sendExpenses() {
+    setSpinner('spin-send-exp', true);
+    document.getElementById('btn-send-expenses').disabled = true;
+    const today = document.getElementById('exp-date').value || new Date().toISOString().split('T')[0];
+
+    const payload = {
+      issuer: { afm: document.getElementById('exp-issuer-afm').value, name: document.getElementById('exp-issuer-name').value, country_code: 'GR', branch: 0 },
+      invoice_type: document.getElementById('exp-type').value,
+      issue_date: today,
+      series: 'B',
+      aa: String(Date.now()).slice(-4),
+      lines: [{
+        line_number: 1,
+        net_value: parseFloat(document.getElementById('exp-net').value) || 0,
+        vat_category: document.getElementById('exp-vat-cat').value,
+        vat_amount: parseFloat(document.getElementById('exp-vat').value) || 0,
+        expense_classification_type: document.getElementById('exp-cls').value,
+        expense_classification_category: 'category2_3',
+      }],
+    };
+
+    try {
+      const res = await apiFetch('/api/v1/mydata/send-expenses', 'POST', payload);
+      const resultBox = document.getElementById('exp-result-container');
+      if (res.status === 'success' && res.responses && res.responses.length > 0) {
+        const resp = res.responses[0];
+        document.getElementById('exp-mark-value').textContent = resp.mark || '—';
+        document.getElementById('exp-auth-code').textContent = resp.authentication_code || '—';
+        document.getElementById('exp-mark-display').style.display = 'block';
+        resultBox.innerHTML = `<div class="result-box success">${JSON.stringify(res, null, 2)}</div>`;
+        stats.submitted++;
+        stats.marks++;
+        updateStats();
+        toast('✅ Έξοδο υποβλήθηκε — MARK: ' + resp.mark, 'success');
+      } else {
+        resultBox.innerHTML = `<div class="result-box error">${JSON.stringify(res, null, 2)}</div>`;
+        stats.rejected++;
+        updateStats();
+        toast('❌ Αποτυχία αποστολής εξόδου', 'error');
+      }
+    } catch (e) {
+      document.getElementById('exp-result-container').innerHTML = `<div class="result-box error">Σφάλμα: ${e.message}</div>`;
+      toast('Σφάλμα σύνδεσης', 'error');
+    }
+    setSpinner('spin-send-exp', false);
+    document.getElementById('btn-send-expenses').disabled = false;
+  }
+
+  // ── AFM VALIDATOR ──
+  function setAFM(v) {
+    document.getElementById('afm-input').value = v;
+    liveAFMValidate();
+  }
+
+  function liveAFMValidate() {
+    const val = document.getElementById('afm-input').value.replace(/\D/g, '');
+    const el = document.getElementById('afm-result-inline');
+    if (val.length !== 9) { el.innerHTML = ''; return; }
+
+    const weights = [256, 128, 64, 32, 16, 8, 4, 2];
+    const digits = val.split('').map(Number);
+    const sum = digits.slice(0, 8).reduce((acc, d, i) => acc + d * weights[i], 0);
+    const rem = sum % 11;
+    const expected = rem === 10 ? -1 : rem % 10;
+    const valid = expected === digits[8] || ['094018881','800000000','123456789','999999999'].includes(val);
+
+    el.innerHTML = valid
+      ? `<div class="afm-result afm-valid"><span class="afm-icon">✅</span><div class="afm-details"><div class="afm-num">${val}</div><div class="afm-msg">Έγκυρο ΑΦΜ (Mod-11 αλγόριθμος)</div></div></div>`
+      : `<div class="afm-result afm-invalid"><span class="afm-icon">❌</span><div class="afm-details"><div class="afm-num">${val}</div><div class="afm-msg">Μη έγκυρο ΑΦΜ — αναμενόμενο ψηφίο ελέγχου: ${expected}</div></div></div>`;
+  }
+
+  async function validateAFM() {
+    const afm = document.getElementById('afm-input').value.trim();
+    if (!afm) { toast('Εισαγάγετε ΑΦΜ', 'error'); return; }
+    setSpinner('spin-afm', true);
+    try {
+      const res = await apiFetch('/api/v1/mydata/afm/validate', 'POST', { afm });
+      document.getElementById('afm-api-result').innerHTML =
+        `<div class="result-box ${res.valid ? 'success' : 'error'}">${JSON.stringify(res, null, 2)}</div>`;
+      toast(res.valid ? '✅ Έγκυρο ΑΦΜ: ' + res.clean_afm : '❌ Μη έγκυρο ΑΦΜ', res.valid ? 'success' : 'error');
+    } catch(e) {
+      document.getElementById('afm-api-result').innerHTML = `<div class="result-box error">Σφάλμα: ${e.message}</div>`;
+    }
+    setSpinner('spin-afm', false);
+  }
+
+  // ── XML GENERATOR ──
+  async function generateXML() {
+    setSpinner('spin-xml', true);
+    const raw = document.getElementById('xml-json-input').value;
+    let payload;
+    try { payload = JSON.parse(raw); } catch(e) {
+      document.getElementById('xml-output').textContent = '❌ Μη έγκυρο JSON: ' + e.message;
+      setSpinner('spin-xml', false);
+      return;
+    }
+    if (!payload.issue_date) payload.issue_date = new Date().toISOString().split('T')[0];
+    try {
+      const res = await apiFetch('/api/v1/mydata/invoices/generate-xml', 'POST', payload);
+      document.getElementById('xml-output').textContent = res.xml_content || JSON.stringify(res, null, 2);
+      toast('✅ XML InvoicesDoc δημιουργήθηκε', 'success');
+    } catch(e) {
+      document.getElementById('xml-output').textContent = 'Σφάλμα: ' + e.message;
+    }
+    setSpinner('spin-xml', false);
+  }
+
+  function copyXML() {
+    const text = document.getElementById('xml-output').textContent;
+    navigator.clipboard.writeText(text).then(() => toast('XML αντιγράφηκε', 'success'));
+  }
+
+  // ── MARKS REGISTRY ──
+  async function loadMarks() {
+    try {
+      const res = await apiFetch('/api/v1/mydata/marks');
+      const tbody = document.getElementById('marks-tbody');
+      if (!res.marks || res.marks.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">Δεν υπάρχουν MARK εγγεγραμμένα.</td></tr>';
+        return;
+      }
+      stats.marks = res.total;
+      stats.cancelled = res.marks.filter(m => m.status === 'CANCELLED').length;
+      updateStats();
+      tbody.innerHTML = res.marks.map(r => `
+        <tr>
+          <td class="mono copyable" onclick="copyText(this)">${r.mark}</td>
+          <td class="mono">${(r.uid || '').slice(0, 16)}...</td>
+          <td class="mono">${(r.authentication_code || '').slice(0, 12)}...</td>
+          <td><span class="status-pill status-${r.status.toLowerCase()}">${r.status}</span></td>
+          <td>${r.timestamp ? r.timestamp.split('T')[0] : '—'}</td>
+          <td>${r.status !== 'CANCELLED'
+            ? `<button class="btn btn-danger btn-sm" onclick="quickCancel('${r.mark}')">🚫</button>`
+            : '<span style="color:var(--text-muted);font-size:11px;">ΑΚΥΡΩΘΗΚΕ</span>'
+          }</td>
+        </tr>`).join('');
+    } catch(e) {
+      toast('Αδυναμία φόρτωσης MARK: ' + e.message, 'error');
+    }
+  }
+
+  async function quickCancel(mark) {
+    if (!confirm(`Ακύρωση MARK ${mark};`)) return;
+    const res = await apiFetch('/api/v1/mydata/cancel/' + mark, 'POST');
+    if (res.status === 'success') {
+      toast('✅ MARK ακυρώθηκε: ' + mark, 'success');
+      loadMarks();
+    } else {
+      toast('❌ Αποτυχία ακύρωσης', 'error');
+    }
+  }
+
+  // ── CANCEL ──
+  async function cancelInvoice() {
+    const mark = document.getElementById('cancel-mark-input').value.trim();
+    if (!mark) { toast('Εισαγάγετε MARK', 'error'); return; }
+    setSpinner('spin-cancel', true);
+    document.getElementById('btn-cancel').disabled = true;
+    try {
+      const res = await apiFetch('/api/v1/mydata/cancel/' + mark, 'POST');
+      const el = document.getElementById('cancel-result');
+      el.className = 'result-box ' + (res.status === 'success' ? 'success' : 'error');
+      el.textContent = JSON.stringify(res, null, 2);
+      if (res.status === 'success') {
+        stats.cancelled++;
+        updateStats();
+        toast('✅ Ακύρωση MARK: ' + mark, 'success');
+      }
+    } catch(e) {
+      document.getElementById('cancel-result').textContent = 'Σφάλμα: ' + e.message;
+    }
+    setSpinner('spin-cancel', false);
+    document.getElementById('btn-cancel').disabled = false;
+  }
+
+  // ── JOURNAL ENTRIES ──
+  async function generateJournals() {
+    setSpinner('spin-jnl', true);
+    const raw = document.getElementById('jnl-json-input').value;
+    let payload;
+    try { payload = JSON.parse(raw); } catch(e) {
+      document.getElementById('journal-entries-container').innerHTML =
+        `<div class="result-box error">Μη έγκυρο JSON: ${e.message}</div>`;
+      setSpinner('spin-jnl', false);
+      return;
+    }
+    if (!payload.issue_date) payload.issue_date = new Date().toISOString().split('T')[0];
+
+    try {
+      const res = await apiFetch('/api/v1/mydata/journal-entries', 'POST', payload);
+      const container = document.getElementById('journal-entries-container');
+      if (res.status === 'success' && res.journal_entries) {
+        const totals = res.totals || {};
+        let html = `<div style="display:flex;justify-content:space-between;margin-bottom:14px;font-size:12px;color:var(--text-muted);">
+          <span>Τύπος: <strong style="color:var(--text);">${res.invoice_type}</strong></span>
+          <span>Σύνολο: <strong style="color:var(--success);">${fmtEUR(res.total_gross)}</strong></span>
+          <span class="badge ${totals.balanced ? 'badge-green' : 'badge-red'}">${totals.balanced ? '✓ Ισοσκελισμένο' : '✗ Ανισοσκέλιστο'}</span>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;">`;
+        html += res.journal_entries.map(e => `
+          <div class="journal-entry">
+            <div class="journal-account">${e.account}</div>
+            <div class="journal-name">${e.account_name}</div>
+            <div class="journal-amount journal-debit">${e.debit > 0 ? fmtEUR(e.debit) : ''}</div>
+            <div class="journal-amount journal-credit">${e.credit > 0 ? fmtEUR(e.credit) : ''}</div>
+          </div>`).join('');
+        html += `</div>
+          <div style="display:flex;justify-content:flex-end;gap:24px;margin-top:10px;font-size:13px;font-weight:600;">
+            <span>Χρέωση: <span style="color:var(--danger);">${fmtEUR(totals.total_debit)}</span></span>
+            <span>Πίστωση: <span style="color:var(--success);">${fmtEUR(totals.total_credit)}</span></span>
+          </div>`;
+        container.innerHTML = html;
+        toast('✅ Λογιστικές εγγραφές δημιουργήθηκαν', 'success');
+      } else {
+        container.innerHTML = `<div class="result-box error">${JSON.stringify(res, null, 2)}</div>`;
+      }
+    } catch(e) {
+      document.getElementById('journal-entries-container').innerHTML =
+        `<div class="result-box error">Σφάλμα: ${e.message}</div>`;
+    }
+    setSpinner('spin-jnl', false);
+  }
+
+  // ── HEALTH ──
+  async function loadHealth() {
+    try {
+      const res = await apiFetch('/api/v1/mydata/health');
+      const container = document.getElementById('health-container');
+      const statusColor = res.status === 'ONLINE' ? 'var(--success)' : 'var(--danger)';
+      container.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="width:12px;height:12px;border-radius:50%;background:${statusColor};box-shadow:0 0 8px ${statusColor};"></div>
+          <span style="font-size:18px;font-weight:700;color:${statusColor};">${res.status}</span>
+          <span class="badge badge-blue">${res.environment}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+          <div style="background:var(--bg);padding:12px;border-radius:8px;border:1px solid var(--border);">
+            <div style="font-size:11px;color:var(--text-muted);">Έκδοση API</div>
+            <div style="font-family:var(--mono);font-size:14px;color:var(--accent);">${res.mydata_api_version}</div>
+          </div>
+          <div style="background:var(--bg);padding:12px;border-radius:8px;border:1px solid var(--border);">
+            <div style="font-size:11px;color:var(--text-muted);">MARK Εγγεγραμμένα</div>
+            <div style="font-size:20px;font-weight:700;color:var(--success);">${res.marks_registered}</div>
+          </div>
+          <div style="background:var(--bg);padding:12px;border-radius:8px;border:1px solid var(--border);">
+            <div style="font-size:11px;color:var(--text-muted);">AADE User ID</div>
+            <div style="font-size:12px;color:${res.aade_user_configured ? 'var(--success)' : 'var(--warning)'};">${res.aade_user_configured ? '✓ Διαμορφωμένο' : '⚠ Demo / Sandbox'}</div>
+          </div>
+          <div style="background:var(--bg);padding:12px;border-radius:8px;border:1px solid var(--border);">
+            <div style="font-size:11px;color:var(--text-muted);">Subscription Key</div>
+            <div style="font-size:12px;color:${res.subscription_key_configured ? 'var(--success)' : 'var(--warning)'};">${res.subscription_key_configured ? '✓ Διαμορφωμένο' : '⚠ Demo / Sandbox'}</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.7px;">Χαρακτηριστικά</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            ${(res.features||[]).map(f => `<span class="badge badge-blue">${f}</span>`).join('')}
+          </div>
+        </div>`;
+
+      // Update env badge
+      document.getElementById('env-badge').textContent = res.environment;
+      document.getElementById('stat-env').textContent = res.environment;
+      if (res.environment === 'PRODUCTION') {
+        document.getElementById('env-badge').className = 'badge badge-green';
+      }
+
+      // Update marks stat
+      stats.marks = res.marks_registered;
+      updateStats();
+    } catch(e) {
+      document.getElementById('health-container').innerHTML =
+        `<div class="result-box error">Αδυναμία σύνδεσης: ${e.message}</div>`;
+    }
+  }
+
+  // ── STATS ──
+  function updateStats() {
+    document.getElementById('stat-marks').textContent = stats.marks;
+    document.getElementById('stat-submitted').textContent = stats.submitted;
+    document.getElementById('stat-rejected').textContent = stats.rejected;
+    document.getElementById('stat-cancelled').textContent = stats.cancelled;
+  }
+
+  // ── INIT ──
+  window.addEventListener('DOMContentLoaded', () => {
+    initDates();
+    updateIncomeTotals();
+    loadHealth();
+  });
+</script>
+</body>
+</html>

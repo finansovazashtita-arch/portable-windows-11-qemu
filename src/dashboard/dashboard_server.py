@@ -291,6 +291,83 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(content)
             return
 
+        elif canonical_path.startswith("/api/v1/ksef") or canonical_path.startswith("/api/ksef"):
+            from src.integration.ksef_api import (
+                get_ksef_health_handler,
+                get_ksef_status_handler,
+                get_ksef_upo_handler,
+                get_ksef_invoices_handler,
+            )
+            from urllib.parse import parse_qs, urlparse
+            parsed_url = urlparse(self.path)
+            q_params = {k: v[0] for k, v in parse_qs(parsed_url.query).items()}
+
+            if canonical_path.endswith("/health"):
+                res = get_ksef_health_handler(q_params)
+                self._send_json_response(res)
+                return
+            elif "/invoices/status/" in canonical_path:
+                ref_num = canonical_path.split("/invoices/status/")[-1]
+                res = get_ksef_status_handler(ref_num)
+                self._send_json_response(res)
+                return
+            elif "/invoices/upo/" in canonical_path:
+                ksef_num = canonical_path.split("/invoices/upo/")[-1]
+                res = get_ksef_upo_handler(ksef_num)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/invoices"):
+                res = get_ksef_invoices_handler(q_params)
+                self._send_json_response(res)
+                return
+
+        elif self.path in ("/ksef", "/ksef.html"):
+            with open(os.path.join(WEB_UI_DIR, "ksef.html"), "rb") as f:
+                content = f.read()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
+        elif canonical_path.startswith("/api/v1/esg") or canonical_path.startswith("/api/esg"):
+            from src.analytics.esg_api import (
+                get_esg_health_handler,
+                calculate_footprint_handler,
+                get_cbam_report_handler,
+                post_carbon_journals_handler,
+                export_csrd_report_handler,
+            )
+            from urllib.parse import parse_qs, urlparse
+            parsed_url = urlparse(self.path)
+            q_params = {k: v[0] for k, v in parse_qs(parsed_url.query).items()}
+
+            if canonical_path.endswith("/health"):
+                self._send_json_response(get_esg_health_handler())
+                return
+            elif canonical_path.endswith("/footprint/calculate"):
+                self._send_json_response(calculate_footprint_handler(q_params))
+                return
+            elif canonical_path.endswith("/cbam/report"):
+                self._send_json_response(get_cbam_report_handler(q_params))
+                return
+            elif canonical_path.endswith("/journals/post"):
+                self._send_json_response(post_carbon_journals_handler(q_params))
+                return
+            elif canonical_path.endswith("/csrd/export"):
+                self._send_json_response(export_csrd_report_handler(q_params))
+                return
+
+        elif self.path in ("/esg", "/esg.html"):
+            with open(os.path.join(WEB_UI_DIR, "esg.html"), "rb") as f:
+                content = f.read()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
+
 
         elif canonical_path in ("/api/v1/reconciliation/pending-matches", "/api/reconciliation/pending-matches"):
 
@@ -431,6 +508,60 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 res = post_anaf_vat_check_handler(req_data)
                 self._send_json_response(res)
                 return
+
+        elif canonical_path.startswith("/api/v1/ksef") or canonical_path.startswith("/api/ksef"):
+            from src.integration.ksef_api import (
+                post_ksef_auth_session_handler,
+                post_ksef_generate_xml_handler,
+                post_ksef_submit_handler,
+                post_ksef_gus_check_handler,
+                post_ksef_validate_nip_handler,
+            )
+            if canonical_path.endswith("/auth/session"):
+                res = post_ksef_auth_session_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/invoices/generate-xml"):
+                res = post_ksef_generate_xml_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/invoices/submit"):
+                res = post_ksef_submit_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/gus/check"):
+                res = post_ksef_gus_check_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/nip/validate"):
+                res = post_ksef_validate_nip_handler(req_data)
+                self._send_json_response(res)
+                return
+
+        elif canonical_path.startswith("/api/v1/esg") or canonical_path.startswith("/api/esg"):
+            from src.analytics.esg_api import (
+                get_esg_health_handler,
+                calculate_footprint_handler,
+                get_cbam_report_handler,
+                post_carbon_journals_handler,
+                export_csrd_report_handler,
+            )
+            if canonical_path.endswith("/footprint/calculate"):
+                self._send_json_response(calculate_footprint_handler(req_data))
+                return
+            elif canonical_path.endswith("/cbam/report"):
+                self._send_json_response(get_cbam_report_handler(req_data))
+                return
+            elif canonical_path.endswith("/journals/post"):
+                self._send_json_response(post_carbon_journals_handler(req_data))
+                return
+            elif canonical_path.endswith("/csrd/export"):
+                self._send_json_response(export_csrd_report_handler(req_data))
+                return
+            elif canonical_path.endswith("/health"):
+                self._send_json_response(get_esg_health_handler())
+                return
+
 
         elif canonical_path in ("/api/v1/mobile/scan", "/api/mobile/scan"):
 

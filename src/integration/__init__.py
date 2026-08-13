@@ -41,7 +41,37 @@ from src.integration.anaf_efactura_gateway import (
     validate_cif,
 )
 
+from src.integration.ksef_gateway import (
+    KSeFEInvoiceGateway,
+    KSeFInvoice,
+    KSeFParty,
+    KSeFInvoiceItem,
+    KSeFInvoiceType,
+    KSeFSchemaVersion,
+    KSeFInvoiceStatus,
+    KSeFVATCategory,
+    KSeFEnvironment,
+    validate_nip,
+)
+
+from src.integration.gus_bir_api import (
+    GUSBIRClient,
+    GUSCompanyData,
+)
+
 __all__ = [
+    "KSeFEInvoiceGateway",
+    "KSeFInvoice",
+    "KSeFParty",
+    "KSeFInvoiceItem",
+    "KSeFInvoiceType",
+    "KSeFSchemaVersion",
+    "KSeFInvoiceStatus",
+    "KSeFVATCategory",
+    "KSeFEnvironment",
+    "validate_nip",
+    "GUSBIRClient",
+    "GUSCompanyData",
     "ANAFEInvoiceGateway",
     "ANAFInvoice",
     "ANAFParty",
@@ -79,5 +109,6 @@ __all__ = [
     "HMRCVATReturn",
     "HMRCEndpoint",
 ]
+
 
 

@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinansProtect | Poland KSeF e-Fakturowanie & GUS BIR Gateway (M79)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #080c14;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      --primary-accent: #dc2626;
+      --pl-white: #ffffff;
+      --pl-red: #dc2626;
+      --success-green: #10b981;
+      --warning-amber: #f59e0b;
+      --danger-red: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .ksef-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .flag-badge {
+      display: inline-flex;
+      flex-direction: column;
+      height: 20px;
+      width: 30px;
+      border-radius: 2px;
+      overflow: hidden;
+      box-shadow: 0 0 4px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .flag-top { background: #ffffff; flex: 1; }
+    .flag-bottom { background: #dc2626; flex: 1; }
+
+    .brand-title h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, #ffffff 0%, #dc2626 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .badge-live {
+      background: rgba(220, 38, 38, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(220, 38, 38, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      background: #1e293b;
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      background: #334155;
+      color: #ffffff;
+      border-color: #475569;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--success-green);
+      font-weight: 500;
+    }
+
+    /* Tabs Styling */
+    .tabs-bar {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      color: #ffffff;
+      border-bottom-color: var(--pl-red);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Section Cards */
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+
+    }
+
+    .form-control {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--pl-red);
+    }
+
+    .btn-action {
+      background: var(--pl-red);
+      color: #ffffff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-action:hover {
+      background: #b91c1c;
+    }
+
+    .btn-secondary {
+      background: #334155;
+      color: #ffffff;
+      border: 1px solid #475569;
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    /* Table Styling */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .data-table th, .data-table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .data-table th {
+      background: #0f172a;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-accepted { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .status-draft { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+    .status-error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+    /* Code & Output Box */
+    .code-box {
+      background: #050811;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #38bdf8;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="ksef-container">
+    <!-- Header -->
+    <header class="header-bar">
+      <div class="brand-title">
+        <span class="flag-badge"><span class="flag-top"></span><span class="flag-bottom"></span></span>
+        <h1>Poland KSeF e-Fakturowanie & GUS BIR Gateway (M79)</h1>
+        <span class="badge-live">LIVE API v1</span>
+      </div>
+      <nav class="nav-links">
+        <a href="dashboard.html" class="nav-btn">Core Dashboard</a>
+        <a href="anaf.html" class="nav-btn">Romania ANAF</a>
+        <a href="ksef.html" class="nav-btn active">Poland KSeF</a>
+        <a href="/api/docs" class="nav-btn" target="_blank">OpenAPI Docs</a>
+      </nav>
+    </header>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">KSeF Session Auth Status</span>
+        <span class="stat-value" id="stat-session-status">ACTIVE</span>
+        <span class="stat-sub" id="stat-session-nip">NIP: 5260250274 (TEST)</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Submitted FA(2)/FA(3) Invoices</span>
+        <span class="stat-value" id="stat-invoices-count">1</span>
+        <span class="stat-sub">100% Validated</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Verified GUS BIR Companies</span>
+        <span class="stat-value" id="stat-gus-count">4</span>
+        <span class="stat-sub">REGON 1.1 Web Service</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">UPO Receipts Archived</span>
+        <span class="stat-value" id="stat-upo-count">1</span>
+        <span class="stat-sub">Official MF Proof of Receipt</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" onclick="switchTab('generator')">FA Invoice Generator & KSeF Submission</button>
+      <button class="tab-btn" onclick="switchTab('archive')">Processing Status & UPO Archive</button>
+      <button class="tab-btn" onclick="switchTab('gus')">GUS BIR Company Lookup</button>
+    </div>
+
+    <!-- TAB 1: GENERATOR -->
+    <div id="tab-generator" class="tab-content active">
+      <div class="panel-card">
+        <h2 class="panel-title">FA(2) / FA(3) Structured XML Invoice Creator</h2>
+        
+        <form id="invoice-form" onsubmit="event.preventDefault();">
+          <h3 style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">1. Supplier (Sprzedawca) Details</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Supplier NIP</label>
+              <input type="text" id="supp-nip" class="form-control" value="5260250274" required>
+            </div>
+            <div class="form-group">
+              <label>Supplier Name</label>
+              <input type="text" id="supp-name" class="form-control" value="MINISTERSTWO FINANSÓW PL" required>
+            </div>
+            <div class="form-group">
+              <label>Street & Building</label>
+              <input type="text" id="supp-street" class="form-control" value="ul. Świętokrzyska 12">
+            </div>
+            <div class="form-group">
+              <label>City & Postal Code</label>
+              <input type="text" id="supp-city" class="form-control" value="00-916 Warszawa">
+            </div>
+          </div>
+
+          <h3 style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">2. Customer (Nabywca) Details</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Customer NIP</label>
+              <input type="text" id="cust-nip" class="form-control" value="5252389023" required>
+            </div>
+            <div class="form-group">
+              <label>Customer Name</label>
+              <input type="text" id="cust-name" class="form-control" value="ALLEGRO SALES SP. Z O.O." required>
+            </div>
+            <div class="form-group">
+              <label>Street & Building</label>
+              <input type="text" id="cust-street" class="form-control" value="ul. Grunwaldzka 182">
+            </div>
+            <div class="form-group">
+              <label>City & Postal Code</label>
+              <input type="text" id="cust-city" class="form-control" value="60-166 Poznań">
+            </div>
+          </div>
+
+          <h3 style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">3. Invoice Core Parameters</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Invoice ID (P_2)</label>
+              <input type="text" id="inv-id" class="form-control" value="FV/2026/08/001" required>
+            </div>
+            <div class="form-group">
+              <label>Issue Date (P_1)</label>
+              <input type="date" id="inv-issue-date" class="form-control" value="2026-08-13" required>
+            </div>
+            <div class="form-group">
+              <label>Schema Version</label>
+              <select id="inv-schema" class="form-control">
+                <option value="FA(2)" selected>FA(2) - Standard 2024</option>
+                <option value="FA(3)">FA(3) - Updated 2025/2026</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Invoice Type</label>
+              <select id="inv-type" class="form-control">
+                <option value="VAT" selected>VAT - Faktura podstawowa</option>
+                <option value="KOR">KOR - Faktura korygująca</option>
+                <option value="ZAL">ZAL - Faktura zaliczkowa</option>
+              </select>
+            </div>
+          </div>
+
+          <h3 style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">4. Line Items (FaWiersz)</h3>
+          <div class="form-grid">
+            <div class="form-group" style="grid-column: span 2;">
+              <label>Description (P_7)</label>
+              <input type="text" id="item-desc" class="form-control" value="Usługi програмиране и консултации ERP FinansProtect">
+            </div>
+            <div class="form-group">
+              <label>Quantity (P_8B)</label>
+              <input type="number" id="item-qty" class="form-control" value="1.0" step="0.1">
+            </div>
+            <div class="form-group">
+              <label>Unit Price Net (PLN)</label>
+              <input type="number" id="item-price" class="form-control" value="5000.00" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>VAT Rate (%)</label>
+              <select id="item-vat" class="form-control">
+                <option value="23" selected>23% (Standard VAT)</option>
+                <option value="8">8% (Reduced)</option>
+                <option value="5">5% (Super Reduced)</option>
+                <option value="0">0% (Zero Rated)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; display: flex; gap: 12px;">
+            <button type="button" class="btn-action btn-secondary" onclick="generateXMLPreview()">Generate XML Preview</button>
+            <button type="button" class="btn-action" onclick="submitToKSeF()">Sign XAdES & Submit to KSeF</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- XML Output Preview Box -->
+      <div class="panel-card">
+        <h2 class="panel-title">FA XML Document Preview</h2>
+        <div id="xml-output" class="code-box">&lt;!-- XML output will appear here after generation --&gt;</div>
+      </div>
+    </div>
+
+    <!-- TAB 2: ARCHIVE -->
+    <div id="tab-archive" class="tab-content">
+      <div class="panel-card">
+        <h2 class="panel-title">Submitted KSeF Invoices & UPO Archive</h2>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Invoice ID</th>
+              <th>KSeF Reference Number</th>
+              <th>Supplier NIP</th>
+              <th>Customer NIP</th>
+              <th>Gross Total</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="invoices-tbody">
+            <tr>
+              <td>FV/2026/08/001</td>
+              <td>5260250274-20260813-SEQP-FA88B9</td>
+              <td>PL5260250274</td>
+              <td>PL5252389027</td>
+              <td>6,150.00 PLN</td>
+              <td><span class="status-badge status-accepted">ACCEPTED</span></td>
+              <td>
+                <button class="btn-action btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="checkStatus('5260250274-20260813-SEQP-FA88B9')">Status</button>
+                <button class="btn-action" style="padding: 4px 8px; font-size: 11px;" onclick="downloadUPO('KSEF-5260250274-20260813-FA88B9')">Download UPO</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- UPO Viewer Box -->
+      <div class="panel-card">
+        <h2 class="panel-title">Official Polish UPO Receipt XML (Urzędowe Poświadczenie Odbioru)</h2>
+        <div id="upo-output" class="code-box">&lt;!-- Select Download UPO above to view official XML receipt --&gt;</div>
+      </div>
+    </div>
+
+    <!-- TAB 3: GUS BIR -->
+    <div id="tab-gus" class="tab-content">
+      <div class="panel-card">
+        <h2 class="panel-title">Polish Central Statistical Office (GUS) BIR 1.1 Verification</h2>
+        <div class="form-grid">
+          <div class="form-group" style="grid-column: span 2;">
+            <label>Polish NIP or REGON Number</label>
+            <input type="text" id="gus-input" class="form-control" value="5260250274" placeholder="Enter NIP (e.g. 5260250274 or 5252389027)">
+          </div>
+          <div class="form-group" style="justify-content: flex-end;">
+            <button type="button" class="btn-action" onclick="searchGUS()">Search GUS BIR Database</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <h2 class="panel-title">Company Verification Result</h2>
+        <div id="gus-result" class="code-box">Enter NIP above and click Search GUS BIR Database</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    async function generateXMLPreview() {
+      const payload = getInvoicePayload();
+      try {
+        const resp = await fetch('/api/v1/ksef/invoices/generate-xml', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        document.getElementById('xml-output').textContent = data.xml || JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('xml-output').textContent = 'Error: ' + err.message;
+      }
+    }
+
+    async function submitToKSeF() {
+      const payload = getInvoicePayload();
+      try {
+        const resp = await fetch('/api/v1/ksef/invoices/submit', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        document.getElementById('xml-output').textContent = JSON.stringify(data, null, 2);
+        fetchInvoicesList();
+      } catch (err) {
+        document.getElementById('xml-output').textContent = 'Error: ' + err.message;
+      }
+    }
+
+    async function checkStatus(refNum) {
+      try {
+        const resp = await fetch('/api/v1/ksef/invoices/status/' + refNum);
+        const data = await resp.json();
+        alert('KSeF Status:\n' + JSON.stringify(data, null, 2));
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function downloadUPO(ksefNum) {
+      try {
+        const resp = await fetch('/api/v1/ksef/invoices/upo/' + ksefNum);
+        const data = await resp.json();
+        document.getElementById('upo-output').textContent = data.upo_xml || JSON.stringify(data, null, 2);
+        switchTab('archive');
+      } catch (err) {
+        document.getElementById('upo-output').textContent = 'Error: ' + err.message;
+      }
+    }
+
+    async function searchGUS() {
+      const nip = document.getElementById('gus-input').value.trim();
+      try {
+        const resp = await fetch('/api/v1/ksef/gus/check', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({nip: nip})
+        });
+        const data = await resp.json();
+        document.getElementById('gus-result').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('gus-result').textContent = 'Error: ' + err.message;
+      }
+    }
+
+    async function fetchInvoicesList() {
+      try {
+        const resp = await fetch('/api/v1/ksef/invoices');
+        const data = await resp.json();
+        if (data.invoices && data.invoices.length > 0) {
+          let html = '';
+          data.invoices.forEach(inv => {
+            html += `<tr>
+              <td>${inv.invoice_id}</td>
+              <td>${inv.ksef_reference_number || 'N/A'}</td>
+              <td>PL${inv.supplier_nip}</td>
+              <td>PL${inv.customer_nip}</td>
+              <td>${inv.gross_total.toFixed(2)} PLN</td>
+              <td><span class="status-badge status-accepted">${inv.status}</span></td>
+              <td>
+                <button class="btn-action btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="checkStatus('${inv.ksef_reference_number}')">Status</button>
+                <button class="btn-action" style="padding: 4px 8px; font-size: 11px;" onclick="downloadUPO('${inv.ksef_reference_number}')">Download UPO</button>
+              </td>
+            </tr>`;
+          });
+          document.getElementById('invoices-tbody').innerHTML = html;
+        }
+      } catch (err) {
+        console.error('Failed fetching invoices:', err);
+      }
+    }
+
+    function getInvoicePayload() {
+      const qty = parseFloat(document.getElementById('item-qty').value) || 1.0;
+      const price = parseFloat(document.getElementById('item-price').value) || 0.0;
+      const vat = parseFloat(document.getElementById('item-vat').value) || 23.0;
+      const net = qty * price;
+      const vatAmt = net * (vat / 100.0);
+
+      return {
+        invoice_id: document.getElementById('inv-id').value,
+        issue_date: document.getElementById('inv-issue-date').value,
+        schema_version: document.getElementById('inv-schema').value,
+        invoice_type: document.getElementById('inv-type').value,
+        supplier: {
+          nip: document.getElementById('supp-nip').value,
+          name: document.getElementById('supp-name').value,
+          street: document.getElementById('supp-street').value,
+          city: document.getElementById('supp-city').value
+        },
+        customer: {
+          nip: document.getElementById('cust-nip').value,
+          name: document.getElementById('cust-name').value,
+          street: document.getElementById('cust-street').value,
+          city: document.getElementById('cust-city').value
+        },
+        items: [{
+          description: document.getElementById('item-desc').value,
+          quantity: qty,
+          unit_price: price,
+          net_amount: net,
+          vat_rate: vat,
+          vat_amount: vatAmt,
+          gross_amount: net + vatAmt
+        }]
+      };
+    }
+
+    // Auto-fetch on load
+    window.addEventListener('DOMContentLoaded', fetchInvoicesList);
+  </script>
+</body>
+</html>

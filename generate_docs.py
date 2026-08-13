@@ -19,6 +19,7 @@ files = {
     "bg/user/gfo-reports.md": "# ГФО Отчети\n\nГенериране на Годишен финансов отчет (ГФО).\n",
     "bg/user/tax-compliance.md": "# Данъчно съответствие\n\nДДС декларации, ЗКПО, данък дивидент, НАП електронни фактури.\n",
     "bg/user/anaf-efactura.md": "# Румъния ANAF e-Factura (M78)\n\nИнтеграция с румънската данъчна портална система ANAF за e-Factura. Генериране на UBL 2.1 RO-CIUS XML, валидация на CUI/CIF, OAuth 2.0 SPV автентикация, QES/XMLDSig дигитален подпис и проверка в ANAF VAT регистър.\n",
+    "bg/user/ksef-gateway.md": "# Полша KSeF Gateway (M79)\n\nИнтеграция с полската държавна портална система KSeF (Krajowy System e-Faktur) към Министерството на финансите на Полша. Генериране на FA(2)/FA(3) XML фактури, NIP валидация по Modulo 11, Session Token автентикация, XAdES дигитален подпис, сваляне на UPO разписки и реално време проверка на компании през GUS BIR1.1 API.\n",
     "bg/user/banking.md": "# Банкиране\n\nОтворено банкиране, SEPA плащания и мониторинг.\n",
 
     "bg/user/ai-features.md": "# AI Функции\n\nAI детекция на измами, гласов асистент и предвиждания.\n",
@@ -42,6 +43,7 @@ files = {
     "en/user/gfo-reports.md": "# GFO Reports\n\nAnnual Financial Statement (ГФО) generation.\n",
     "en/user/tax-compliance.md": "# Tax Compliance\n\nVAT returns, CITA, dividend tax, NRA e-invoicing.\n",
     "en/user/anaf-efactura.md": "# Romania ANAF e-Factura (M78)\n\nIntegration with Romanian ANAF e-Factura portal system. UBL 2.1 RO-CIUS XML generation, CUI/CIF check digit validation, OAuth 2.0 SPV authentication, QES/XMLDSig signing, and ANAF VAT Registry lookup.\n",
+    "en/user/ksef-gateway.md": "# Poland KSeF Gateway (M79)\n\nIntegration with Polish Ministry of Finance National e-Invoice System KSeF (Krajowy System e-Faktur). FA(2)/FA(3) XML invoice generation, Modulo 11 NIP validation, Session Token authentication, XAdES digital signature wrapper, UPO receipt downloading, and real-time company verification via GUS BIR1.1 API.\n",
     "en/user/banking.md": "# Banking\n\nOpen banking, SEPA payments, bank feed monitoring.\n",
 
     "en/user/ai-features.md": "# AI Features\n\nAI fraud detection, predictive analytics.\n",
