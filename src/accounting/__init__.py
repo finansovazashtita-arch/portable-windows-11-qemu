@@ -2,6 +2,7 @@
 Accounting Package.
 """
 
+from src.accounting.cash_desk_manager import CashDeskManager, CashDeskSummary, CashOrder, CashOrderType
 from src.accounting.corporate_consolidation import (
     ConsolidatedFinancialStatement,
     CorporateConsolidationEngine,
@@ -62,4 +63,8 @@ __all__ = [
     "CorporateConsolidationEngine",
     "EntityFinancialTrialBalance",
     "ConsolidatedFinancialStatement",
+    "CashDeskManager",
+    "CashOrder",
+    "CashOrderType",
+    "CashDeskSummary",
 ]
