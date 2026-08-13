@@ -60,6 +60,8 @@
 - **OpenBalancer Telemetry Client**: `src/dashboard/openbalancer_client.py` emitting live telemetry to OpenBalancer Dashboard (`https://n8n.openbalancer.com`).
 - **Windows 11 QEMU VM Automation Layer**: VNC (`127.0.0.1:5901`) and PowerShell Base64 automation interacting with Microinvest Delta Pro (`C:\Program Files (x86)\Microinvest\Delta Pro\DeltaPro.exe`) and MS SQL Server (`SQLEXPRESS` / `MSSQLSERVER`) inside `windows11_portable.qcow2`.
 - **Verification & Audit Layer**: Direct SQL verification (`sqlcmd`) and persistent audit export `C:\TRANSFER.LOG` on Windows 11 VM storage.
+- **Enterprise Edge AI & Mobile Receipt Scanner Suite**: `src/ocr/edge_ai_mobile_suite.py` providing local WebAssembly/On-Device OCR scanning of fiscal receipts and invoices with NRA QR parsing, HMAC-signed offline sync, double-entry accounting (601/602/609 + 4531 -> 501/422/401/503), and Microinvest TransferData XML export.
+- **Autonomous Regulatory Compliance & E-Archiving Audit Vault**: `src/security/e_archiving_compliance_vault.py` providing full eIDAS 2.0 LTV compatibility, Qualified Electronic Signatures (КЕП), RFC 3161 timestamps, and ZK tax audit proofs.
 
 ## Feature Inventory
 | # | Feature | Description | Milestone | Status |
@@ -136,6 +138,7 @@
 | 70 | Quantum-Safe Active-Active DR Mesh | Unifying post-quantum signing (M36) and DR orchestrator (M59) into an active multi-cloud K3s mesh (AWS + Hetzner + On-premise Mac Mini) | M63 | DONE |
 | 71 | Dynamic Cash Flow Optimization & Predictive Liquidity Engine | Monte Carlo stochastic liquidity simulations (VaR 95/99%), automated supplier payment scheduling maximizing cash discount yield vs cost of capital | M64 | DONE |
 | 72 | Autonomous Regulatory Compliance & E-Archiving Audit Vault | Full eIDAS 2.0 LTV compatibility, Qualified Electronic Signatures (КЕП), RFC 3161 timestamps & ZK tax audit proofs | M66 | DONE |
+| 73 | Enterprise Edge AI & Mobile Receipt Scanner Suite | Local WebAssembly/On-Device OCR for mobile devices, NRA QR validation, offline HMAC queue sync & Delta Pro accounting | M67 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -159,7 +162,7 @@
 | M16 | `m16_e_invoicing_vies_sync` | European Commission VIES REST API validation for counterparty BG/EU VAT numbers | M15 | DONE |
 | M17 | `m17_fraud_prevention_anomaly_detection` | AI Fraud Prevention & Anomaly Detection engine for IBAN validation, duplicate invoices & monetary spikes | M16 | DONE |
 | M18 | `m18_ha_clustering_failover` | High Availability HA Clustering across macmini-primary and secondary with automated failover | M17 | DONE |
-| M19 | `m19_cashflow_forecasting` | Real-time cash flow forecasting, 30/60/90-day liquidity projections & VAT tax liability estimation | M18 | DONE |
+| M19 | `m19_cashflow_forecasting` | Real-time cash flow forecasting, 30/60/90-day liquidity projections & VAT liability estimation | M18 | DONE |
 | M20 | `m20_saft_nra_exporter` | OECD SAF-T v2.0 XML compliance audit files for Bulgarian National Revenue Agency (НАП) | M19 | DONE |
 | M21 | `m21_multi_currency_fx_revaluation` | Live BNB/ECB rates, EUR/BGN fixed peg, and double-entry FX gain/loss entries (724 / 624) | M20 | DONE |
 | M22 | `m22_telegram_mobile_bot_guard` | Real-time mobile & Telegram alerts for high/critical fraud flags, HA failover & audit discrepancies | M21 | DONE |
@@ -207,7 +210,7 @@
 | M64 | `m64_ai_cash_optimizer` | Autonomous Dynamic Cash Flow Optimization & Predictive Liquidity AI Engine with Monte Carlo simulations & automated cash-discount payment scheduler | M19, M57 | DONE |
 | M65 | `m65_realtime_compliance_ui` | Real-Time Multi-Entity Audit Compliance & WebSockets Telemetry Dashboard for NRA e-invoicing status, PQC replication mesh & interactive corrections | M60, M62, M63 | DONE |
 | M66 | `m66_e_archiving_compliance_vault` | Autonomous Regulatory Compliance & E-Archiving Audit Vault with eIDAS 2.0 LTV preservation, QES validation, RFC 3161 timestamps & ZK proofs for tax audits | M33, M36, M56, M60 | DONE |
-
+| M67 | `m67_edge_ai_mobile_suite` | Enterprise Edge AI & Mobile Receipt Scanner Suite with WebAssembly/On-Device OCR, NRA QR validation, offline HMAC queue sync & Delta Pro accounting | M23, M27, M54 | DONE |
 
 ## Code Layout
 - `src/intake/`: Open Banking PISP Aggregator (`open_banking_pisp.py`), Bank Feed Guard (`bank_feed_guard.py`), SEPA Instant / BISERA 6 Adapter (`sepa_bisera_instant.py`), Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)
@@ -219,11 +222,8 @@
 - `src/backup/`: Active-Active SQL Sync Guard (`active_active_sql_sync.py`), Autonomous Audit Log Cold Storage Archiver (`cold_storage_archiver.py`), DR Multi-Region Replication Manager (`disaster_recovery_replication.py`), Automated Nightly Backup Manager (`nightly_backup.py`)
 - `src/cluster/`: Quantum-Safe Active-Active DR Mesh (`quantum_safe_dr_mesh.py`), Zero-Trust DR Failover Orchestrator (`dr_failover_orchestrator.py`), Rolling Upgrade Controller (`rolling_upgrade_controller.py`), High Availability Cluster Manager (`ha_failover.py`)
 - `src/integration/`: UK HMRC MTD VAT Adapter (`hmrc_mtd_adapter.py`), Autonomous NRA E-Invoicing Gateway (`nra_einvoice_gateway.py`), Native Mobile Push Gateway (`mobile_push_gateway.py`), Peppol EU E-Invoicing Engine (`peppol_einvoicing.py`), Telegram Bot Guard (`telegram_notifier.py`), VIES VAT Checker (`vies_vat_checker.py`), Obsidian Vault exporter (`obsidian_exporter.py`) & Supabase logger (`supabase_logger.py`)
-- `src/ocr/`: Image Preprocessor (`image_preprocessor.py`), PDF OCR, multi-bank extractors & batch processing (`extract_dsk_statement.py`, `multi_bank_extractor.py`, `batch_processor.py`)
+- `src/ocr/`: Enterprise Edge AI & Mobile Receipt Scanner Suite (`edge_ai_mobile_suite.py`), Image Preprocessor (`image_preprocessor.py`), PDF OCR, multi-bank extractors & batch processing (`extract_dsk_statement.py`, `multi_bank_extractor.py`, `batch_processor.py`)
 - `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `scripts/`: Microinvest n8n service, DR replication runner, HA cluster deployer, nightly backup scheduler (`microinvest_n8n_service.py`, `run_dr_replication.sh`, `deploy_ha_cluster.sh`, `schedule_nightly_backup.sh`, `deploy_production_stack.sh`)
 - `tests/`: Unit and E2E test suites (385/385 passed)
-
-
-

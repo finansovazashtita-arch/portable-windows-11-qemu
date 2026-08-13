@@ -99,6 +99,19 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._send_json_response(payload)
             return
 
+        elif self.path in ("/api/v1/mobile/status", "/api/mobile/status"):
+            from src.ocr.edge_ai_mobile_suite import OfflineReceiptQueueGuard
+            guard = OfflineReceiptQueueGuard()
+            with open(guard.queue_file_path, "r", encoding="utf-8") as f:
+                qdata = json.load(f)
+            self._send_json_response({
+                "status": "ONLINE",
+                "edge_ocr_wasm_engine": "ACTIVE",
+                "queued_scans_count": len(qdata.get("queued", [])),
+                "synced_scans_count": len(qdata.get("synced", [])),
+            })
+            return
+
         # 3. Server-Sent Events (SSE) Stream Fallback
         elif self.path in ("/api/compliance/stream", "/api/stream"):
             self.send_response(200)
@@ -130,7 +143,37 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         except Exception:
             req_data = {}
 
-        if self.path in ("/api/compliance/correct", "/api/correct"):
+        if self.path in ("/api/v1/mobile/scan", "/api/mobile/scan"):
+            from src.ocr.edge_ai_mobile_suite import (
+                EdgeAIReceiptScanner,
+                DeltaProReceiptAccountingMapper,
+                OfflineReceiptQueueGuard,
+            )
+            ocr_text = req_data.get("ocr_text", "")
+            nra_qr = req_data.get("nra_qr_string")
+            is_offline = req_data.get("is_offline", False)
+            acc_person = req_data.get("accountable_person")
+
+            receipt_data = EdgeAIReceiptScanner.scan_fiscal_receipt_text(ocr_text, nra_qr_string=nra_qr, accountable_person=acc_person)
+            receipt_dict = dataclasses.asdict(receipt_data)
+
+            if is_offline:
+                guard = OfflineReceiptQueueGuard()
+                res = guard.enqueue_offline_scan(receipt_dict)
+                self._send_json_response({"success": True, "offline": True, "result": res})
+            else:
+                entry = DeltaProReceiptAccountingMapper.map_receipt_to_double_entry(receipt_data)
+                self._send_json_response({"success": True, "offline": False, "receipt": receipt_dict, "journal_entry": entry})
+            return
+
+        elif self.path in ("/api/v1/mobile/sync", "/api/mobile/sync"):
+            from src.ocr.edge_ai_mobile_suite import OfflineReceiptQueueGuard
+            guard = OfflineReceiptQueueGuard()
+            res = guard.sync_offline_scans()
+            self._send_json_response({"success": True, "sync_result": res})
+            return
+
+        elif self.path in ("/api/compliance/correct", "/api/correct"):
             res = COMPLIANCE_ENGINE.submit_correction(req_data)
             self._send_json_response(res, status=200 if res.get("success") else 400)
             if res.get("success"):
