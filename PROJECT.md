@@ -2,6 +2,7 @@
 
 ## Architecture
 - **OCR Engine Layer**: PyMuPDF (`fitz`), Pillow (`PIL`), and Tesseract 5 (`-l bul+eng --psm 6`) extracting 100% of transactions from PDF statements with PyMuPDF direct text fallback.
+- **Zero-Downtime Live Production Rolling Upgrade Controller**: `src/cluster/rolling_upgrade_controller.py` orchestrating zero-downtime canary and blue/green container deployments across HA nodes with traffic draining and automatic rollback.
 - **Prometheus & Grafana Monitoring Telemetry Exporter**: `src/dashboard/prometheus_exporter.py` exposing `/metrics` endpoints tracking real-time processed financial turnover (€/sec), transaction volume, OCR precision (%), QEMU VM RAM allocation, and HA cluster leader state.
 - **Autonomous Audit Log Cold Storage Archiver**: `src/backup/cold_storage_archiver.py` compressing persistent `C:\TRANSFER.LOG` audit files and HSM signatures into ZSTD/GZIP archives with 10-year NRA tax retention metadata and SHA-256 verification.
 - **Native Mobile Push Notification Gateway**: `src/integration/mobile_push_gateway.py` dispatching instant high-priority mobile push notifications across iOS (Apple APNs) and Android (Firebase FCM) for fraud and failover alerts.
@@ -51,7 +52,7 @@
 | 9 | Database SQL Verification | Query SQLEXPRESS tables (Partners, Operations, OperationDetails) via sqlcmd | M4 | DONE |
 | 10 | Persistent Audit Log Export | Export validated C:\TRANSFER.LOG on persistent Windows 11 QEMU VM storage | M4 | DONE |
 | 11 | E2E Test Suite Creation | Create requirement-driven opaque-box E2E test infra (Tiers 1-4) and publish TEST_READY.md | E2E Track | DONE |
-| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (232/232 passed) and complete Tier 5 coverage | M5 | DONE |
+| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (234/234 passed) and complete Tier 5 coverage | M5 | DONE |
 | 13 | Self-Hosted Ecosystem Integration | Connect Infisical, n8n, Supabase, Obsidian Vault, Unsloth AI, OpenBalancer Telemetry | M6 | DONE |
 | 14 | Multi-PDF Batch Queue & ZIP Processing | Directory scanner, ZIP archive ingestion, fault-tolerant batch execution (`POST /process-batch`) | M7 | DONE |
 | 15 | Automated Email Intake Pipeline | IMAP/Gmail fetcher, MIME parser, Cloudflare Email Routing Worker (`POST /email-intake`) | M8 | DONE |
@@ -81,6 +82,7 @@
 | 39 | Native Mobile Push Notification Gateway | Apple APNs HTTP/2 & Firebase FCM REST API v1 push notifications for mobile devices | M32 | DONE |
 | 40 | 10-Year NRA Audit Log Cold Storage Archiver | ZSTD/GZIP audit log compression with 10-year NRA retention metadata and SHA-256 verification | M33 | DONE |
 | 41 | Prometheus & Grafana Telemetry Exporter | Prometheus exposition format for financial turnover (€/sec), OCR precision & QEMU VM RAM allocation | M34 | DONE |
+| 42 | Zero-Downtime Rolling Upgrade Controller | Zero-downtime canary & blue/green deployments across HA cluster nodes with automatic rollback | M35 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -90,7 +92,7 @@
 | M3 | `m3_vm_vnc_sql_automation` | Delta Pro Chart of Accounts UI setup, VNC & PowerShell Base64 automated import into SQLEXPRESS | M2 | DONE |
 | M4 | `m4_audit_log_export` | 3-way reconciliation (PDF ↔ Journal ↔ SQL DB), persistent C:\TRANSFER.LOG export on Windows 11 VM | M3 | DONE |
 | E2E | `m_e2e_testing` | E2E Test infrastructure, Tiers 1-4 test suite creation, publish TEST_READY.md | none | DONE |
-| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (232/232 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
+| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (234/234 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
 | M6 | `m6_full_ecosystem_integration` | Integrate Infisical Vault, Obsidian Vault Sync, Unsloth AI Classifier, Supabase, OpenBalancer | M5 | DONE |
 | M7 | `m7_multi_pdf_batch_queue` | Batch processing queue for processing multiple bank PDF statements, ZIP archives, and multi-page statements | M6 | DONE |
 | M8 | `m8_automated_email_intake` | IMAP/Gmail/Cloudflare Worker email intake parser to automatically ingest PDF attachments into n8n webhook | M7 | DONE |
@@ -120,8 +122,10 @@
 | M32 | `m32_mobile_push_gateway` | Apple APNs HTTP/2 & Firebase FCM REST API v1 push notifications for mobile devices | M31 | DONE |
 | M33 | `m33_cold_storage_archiver` | ZSTD/GZIP audit log compression with 10-year NRA retention metadata and SHA-256 verification | M32 | DONE |
 | M34 | `m34_prometheus_exporter` | Prometheus exposition format for financial turnover (€/sec), OCR precision & QEMU VM RAM allocation | M33 | DONE |
+| M35 | `m35_rolling_upgrade_controller` | Zero-downtime canary & blue/green deployments across HA cluster nodes with automatic rollback | M34 | DONE |
 
 ## Code Layout
+- `src/cluster/`: Rolling Upgrade Controller (`rolling_upgrade_controller.py`), High Availability Cluster Manager (`ha_failover.py`)
 - `src/dashboard/`: Prometheus Telemetry Exporter (`prometheus_exporter.py`), Web UI Dashboard server & OpenBalancer client (`dashboard_server.py`, `openbalancer_client.py`)
 - `src/backup/`: Autonomous Audit Log Cold Storage Archiver (`cold_storage_archiver.py`), DR Multi-Region Replication Manager (`disaster_recovery_replication.py`), Automated Nightly Backup Manager (`nightly_backup.py`)
 - `src/integration/`: Native Mobile Push Gateway (`mobile_push_gateway.py`), Peppol EU E-Invoicing Engine (`peppol_einvoicing.py`), Telegram Bot Guard (`telegram_notifier.py`), VIES VAT Checker (`vies_vat_checker.py`), Obsidian Vault exporter (`obsidian_exporter.py`) & Supabase logger (`supabase_logger.py`)
@@ -131,8 +135,7 @@
 - `src/intake/`: Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)
 - `src/ocr/`: Image Preprocessor (`image_preprocessor.py`), PDF OCR, multi-bank extractors & batch processing (`extract_dsk_statement.py`, `multi_bank_extractor.py`, `batch_processor.py`)
 - `src/audit/`: OECD SAF-T Exporter (`saft_exporter.py`), SQL verification & TRANSFER.LOG exporter (`generate_transfer_log.py`)
-- `src/cluster/`: High Availability Cluster Manager (`ha_failover.py`)
 - `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `scripts/`: Microinvest n8n service, DR replication runner, HA cluster deployer, nightly backup scheduler (`microinvest_n8n_service.py`, `run_dr_replication.sh`, `deploy_ha_cluster.sh`, `schedule_nightly_backup.sh`, `deploy_production_stack.sh`)
-- `tests/`: Unit and E2E test suites (232/232 passed)
+- `tests/`: Unit and E2E test suites (234/234 passed)
