@@ -23,6 +23,12 @@ from src.accounting.translate_to_delta import (
     validate_eik,
     validate_iban,
 )
+from src.accounting.travel_expense_manager import (
+    BusinessTravelOrder,
+    BusinessTravelReport,
+    TravelExpenseManager,
+    TravelType,
+)
 
 # Backward-compatibility aliases
 FXRevaluationEngine = FXRevaluationCalculator
@@ -67,4 +73,8 @@ __all__ = [
     "CashOrder",
     "CashOrderType",
     "CashDeskSummary",
+    "TravelExpenseManager",
+    "BusinessTravelOrder",
+    "BusinessTravelReport",
+    "TravelType",
 ]
