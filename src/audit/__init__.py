@@ -6,6 +6,7 @@ from src.audit.generate_transfer_log import generate_transfer_log, reconcile_3wa
 from src.audit.nra_vat_reporter import NRAVATDeclaration, NRAVATReporter, VATPeriod
 from src.audit.saft_exporter import SAFTExporter
 from src.audit.tax_audit_defense import AuditDefenseEvaluation, AuditRiskLevel, TaxAuditDefenseEngine
+from src.audit.tax_policy_ingestor import AutonomousTaxPolicyIngestor, RegulationChangeType, TaxRegulationUpdate
 
 __all__ = [
     "generate_transfer_log",
@@ -17,4 +18,7 @@ __all__ = [
     "TaxAuditDefenseEngine",
     "AuditDefenseEvaluation",
     "AuditRiskLevel",
+    "AutonomousTaxPolicyIngestor",
+    "TaxRegulationUpdate",
+    "RegulationChangeType",
 ]
