@@ -330,6 +330,49 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(content)
             return
 
+        elif canonical_path.startswith("/api/v1/mydata") or canonical_path.startswith("/api/mydata"):
+            from src.integration.mydata_api import (
+                get_mydata_health_handler,
+                get_mydata_marks_handler,
+                get_mydata_mark_status_handler,
+                get_mydata_invoices_handler,
+                get_mydata_request_income_handler,
+            )
+            from urllib.parse import parse_qs, urlparse
+            parsed_url = urlparse(self.path)
+            q_params = {k: v[0] for k, v in parse_qs(parsed_url.query).items()}
+
+            if canonical_path.endswith("/health"):
+                res = get_mydata_health_handler(q_params)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/marks"):
+                res = get_mydata_marks_handler(q_params)
+                self._send_json_response(res)
+                return
+            elif "/marks/" in canonical_path:
+                mark = canonical_path.split("/marks/")[-1]
+                res = get_mydata_mark_status_handler(mark)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/invoices"):
+                res = get_mydata_invoices_handler(q_params)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/incomes/request"):
+                res = get_mydata_request_income_handler(q_params)
+                self._send_json_response(res)
+                return
+
+        elif self.path in ("/mydata", "/mydata.html"):
+            with open(os.path.join(WEB_UI_DIR, "mydata.html"), "rb") as f:
+                content = f.read()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
         elif canonical_path.startswith("/api/v1/esg") or canonical_path.startswith("/api/esg"):
             from src.analytics.esg_api import (
                 get_esg_health_handler,
@@ -560,6 +603,46 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 return
             elif canonical_path.endswith("/health"):
                 self._send_json_response(get_esg_health_handler())
+                return
+
+        elif canonical_path.startswith("/api/v1/mydata") or canonical_path.startswith("/api/mydata"):
+            from src.integration.mydata_api import (
+                post_mydata_afm_validate_handler,
+                post_mydata_generate_xml_handler,
+                post_mydata_validate_handler,
+                post_mydata_send_invoices_handler,
+                post_mydata_send_expenses_handler,
+                post_mydata_cancel_handler,
+                post_mydata_journal_entries_handler,
+            )
+            if canonical_path.endswith("/afm/validate"):
+                res = post_mydata_afm_validate_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/invoices/generate-xml"):
+                res = post_mydata_generate_xml_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/invoices/validate"):
+                res = post_mydata_validate_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/send-invoices"):
+                res = post_mydata_send_invoices_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/send-expenses"):
+                res = post_mydata_send_expenses_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif "/cancel/" in canonical_path:
+                mark = canonical_path.split("/cancel/")[-1]
+                res = post_mydata_cancel_handler(mark)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/journal-entries"):
+                res = post_mydata_journal_entries_handler(req_data)
+                self._send_json_response(res)
                 return
 
 
