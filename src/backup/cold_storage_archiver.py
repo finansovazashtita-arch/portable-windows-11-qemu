@@ -100,3 +100,32 @@ class AuditLogColdArchiver:
 
         logger.info(f"✅ Cold Archive [{archive.archive_id}] successfully restored to {restored_path}")
         return restored_path
+
+    def create_eidas_compliance_vault_archive(
+        self,
+        source_log_path: str,
+        nra_tax_code: str = "BG-NRA-AUDIT-VAULT-2026",
+        audit_context: Optional[Dict[str, Any]] = None,
+    ) -> str:
+        """Creates an eIDAS 2.0 electronic archiving vault container (.eIDAS-vault ZIP) with QES, RFC 3161 timestamps, and ZK proofs."""
+        from src.security.e_archiving_compliance_vault import EArchivingComplianceVault, QESProvider
+
+        if not os.path.exists(source_log_path):
+            raise FileNotFoundError(f"Source log missing: {source_log_path}")
+
+        with open(source_log_path, "r", encoding="utf-8", errors="replace") as f:
+            content = f.read()
+
+        vault = EArchivingComplianceVault(nra_tax_code=nra_tax_code)
+        archive = vault.create_compliance_archive(
+            payload_content=content,
+            qes_provider=QESProvider.STAMP_IT,
+            audit_context=audit_context,
+            generate_zk_proofs=True,
+        )
+
+        out_path = os.path.join(self.archive_dir, f"{archive.archive_id}_eidas_vault.zip")
+        vault.export_vault_to_file(archive, out_path)
+        logger.info(f"🏛️ eIDAS 2.0 Compliance Vault Archive created at {out_path}")
+        return out_path
+

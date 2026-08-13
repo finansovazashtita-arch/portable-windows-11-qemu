@@ -42,6 +42,14 @@ class TestAuditLogColdArchiver(unittest.TestCase):
             content = f.read()
         self.assertIn("TRANSFER_LOG_AUDIT_TRAIL_SAMPLE_DATA", content)
 
+    def test_create_eidas_compliance_vault_archive(self):
+        vault_path = self.archiver.create_eidas_compliance_vault_archive(
+            self.sample_log, nra_tax_code="TEST-NRA-VAULT"
+        )
+        self.assertTrue(os.path.exists(vault_path))
+        self.assertGreater(os.path.getsize(vault_path), 500)
+
 
 if __name__ == "__main__":
     unittest.main()
+
