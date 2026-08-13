@@ -3,20 +3,47 @@ Accounting Package.
 """
 
 from src.accounting.customs_excise_accounting import CustomsDeclaration, CustomsExciseProcessor
+from src.accounting.eu_oss_accounting import EUOSSAccountingAdapter, OSSDeclarationQuarter, OSSSaleTransaction
 from src.accounting.fx_revaluation import FXRateProvider, FXRevaluationCalculator, FXRevaluationResult
 from src.accounting.payroll_accounting import PayrollProcessor, PayrollSummary
-from src.accounting.translate_to_delta import process_translation, translate_transactions, validate_eik, validate_iban
+from src.accounting.translate_to_delta import (
+    generate_csv,
+    generate_json,
+    generate_xml,
+    process_translation,
+    translate_transactions,
+    validate_eik,
+    validate_iban,
+)
+
+# Backward-compatibility aliases
+FXRevaluationEngine = FXRevaluationCalculator
+PayrollAccountingEngine = PayrollProcessor
+CustomsExciseAccountingEngine = CustomsExciseProcessor
+generate_microinvest_xml = generate_xml
+generate_delta_bg_csv = generate_csv
 
 __all__ = [
-    "translate_transactions",
-    "process_translation",
     "validate_eik",
     "validate_iban",
+    "translate_transactions",
+    "generate_xml",
+    "generate_csv",
+    "generate_json",
+    "process_translation",
+    "generate_microinvest_xml",
+    "generate_delta_bg_csv",
     "FXRateProvider",
     "FXRevaluationCalculator",
+    "FXRevaluationEngine",
     "FXRevaluationResult",
     "PayrollProcessor",
+    "PayrollAccountingEngine",
     "PayrollSummary",
     "CustomsExciseProcessor",
+    "CustomsExciseAccountingEngine",
     "CustomsDeclaration",
+    "EUOSSAccountingAdapter",
+    "OSSSaleTransaction",
+    "OSSDeclarationQuarter",
 ]
