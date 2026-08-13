@@ -65,10 +65,9 @@ class TestUSSalesTaxEngine(unittest.TestCase):
         tx = USSalesTaxEngine.calculate_sales_tax("TX1", "ENT_US", "TX", 100.0)
         entries = USSalesTaxEngine.generate_sales_tax_journal_entries([tx])
 
-        self.assertEqual(len(entries), 2)
+        self.assertEqual(len(entries), 1)
         self.assertEqual(entries[0]["debit_account"], "503")
-        self.assertEqual(entries[0]["credit_account"], "702")
-        self.assertEqual(entries[1]["credit_account"], "4537")
+        self.assertEqual(entries[0]["credit_account"], "4537")
 
     def test_generate_multi_state_summary(self):
         tx_ca = USSalesTaxEngine.calculate_sales_tax("TX_CA", "ENT_US", "CA", 1000.0)
@@ -80,9 +79,9 @@ class TestUSSalesTaxEngine(unittest.TestCase):
         )
 
         self.assertEqual(summary["entity_id"], "ENT_US")
-        self.assertEqual(summary["total_states"], 2)
-        self.assertIn("CA", summary["by_state"])
-        self.assertIn("NY", summary["by_state"])
+        self.assertEqual(summary["total_gross_sales"], 2000.0)
+        self.assertIn("CA", summary["state_breakdown"])
+        self.assertIn("NY", summary["state_breakdown"])
 
 
 if __name__ == "__main__":

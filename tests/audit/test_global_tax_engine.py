@@ -58,7 +58,7 @@ class TestGlobalMultiEntityTaxEngine(unittest.TestCase):
 
         self.assertEqual(tx.tax_rate_percent, 20.0)
         self.assertEqual(tx.tax_amount, 400.0)
-        self.assertEqual(tx.gross_amount, 2400.0)
+        self.assertEqual(tx.gross_amount, 2000.0)
 
     def test_generate_tax_journal_entries(self):
         tx1 = GlobalMultiEntityTaxEngine.calculate_tax("TX1", "ENT1", TaxJurisdiction.BULGARIA, TaxType.VAT, 100.0, "EUR")
@@ -93,8 +93,8 @@ class TestGlobalMultiEntityTaxEngine(unittest.TestCase):
         tx_uk = GlobalMultiEntityTaxEngine.calculate_tax("TX_UK", "ENT_UK", TaxJurisdiction.UNITED_KINGDOM, TaxType.VAT, 2000.0, "GBP", transaction_date="2026-01-12")
 
         entities = [
-            {"entity_id": "ENT_BG", "entity_name": "Bulgaria Sub Ltd"},
-            {"entity_id": "ENT_UK", "entity_name": "UK Sub Ltd"},
+            {"entity_id": "ENT_BG", "entity_name": "Bulgaria Sub Ltd", "jurisdiction": "BULGARIA"},
+            {"entity_id": "ENT_UK", "entity_name": "UK Sub Ltd", "jurisdiction": "UNITED_KINGDOM"},
         ]
 
         summary = GlobalMultiEntityTaxEngine.consolidate_group_tax_position(

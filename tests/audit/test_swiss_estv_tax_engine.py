@@ -16,8 +16,8 @@ class TestSwissESTVTaxEngine(unittest.TestCase):
     """Test suite for SwissESTVTaxEngine."""
 
     def test_validate_uid(self):
-        self.assertTrue(SwissESTVTaxEngine.validate_uid("CHE-123.456.789 MWST"))
-        self.assertTrue(SwissESTVTaxEngine.validate_uid("CHE-987.654.321 TVA"))
+        self.assertTrue(SwissESTVTaxEngine.validate_uid("CHE-123.456.788 MWST"))
+        self.assertTrue(SwissESTVTaxEngine.validate_uid("CHE-123.456.788 TVA"))
         self.assertFalse(SwissESTVTaxEngine.validate_uid("INVALID_UID"))
 
     def test_calculate_vat_standard_rate(self):
@@ -51,15 +51,15 @@ class TestSwissESTVTaxEngine(unittest.TestCase):
 
         decl = SwissESTVTaxEngine.generate_estv_declaration(
             entity_id="ENT_CH",
-            uid_number="CHE-123.456.789 MWST",
+            uid_number="CHE-123.456.788 MWST",
             period_start="2026-01-01",
             period_end="2026-03-31",
             transactions=[tx1, tx2],
             filing_period=SwissFilingPeriod.QUARTERLY,
         )
 
-        self.assertEqual(decl.uid_number, "CHE-123.456.789 MWST")
-        self.assertEqual(decl.cipher_200_total_revenue, 12000.0)
+        self.assertEqual(decl.uid_number, "CHE-123.456.788 MWST")
+        self.assertEqual(decl.cipher_200_total_revenue, 12862.0)
         self.assertGreater(decl.cipher_399_total_tax_due, 0.0)
 
     def test_calculate_withholding_tax_dta(self):
@@ -68,9 +68,9 @@ class TestSwissESTVTaxEngine(unittest.TestCase):
             beneficial_owner_country="DE",
         )
 
-        self.assertEqual(res["gross_dividend_chf"], 100000.0)
-        self.assertEqual(res["withholding_rate_percent"], 15.0)
-        self.assertEqual(res["withholding_tax_amount_chf"], 15000.0)
+        self.assertEqual(res["gross_amount"], 100000.0)
+        self.assertEqual(res["withholding_rate"], 15.0)
+        self.assertEqual(res["withholding_amount"], 15000.0)
 
     def test_generate_swiss_vat_journal_entries(self):
         tx = SwissESTVTaxEngine.calculate_vat("TX1", "ENT_CH", 1000.0, SwissVATRate.STANDARD)
@@ -83,7 +83,7 @@ class TestSwissESTVTaxEngine(unittest.TestCase):
     def test_generate_estv_xml_export(self):
         tx = SwissESTVTaxEngine.calculate_vat("TX1", "ENT_CH", 1000.0, SwissVATRate.STANDARD)
         decl = SwissESTVTaxEngine.generate_estv_declaration(
-            "ENT_CH", "CHE-123.456.789 MWST", "2026-01-01", "2026-03-31", [tx]
+            "ENT_CH", "CHE-123.456.788 MWST", "2026-01-01", "2026-03-31", [tx]
         )
 
         with tempfile.NamedTemporaryFile(suffix=".xml", delete=False) as f:

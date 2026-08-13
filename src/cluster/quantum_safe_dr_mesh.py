@@ -250,8 +250,8 @@ class QuantumSafeDRMesh:
                     payload={"status": "OK", "timestamp": timestamp}
                 )
                 self.pq_signer.verify_attestation(attestation)
-                attestation_hashes.append(hashlib.sha256(json.dumps(attestation.payload).encode()).hexdigest())
-            elif node.state == MeshNodeState.FAILED:
+                attestation_hashes.append(attestation.payload_hash)
+            elif node.state in (MeshNodeState.FAILED, MeshNodeState.PARTITIONED):
                 failed_nodes.append(node_id)
             elif node.state == MeshNodeState.PARTITIONED:
                 partitioned_nodes.append(node_id)
@@ -284,16 +284,11 @@ class QuantumSafeDRMesh:
             "group_b": []
         }
         
-        # Simple simulation: group by connectivity.
-        nodes = list(self.mesh_nodes.values())
-        if nodes:
-            partitions["group_a"].append(nodes[0].node_id)
-            for node in nodes[1:]:
-                # Simulate grouping
-                if node.state == MeshNodeState.PARTITIONED:
-                    partitions["group_b"].append(node.node_id)
-                else:
-                    partitions["group_a"].append(node.node_id)
+        for node in self.mesh_nodes.values():
+            if node.state in (MeshNodeState.PARTITIONED, MeshNodeState.FAILED):
+                partitions["group_b"].append(node.node_id)
+            else:
+                partitions["group_a"].append(node.node_id)
                     
         return partitions
 
