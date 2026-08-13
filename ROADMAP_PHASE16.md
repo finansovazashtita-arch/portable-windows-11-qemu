@@ -1,0 +1,29 @@
+# Phase 16 Strategic Roadmap: Next-Gen Enterprise Open Banking & Neural Sentinel
+
+## Vision & Objective
+Phase 16 extends the Microinvest Bank Statement OCR & Delta Pro Accounting Automation platform into next-generation enterprise open banking payment initiation (PISP/AISP) and neural anomaly detection for trial balances.
+
+---
+
+## Strategic Milestones
+
+### Milestone M57: Autonomous Open Banking Payment Initiation & Multi-Bank AISP Aggregator (`m57_open_banking_pisp`)
+- **Objective**: Implement automated Payment Initiation Service Provider (PISP) and Account Information Service Provider (AISP) integration under Berlin Group PSD2 specifications.
+- **Scope**:
+  - Automated payment initiation for vendor invoices (Account 401 -> Account 503)
+  - Multi-bank consolidated balance aggregation across DSK, UniCredit, UBB, and Postbank
+- **Target Deliverables**: `src/intake/open_banking_pisp.py`, `tests/intake/test_open_banking_pisp.py`
+
+### Milestone M58: Real-Time Trial Balance Anomaly & Discrepancy Prevention Neural Sentinel (`m58_neural_trial_balance_sentinel`)
+- **Objective**: Autonomous deep learning neural sentinel analyzing trial balance movements and flag misposted journal entries prior to NRA monthly tax filings.
+- **Scope**:
+  - Real-time balance sheet anomaly detection
+  - Debit/Credit imbalance alerts and automated correction recommendations
+- **Target Deliverables**: `src/ai/neural_trial_balance_sentinel.py`, `tests/ai/test_neural_trial_balance_sentinel.py`
+
+### Milestone M59: Zero-Trust DR Failover & Instant Recovery Orchestrator (`m59_zero_trust_dr_orchestrator`)
+- **Objective**: Automated scheduled disaster recovery failover testing and sub-5-second RTO switchover between HA primary and secondary nodes.
+- **Scope**:
+  - Automated health probes, virtual machine state cloning, and database synchronization check
+  - Zero downtime failover drill execution
+- **Target Deliverables**: `src/cluster/dr_failover_orchestrator.py`, `tests/cluster/test_dr_failover_orchestrator.py`
