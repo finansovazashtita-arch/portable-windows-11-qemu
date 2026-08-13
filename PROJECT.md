@@ -149,7 +149,8 @@
 | 81 | Comprehensive Bilingual User Documentation | MkDocs Material site with 42 pages (BG/EN), admin guide, user manual, API reference, Postman collection | M74 | DONE |
 | 82 | Multi-Tenant SaaS Billing & Subscription Management | Stripe payment integration, tenant provisioning, usage metering, database isolation, GDPR Art. 17 erasure | M75 | DONE |
 | 83 | Business Intelligence (BI) Analytics Dashboard | Multi-dimensional OLAP query engine, executive KPI matrix, scenario simulator, threshold alerting, multi-format exports & modern web UI | M76 | DONE |
-| 84 | Predictive AI Advisory & Executive Decision Engine | Multi-scenario financial trajectory simulator, prescriptive C-level recommendations, double-entry journal advice, working capital CCC optimizer & tax strategy advisor | M77 | DONE |
+| 84 | Predictive AI Advisory & Executive Decision Engine | Multi-scenario financial trajectory simulator, prescriptive C-level action cards, double-entry journal advice, working capital CCC optimizer & tax strategy advisor | M77 | DONE |
+| 85 | Romania ANAF e-Factura Gateway | UBL 2.1 RO-CIUS XML generation, Romanian CIF check digit validation, ANAF OAuth 2.0 SPV, QES XMLDSig signing, submission upload/status/download, ANAF VAT Registry API, REST API router & web UI dashboard | M78 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -232,6 +233,7 @@
 | M75 | `m75_saas_billing` | Multi-Tenant SaaS Billing & Subscription Management with Stripe integration, tenant provisioning API, usage metering & GDPR Art. 17 erasure | M15, M69, M73 | DONE |
 | M76 | `m76_bi_analytics_dashboard` | Business Intelligence (BI) Analytics Dashboard with financial & operational KPIs, multi-dimensional OLAP query engine, threshold alerts, scenario simulations & interactive web UI | M12, M19, M41, M65, M75 | DONE |
 | M77 | `m77_predictive_ai_advisory` | Predictive AI Advisory & Autonomous Decision Engine with multi-scenario financial simulations, prescriptive C-level action cards, Bulgarian double-entry journal advice, working capital CCC optimizer & interactive web UI | M12, M19, M41, M64, M76 | DONE |
+| M78 | `m78_romania_anaf_efactura` | Romania ANAF e-Factura & Cross-Border CEE Compliance Gateway with UBL 2.1 RO-CIUS XML generation, CUI/CIF validation, OAuth 2.0 SPV, QES signing, submission upload/status/download, ANAF VAT Registry API, REST API router & web UI dashboard | M12, M19, M41, M60, M77 | DONE |
 
 ## Code Layout
 - `src/config/`: Production Configuration & Secrets Management Hardening (`config_hardening.py`)
@@ -245,12 +247,13 @@
 - `src/dashboard/`: Real-Time Multi-Entity Audit Compliance Engine (`realtime_compliance_ui.py`), Web UI Dashboard Server & WebSockets Telemetry Hub (`dashboard_server.py`), Executive Briefing Generator (`executive_briefing.py`), Prometheus Telemetry Exporter (`prometheus_exporter.py`), OpenBalancer client (`openbalancer_client.py`)
 - `src/backup/`: Active-Active SQL Sync Guard (`active_active_sql_sync.py`), Autonomous Audit Log Cold Storage Archiver (`cold_storage_archiver.py`), DR Multi-Region Replication Manager (`disaster_recovery_replication.py`), Automated Nightly Backup Manager (`nightly_backup.py`)
 - `src/cluster/`: Quantum-Safe Active-Active DR Mesh (`quantum_safe_dr_mesh.py`), Zero-Trust DR Failover Orchestrator (`dr_failover_orchestrator.py`), Rolling Upgrade Controller (`rolling_upgrade_controller.py`), High Availability Cluster Manager (`ha_failover.py`)
-- `src/integration/`: UK HMRC MTD VAT Adapter (`hmrc_mtd_adapter.py`), Autonomous NRA E-Invoicing Gateway (`nra_einvoice_gateway.py`), Native Mobile Push Gateway (`mobile_push_gateway.py`), Peppol EU E-Invoicing Engine (`peppol_einvoicing.py`), Telegram Bot Guard (`telegram_notifier.py`), VIES VAT Checker (`vies_vat_checker.py`), Obsidian Vault exporter (`obsidian_exporter.py`) & Supabase logger (`supabase_logger.py`)
+- `src/integration/`: Romania ANAF e-Factura Gateway (`anaf_efactura_gateway.py`, `anaf_api.py`), UK HMRC MTD VAT Adapter (`hmrc_mtd_adapter.py`), Autonomous NRA E-Invoicing Gateway (`nra_einvoice_gateway.py`), Native Mobile Push Gateway (`mobile_push_gateway.py`), Peppol EU E-Invoicing Engine (`peppol_einvoicing.py`), Telegram Bot Guard (`telegram_notifier.py`), VIES VAT Checker (`vies_vat_checker.py`), Obsidian Vault exporter (`obsidian_exporter.py`) & Supabase logger (`supabase_logger.py`)
 - `src/ocr/`: Enterprise Edge AI & Mobile Receipt Scanner Suite (`edge_ai_mobile_suite.py`), Image Preprocessor (`image_preprocessor.py`), PDF OCR, multi-bank extractors & batch processing (`extract_dsk_statement.py`, `multi_bank_extractor.py`, `batch_processor.py`)
-- `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
+- `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `anaf.html`, `advisory.html`, `analytics.html`, `styles.css`, `app.js`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `scripts/`: Microinvest n8n service, DR replication runner, HA cluster deployer, nightly backup scheduler (`microinvest_n8n_service.py`, `run_dr_replication.sh`, `deploy_ha_cluster.sh`, `schedule_nightly_backup.sh`, `deploy_production_stack.sh`)
 - `deploy/helm/`: Production Helm chart for Kubernetes/K3s deployment (`Chart.yaml`, `values.yaml`, 15 templates)
 - `deploy/k3s/`: K3s cluster installation scripts, Traefik IngressRoute & cert-manager configuration
 - `docs/site/`: Bilingual MkDocs Material documentation site (BG/EN) with admin guide, user manual & API reference
-- `tests/`: Unit and E2E test suites (450/450 passed)
+- `tests/`: Unit and E2E test suites (573/573 passed)
+

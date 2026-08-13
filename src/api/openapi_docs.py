@@ -63,9 +63,76 @@ OPENAPI_SPEC: Dict[str, Any] = {
         {"name": "SaaS Billing", "description": "M75 Stripe subscription management, multi-tenant provisioning, usage metering, and GDPR Art. 17 data erasure"},
         {"name": "BI Analytics Dashboard", "description": "M76 BI analytics engine, C-level executive KPIs, multi-dimensional OLAP query builder, scenario simulations, alerts, and multi-format exports"},
         {"name": "Predictive AI Advisory", "description": "M77 Predictive AI Advisory engine, multi-scenario simulations, prescriptive action cards, working capital CCC optimization, and tax strategies"},
+        {"name": "Romania ANAF e-Factura", "description": "M78 Romania ANAF e-Factura gateway, UBL 2.1 RO-CIUS XML generation, OAuth 2.0 SPV, submission upload, status query, receipt download, and VAT Registry lookup"},
         {"name": "Documentation", "description": "OpenAPI specifications & interactive UI endpoints"}
     ],
     "paths": {
+        "/api/v1/anaf/health": {
+            "get": {
+                "tags": ["Romania ANAF e-Factura"],
+                "summary": "ANAF Gateway Connectivity & Health Status",
+                "responses": {"200": {"description": "ANAF Gateway health and OAuth status"}}
+            }
+        },
+        "/api/v1/anaf/oauth/token": {
+            "post": {
+                "tags": ["Romania ANAF e-Factura"],
+                "summary": "Authenticate OAuth 2.0 Token with ANAF SPV",
+                "responses": {"200": {"description": "OAuth 2.0 access token issued"}}
+            }
+        },
+        "/api/v1/anaf/invoices/generate-xml": {
+            "post": {
+                "tags": ["Romania ANAF e-Factura"],
+                "summary": "Generate UBL 2.1 RO-CIUS XML Document",
+                "responses": {"200": {"description": "Valid UBL 2.1 XML and RO-CIUS validation result"}}
+            }
+        },
+        "/api/v1/anaf/invoices/validate": {
+            "post": {
+                "tags": ["Romania ANAF e-Factura"],
+                "summary": "Validate Invoice Against RO-CIUS Schematron Rules",
+                "responses": {"200": {"description": "RO-CIUS Schematron validation report"}}
+            }
+        },
+        "/api/v1/anaf/invoices/submit": {
+            "post": {
+                "tags": ["Romania ANAF e-Factura"],
+                "summary": "Submit e-Factura XML to ANAF Portal",
+                "responses": {"200": {"description": "Invoice submitted to ANAF, returns upload_id and audit hash"}}
+            }
+        },
+        "/api/v1/anaf/invoices/status/{upload_id}": {
+            "get": {
+                "tags": ["Romania ANAF e-Factura"],
+                "summary": "Query ANAF Upload Processing Status",
+                "parameters": [{"name": "upload_id", "in": "path", "required": True, "schema": {"type": "string"}}],
+                "responses": {"200": {"description": "ANAF processing status payload"}}
+            }
+        },
+        "/api/v1/anaf/invoices/download/{download_id}": {
+            "get": {
+                "tags": ["Romania ANAF e-Factura"],
+                "summary": "Download Processed ANAF Validation Receipt",
+                "parameters": [{"name": "download_id", "in": "path", "required": True, "schema": {"type": "string"}}],
+                "responses": {"200": {"description": "ANAF XML receipt content"}}
+            }
+        },
+        "/api/v1/anaf/vat-registry/check": {
+            "post": {
+                "tags": ["Romania ANAF e-Factura"],
+                "summary": "Lookup Company in ANAF VAT Registry by CIF",
+                "responses": {"200": {"description": "ANAF VAT Registry company details & TVAi status"}}
+            }
+        },
+        "/api/v1/anaf/invoices": {
+            "get": {
+                "tags": ["Romania ANAF e-Factura"],
+                "summary": "List Submitted ANAF e-Factura Records",
+                "responses": {"200": {"description": "Array of submitted ANAF e-invoices"}}
+            }
+        },
+
 
         "/api/docs": {
             "get": {

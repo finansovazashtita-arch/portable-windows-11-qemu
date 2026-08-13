@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinansProtect | Romania ANAF e-Factura & Cross-Border Gateway (M78)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #080c14;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      --primary-accent: #38bdf8;
+      --romania-blue: #002B7F;
+      --romania-yellow: #FCD116;
+      --romania-red: #CE1126;
+      --success-green: #10b981;
+      --warning-amber: #f59e0b;
+      --danger-red: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .anaf-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .flag-badge {
+      display: inline-flex;
+      height: 18px;
+      width: 27px;
+      border-radius: 2px;
+      overflow: hidden;
+      box-shadow: 0 0 4px rgba(0,0,0,0.5);
+    }
+    .flag-blue { background: #002B7F; flex: 1; }
+    .flag-yellow { background: #FCD116; flex: 1; }
+    .flag-red { background: #CE1126; flex: 1; }
+
+    .brand-title h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, #38bdf8 0%, #FCD116 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .badge-live {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary-accent);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      background: #1e293b;
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      color: var(--text-main);
+      border-color: var(--primary-accent);
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--success-green);
+    }
+
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: #0b1120;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 9px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-accent);
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-action:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background: #1e293b;
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary-accent);
+    }
+
+    /* XML Code Box */
+    .xml-preview {
+      background: #040810;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #38bdf8;
+      max-height: 280px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-top: 14px;
+    }
+
+    /* Status Badge */
+    .status-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .status-accepted { background: rgba(16, 185, 129, 0.15); color: var(--success-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-processing { background: rgba(245, 158, 11, 0.15); color: var(--warning-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .status-rejected { background: rgba(239, 68, 68, 0.15); color: var(--danger-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    .data-table th {
+      text-align: left;
+      padding: 10px;
+      background: #0b1120;
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .data-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .registry-result {
+      background: #0b1120;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 14px;
+      font-size: 13px;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .result-row:last-child {
+      border-bottom: none;
+    }
+
+    .tag-true { color: var(--success-green); font-weight: 600; }
+    .tag-false { color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="anaf-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <div class="brand-title">
+        <span class="flag-badge"><span class="flag-blue"></span><span class="flag-yellow"></span><span class="flag-red"></span></span>
+        <h1>Romania ANAF e-Factura Gateway</h1>
+        <span class="badge-live">RO-CIUS 1.0.1 | SPV ONLINE</span>
+      </div>
+      <div class="nav-links">
+        <a href="index.html" class="nav-btn">Overview</a>
+        <a href="analytics.html" class="nav-btn">Analytics</a>
+        <a href="advisory.html" class="nav-btn">Advisory</a>
+        <a href="anaf.html" class="nav-btn active">ANAF e-Factura</a>
+        <a href="/api/docs" class="nav-btn" target="_blank">API Docs</a>
+      </div>
+    </div>
+
+    <!-- KPI Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Submissions</div>
+        <div class="kpi-value" id="kpi-total">142</div>
+        <div class="kpi-sub">100% RO-CIUS Compliant</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">ANAF SPV Accepted</div>
+        <div class="kpi-value" id="kpi-accepted" style="color: var(--success-green);">139</div>
+        <div class="kpi-sub">97.9% Acceptance Rate</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Processing / In Queue</div>
+        <div class="kpi-value" id="kpi-processing" style="color: var(--warning-amber);">3</div>
+        <div class="kpi-sub">Avg Latency &lt; 1.2s</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">ANAF VAT Registry Checks</div>
+        <div class="kpi-value" id="kpi-registry" style="color: var(--primary-accent);">58</div>
+        <div class="kpi-sub">PlatitorTvaRest API v8</div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+      <!-- Left Panel: Generator & Builder -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">⚡ RO-CIUS UBL 2.1 XML Generator</div>
+          <span style="font-size: 11px; color: var(--text-muted);">QES XMLDSig Ready</span>
+        </div>
+
+        <form id="anaf-invoice-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Invoice ID</label>
+              <input type="text" id="inv-id" value="INV-RO-2026-0801">
+            </div>
+            <div class="form-group">
+              <label>Series & Number</label>
+              <input type="text" id="inv-series" value="FPS-10045">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Issue Date</label>
+              <input type="date" id="inv-date" value="2026-08-13">
+            </div>
+            <div class="form-group">
+              <label>Due Date</label>
+              <input type="date" id="inv-due" value="2026-09-12">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Supplier CIF (Furnizor)</label>
+              <input type="text" id="supp-cif" value="RO114077876">
+            </div>
+            <div class="form-group">
+              <label>Supplier Name</label>
+              <input type="text" id="supp-name" value="FINANSPROTECT ROMANIA SRL">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Customer CIF (Client)</label>
+              <input type="text" id="cust-cif" value="RO12345678">
+            </div>
+            <div class="form-group">
+              <label>Customer Name</label>
+              <input type="text" id="cust-name" value="ROBOTICS SOFTWARE SERVICES SRL">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Item Description (Denumire Produs / Serviciu)</label>
+            <input type="text" id="item-desc" value="Consultanță Tehnologică și Audit Fiscal Real-Time">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Quantity</label>
+              <input type="number" step="0.01" id="item-qty" value="10.0">
+            </div>
+            <div class="form-group">
+              <label>Unit Price (RON)</label>
+              <input type="number" step="0.01" id="item-price" value="450.00">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>VAT Rate (%) & Category</label>
+              <select id="item-vat">
+                <option value="19.0|S" selected>19% Standard (S)</option>
+                <option value="9.0|RED">9% Reduced (RED)</option>
+                <option value="5.0|SUPER_RED">5% Super Reduced (SUPER_RED)</option>
+                <option value="0.0|Z">0% Zero Rated (Z)</option>
+                <option value="0.0|AE">0% Reverse Charge (AE)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Currency</label>
+              <select id="inv-currency">
+                <option value="RON" selected>RON (Leu)</option>
+                <option value="EUR">EUR (Euro)</option>
+                <option value="USD">USD (Dollar)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 16px;">
+            <button type="button" class="btn-action" onclick="generateXML()">Generate XML</button>
+            <button type="button" class="btn-secondary" onclick="validateInvoice()">Validate RO-CIUS</button>
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="submitToANAF()">Submit to ANAF SPV</button>
+          </div>
+        </form>
+
+        <div id="validation-output" style="margin-top: 14px; display: none;"></div>
+
+        <div class="xml-preview" id="xml-display">
+&lt;!-- Click 'Generate XML' to produce compliant UBL 2.1 RO-CIUS e-Factura document --&gt;
+        </div>
+      </div>
+
+      <!-- Right Panel: VAT Registry & Status Tracker -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">🔍 ANAF VAT Registry (CIF Lookup)</div>
+          <span style="font-size: 11px; color: var(--text-muted);">PlatitorTvaRest API v8</span>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="cif-search-input" placeholder="Enter Romanian CIF (e.g. RO12345678 or 12345678)" value="RO12345678">
+          <button class="btn-action" onclick="checkVATRegistry()">Verify CIF</button>
+        </div>
+
+        <div class="registry-result" id="registry-display">
+          <div class="result-row"><span>Company Name:</span> <strong>ROBOTICS SOFTWARE SERVICES SRL</strong></div>
+          <div class="result-row"><span>Formatted CIF:</span> <strong>RO12345678 (Valid Check Digit)</strong></div>
+          <div class="result-row"><span>Address:</span> <span>Bulevardul Unirii 10, București</span></div>
+          <div class="result-row"><span>VAT Registered (Plătitor TVA):</span> <span class="tag-true">YES (Active since 2020)</span></div>
+          <div class="result-row"><span>TVA la încasare (TVAi):</span> <span class="tag-false">NO</span></div>
+          <div class="result-row"><span>Split VAT Active:</span> <span class="tag-false">NO</span></div>
+          <div class="result-row"><span>ANAF Status:</span> <span class="tag-true">ACTIVE / OK</span></div>
+        </div>
+
+        <div class="panel-header" style="margin-top: 24px;">
+          <div class="panel-title">📋 ANAF Submission History & Status</div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Invoice ID</th>
+              <th>Customer</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="submissions-tbody">
+            <tr>
+              <td>INV-RO-2026-0801</td>
+              <td>ROBOTICS SRL</td>
+              <td>5,355.00 RON</td>
+              <td><span class="status-badge status-accepted">ACCEPTED</span></td>
+              <td><button class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="downloadReceipt('DL-ANAF-889900')">Receipt</button></td>
+            </tr>
+            <tr>
+              <td>INV-RO-2026-0800</td>
+              <td>TRANSILVANIA SA</td>
+              <td>12,400.00 RON</td>
+              <td><span class="status-badge status-accepted">ACCEPTED</span></td>
+              <td><button class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="downloadReceipt('DL-ANAF-889901')">Receipt</button></td>
+            </tr>
+            <tr>
+              <td>INV-RO-2026-0799</td>
+              <td>FINANSPROTECT</td>
+              <td>1,190.00 RON</td>
+              <td><span class="status-badge status-processing">PROCESSING</span></td>
+              <td><button class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="checkStatus('ANAF-17709000-A1')">Status</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function generateXML() {
+      const payload = getFormPayload();
+      try {
+        const resp = await fetch('/api/v1/anaf/invoices/generate-xml', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        document.getElementById('xml-display').textContent = data.ubl_xml || '// Error generating XML';
+        showValidation(data.valid, data.validation_errors, data.validation_warnings);
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function validateInvoice() {
+      const payload = getFormPayload();
+      try {
+        const resp = await fetch('/api/v1/anaf/invoices/validate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        showValidation(data.valid, data.errors, data.warnings);
+      } catch (err) {
+        alert('Validation call failed: ' + err.message);
+      }
+    }
+
+    async function submitToANAF() {
+      const payload = getFormPayload();
+      try {
+        const resp = await fetch('/api/v1/anaf/invoices/submit', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        alert('ANAF Submission Response:\nUpload ID: ' + (data.upload_id || 'N/A') + '\nStatus: ' + data.anaf_status + '\nMessage: ' + data.message);
+        addSubmissionRow(payload.invoice_id, payload.customer.name, (payload.items[0].unit_price * payload.items[0].quantity * 1.19).toFixed(2) + ' RON', 'ACCEPTED', data.download_id);
+      } catch (err) {
+        alert('Submission failed: ' + err.message);
+      }
+    }
+
+    async function checkVATRegistry() {
+      const cif = document.getElementById('cif-search-input').value;
+      try {
+        const resp = await fetch('/api/v1/anaf/vat-registry/check', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ cif })
+        });
+        const data = await resp.json();
+        renderRegistryResult(data);
+      } catch (err) {
+        alert('VAT Registry lookup error: ' + err.message);
+      }
+    }
+
+    function renderRegistryResult(data) {
+      const box = document.getElementById('registry-display');
+      box.innerHTML = `
+        <div class="result-row"><span>Company Name:</span> <strong>${data.company_name}</strong></div>
+        <div class="result-row"><span>Formatted CIF:</span> <strong>${data.cif}</strong></div>
+        <div class="result-row"><span>Address:</span> <span>${data.address}</span></div>
+        <div class="result-row"><span>VAT Registered (Plătitor TVA):</span> <span class="${data.vat_registered ? 'tag-true' : 'tag-false'}">${data.vat_registered ? 'YES' : 'NO'}</span></div>
+        <div class="result-row"><span>TVA la încasare (TVAi):</span> <span class="${data.tvai_active ? 'tag-true' : 'tag-false'}">${data.tvai_active ? 'YES' : 'NO'}</span></div>
+        <div class="result-row"><span>Split VAT Active:</span> <span class="${data.vat_split_active ? 'tag-true' : 'tag-false'}">${data.vat_split_active ? 'YES' : 'NO'}</span></div>
+        <div class="result-row"><span>ANAF Status:</span> <span class="tag-true">${data.message}</span></div>
+      `;
+    }
+
+    function getFormPayload() {
+      const [vatRate, vatCat] = document.getElementById('item-vat').value.split('|');
+      return {
+        invoice_id: document.getElementById('inv-id').value,
+        series: document.getElementById('inv-series').value,
+        issue_date: document.getElementById('inv-date').value,
+        due_date: document.getElementById('inv-due').value,
+        currency: document.getElementById('inv-currency').value,
+        supplier: {
+          cif: document.getElementById('supp-cif').value,
+          name: document.getElementById('supp-name').value,
+          country_code: 'RO'
+        },
+        customer: {
+          cif: document.getElementById('cust-cif').value,
+          name: document.getElementById('cust-name').value,
+          country_code: 'RO'
+        },
+        items: [{
+          line_id: "1",
+          description: document.getElementById('item-desc').value,
+          quantity: parseFloat(document.getElementById('item-qty').value),
+          unit_price: parseFloat(document.getElementById('item-price').value),
+          vat_rate: parseFloat(vatRate),
+          vat_category: vatCat
+        }]
+      };
+    }
+
+    function showValidation(valid, errors, warnings) {
+      const box = document.getElementById('validation-output');
+      box.style.display = 'block';
+      if (valid) {
+        box.innerHTML = `<div style="background: rgba(16, 185, 129, 0.15); border: 1px solid var(--success-green); color: var(--success-green); padding: 10px; border-radius: 6px;">✓ RO-CIUS Schematron Validation Passed (0 Errors)</div>`;
+      } else {
+        box.innerHTML = `<div style="background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger-red); color: var(--danger-red); padding: 10px; border-radius: 6px;">✕ Validation Errors: ${errors.join('; ')}</div>`;
+      }
+    }
+
+    function addSubmissionRow(id, name, amount, status, downloadId) {
+      const tbody = document.getElementById('submissions-tbody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${id}</td>
+        <td>${name}</td>
+        <td>${amount}</td>
+        <td><span class="status-badge status-accepted">${status}</span></td>
+        <td><button class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="downloadReceipt('${downloadId}')">Receipt</button></td>
+      `;
+      tbody.insertBefore(tr, tbody.firstChild);
+    }
+
+    async function downloadReceipt(downloadId) {
+      try {
+        const resp = await fetch(`/api/v1/anaf/invoices/download/${downloadId}`);
+        const data = await resp.json();
+        alert('Downloaded ANAF Validation Receipt:\n' + data.data.xml_content);
+      } catch (err) {
+        alert('Download failed: ' + err.message);
+      }
+    }
+
+    async function checkStatus(uploadId) {
+      try {
+        const resp = await fetch(`/api/v1/anaf/invoices/status/${uploadId}`);
+        const data = await resp.json();
+        alert('ANAF Processing Status:\n' + JSON.stringify(data.data, null, 2));
+      } catch (err) {
+        alert('Status query failed: ' + err.message);
+      }
+    }
+  </script>
+</body>
+</html>

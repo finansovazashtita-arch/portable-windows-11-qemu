@@ -18,7 +18,9 @@ files = {
     "bg/user/reconciliation.md": "# Съвпадение на фактури\n\nАвтоматично съвпадение и равнение (M71).\n",
     "bg/user/gfo-reports.md": "# ГФО Отчети\n\nГенериране на Годишен финансов отчет (ГФО).\n",
     "bg/user/tax-compliance.md": "# Данъчно съответствие\n\nДДС декларации, ЗКПО, данък дивидент, НАП електронни фактури.\n",
+    "bg/user/anaf-efactura.md": "# Румъния ANAF e-Factura (M78)\n\nИнтеграция с румънската данъчна портална система ANAF за e-Factura. Генериране на UBL 2.1 RO-CIUS XML, валидация на CUI/CIF, OAuth 2.0 SPV автентикация, QES/XMLDSig дигитален подпис и проверка в ANAF VAT регистър.\n",
     "bg/user/banking.md": "# Банкиране\n\nОтворено банкиране, SEPA плащания и мониторинг.\n",
+
     "bg/user/ai-features.md": "# AI Функции\n\nAI детекция на измами, гласов асистент и предвиждания.\n",
     "bg/api/overview.md": "# API Общ преглед\n\nАрхитектура, автентикация и лимити на REST API.\n",
     "bg/api/endpoints.md": "# Крайни точки\n\nСписък с всички API endpoints.\n",
@@ -39,7 +41,9 @@ files = {
     "en/user/reconciliation.md": "# Reconciliation\n\nInvoice matching and auto-reconciliation.\n",
     "en/user/gfo-reports.md": "# GFO Reports\n\nAnnual Financial Statement (ГФО) generation.\n",
     "en/user/tax-compliance.md": "# Tax Compliance\n\nVAT returns, CITA, dividend tax, NRA e-invoicing.\n",
+    "en/user/anaf-efactura.md": "# Romania ANAF e-Factura (M78)\n\nIntegration with Romanian ANAF e-Factura portal system. UBL 2.1 RO-CIUS XML generation, CUI/CIF check digit validation, OAuth 2.0 SPV authentication, QES/XMLDSig signing, and ANAF VAT Registry lookup.\n",
     "en/user/banking.md": "# Banking\n\nOpen banking, SEPA payments, bank feed monitoring.\n",
+
     "en/user/ai-features.md": "# AI Features\n\nAI fraud detection, predictive analytics.\n",
     "en/api/overview.md": "# API Overview\n\nArchitecture, authentication, rate limits.\n",
     "en/api/endpoints.md": "# Endpoints\n\nFull endpoint reference.\n",

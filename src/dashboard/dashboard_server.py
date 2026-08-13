@@ -252,6 +252,46 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(content)
             return
 
+        elif canonical_path.startswith("/api/v1/anaf") or canonical_path.startswith("/api/anaf"):
+            from src.integration.anaf_api import (
+                get_anaf_health_handler,
+                get_anaf_status_handler,
+                get_anaf_download_handler,
+                get_anaf_invoices_handler,
+            )
+            from urllib.parse import parse_qs, urlparse
+            parsed_url = urlparse(self.path)
+            q_params = {k: v[0] for k, v in parse_qs(parsed_url.query).items()}
+
+            if canonical_path.endswith("/health"):
+                res = get_anaf_health_handler(q_params)
+                self._send_json_response(res)
+                return
+            elif "/invoices/status/" in canonical_path:
+                upload_id = canonical_path.split("/invoices/status/")[-1]
+                res = get_anaf_status_handler(upload_id)
+                self._send_json_response(res)
+                return
+            elif "/invoices/download/" in canonical_path:
+                download_id = canonical_path.split("/invoices/download/")[-1]
+                res = get_anaf_download_handler(download_id)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/invoices"):
+                res = get_anaf_invoices_handler(q_params)
+                self._send_json_response(res)
+                return
+
+        elif self.path in ("/anaf", "/anaf.html"):
+            with open(os.path.join(WEB_UI_DIR, "anaf.html"), "rb") as f:
+                content = f.read()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
+
         elif canonical_path in ("/api/v1/reconciliation/pending-matches", "/api/reconciliation/pending-matches"):
 
             payload = COMPLIANCE_ENGINE.get_telemetry_payload()
@@ -363,7 +403,37 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 self._send_json_response(res)
                 return
 
+        elif canonical_path.startswith("/api/v1/anaf") or canonical_path.startswith("/api/anaf"):
+            from src.integration.anaf_api import (
+                post_anaf_oauth_token_handler,
+                post_anaf_generate_xml_handler,
+                post_anaf_validate_handler,
+                post_anaf_submit_handler,
+                post_anaf_vat_check_handler,
+            )
+            if canonical_path.endswith("/oauth/token"):
+                res = post_anaf_oauth_token_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/invoices/generate-xml"):
+                res = post_anaf_generate_xml_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/invoices/validate"):
+                res = post_anaf_validate_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/invoices/submit"):
+                res = post_anaf_submit_handler(req_data)
+                self._send_json_response(res)
+                return
+            elif canonical_path.endswith("/vat-registry/check"):
+                res = post_anaf_vat_check_handler(req_data)
+                self._send_json_response(res)
+                return
+
         elif canonical_path in ("/api/v1/mobile/scan", "/api/mobile/scan"):
+
 
             from src.ocr.edge_ai_mobile_suite import (
                 EdgeAIReceiptScanner,

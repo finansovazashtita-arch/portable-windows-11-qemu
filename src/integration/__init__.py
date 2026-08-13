@@ -28,7 +28,30 @@ from src.integration.supabase_logger import SupabaseLogger
 from src.integration.telegram_notifier import TelegramNotifier
 from src.integration.vies_vat_checker import VIESVATChecker
 
+from src.integration.anaf_efactura_gateway import (
+    ANAFEInvoiceGateway,
+    ANAFInvoice,
+    ANAFParty,
+    ANAFInvoiceItem,
+    ANAFInvoiceType,
+    ANAFInvoiceStatus,
+    VATCategory,
+    ANAFEnvironment,
+    ANAFVATRegistryInfo,
+    validate_cif,
+)
+
 __all__ = [
+    "ANAFEInvoiceGateway",
+    "ANAFInvoice",
+    "ANAFParty",
+    "ANAFInvoiceItem",
+    "ANAFInvoiceType",
+    "ANAFInvoiceStatus",
+    "VATCategory",
+    "ANAFEnvironment",
+    "ANAFVATRegistryInfo",
+    "validate_cif",
     "ObsidianVaultExporter",
     "SupabaseLogger",
     "VIESVATChecker",
@@ -56,4 +79,5 @@ __all__ = [
     "HMRCVATReturn",
     "HMRCEndpoint",
 ]
+
 
