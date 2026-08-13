@@ -30,7 +30,7 @@ Phase 19 transforms the mature feature-complete platform (67 milestones) into a 
 - **Status**: Completed 100% (Centralized ConfigHardeningManager, startup secret validation, Infisical key rotation, profile support, docker-compose prod/dev profiles & 8 unit tests passing).
 
 
-### Milestone M70: Comprehensive API Documentation & OpenAPI Spec (`m70_openapi_docs`)
+### Milestone M70: Comprehensive API Documentation & OpenAPI Spec (`m70_openapi_docs`) [DONE]
 - **Objective**: Deliver comprehensive OpenAPI 3.1 documentation, integrated Swagger UI within the FinansProtect Dashboard, request/response validation middleware, and API versioning.
 - **Scope**:
   - OpenAPI 3.1 YAML/JSON spec for all REST endpoints
@@ -39,3 +39,5 @@ Phase 19 transforms the mature feature-complete platform (67 milestones) into a 
   - API versioning strategy (v1, v2)
 - **Dependencies**: M12, M65
 - **Target Deliverables**: `src/api/openapi_docs.py`, `docs/openapi.yaml`, `tests/api/test_openapi_docs.py`
+- **Status**: Completed 100% (OpenAPI 3.1 YAML/JSON spec created, Swagger UI embedded at /api/docs, OpenAPISchemaValidator request/response middleware added, APIVersionRouter v1/v2 support added, 15 unit/integration tests passing).
+

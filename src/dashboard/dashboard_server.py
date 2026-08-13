@@ -26,6 +26,13 @@ from src.dashboard.realtime_compliance_ui import (
     RealTimeComplianceEngine,
     WebSocketFrame,
 )
+from src.api.openapi_docs import (
+    APIVersionRouter,
+    OpenAPISchemaValidator,
+    get_openapi_json,
+    get_openapi_yaml,
+    get_swagger_ui_html,
+)
 
 PORT = 8095
 WEB_UI_DIR = os.path.join(os.path.dirname(__file__), "web_ui")
@@ -74,10 +81,54 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_websocket_upgrade()
             return
 
-        # 2. REST API Telemetry Endpoints
-        if self.path == "/api/telemetry":
+        # 2. OpenAPI & Swagger UI Documentation Endpoints
+        if self.path in ("/api/docs", "/api/docs/"):
+            html_content = get_swagger_ui_html(openapi_url="/api/openapi.json")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(html_content.encode("utf-8"))
+            return
+
+        elif self.path in ("/api/openapi.json", "/api/docs/openapi.json"):
+            json_spec = get_openapi_json()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json_spec.encode("utf-8"))
+            return
+
+        elif self.path in ("/api/openapi.yaml", "/api/docs/openapi.yaml"):
+            yaml_spec = get_openapi_yaml()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/yaml; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(yaml_spec.encode("utf-8"))
+            return
+
+        # 3. Resolve API Versioning
+        header_version = self.headers.get("X-API-Version")
+        canonical_path, api_ver = APIVersionRouter.resolve_version_and_route(self.path, header_version)
+
+        # 4. REST API Telemetry & Compliance Endpoints
+        if canonical_path == "/api/v2/telemetry" or api_ver == "v2":
             payload = COMPLIANCE_ENGINE.get_telemetry_payload()
-            bg_entity = next((e for e in payload["entities"] if e["jurisdiction"] == "BG"), {})
+            res_data = {
+                "api_version": "2.0.0",
+                "status": payload["system_status"],
+                "overall_compliance_score": payload["overall_compliance_score"],
+                "timestamp": time.time(),
+                "summary": payload["summary"],
+                "pqc_nodes_online": len(payload["pqc_replication_nodes"]),
+            }
+            self._send_json_response(res_data)
+            return
+
+        elif canonical_path in ("/api/v1/telemetry", "/api/telemetry"):
+            payload = COMPLIANCE_ENGINE.get_telemetry_payload()
             res_data = {
                 "status": payload["system_status"],
                 "overall_compliance_score": payload["overall_compliance_score"],
@@ -95,12 +146,12 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._send_json_response(res_data)
             return
 
-        elif self.path in ("/api/compliance/telemetry", "/api/compliance/summary"):
+        elif canonical_path in ("/api/v1/compliance/telemetry", "/api/v1/compliance/summary", "/api/compliance/telemetry", "/api/compliance/summary"):
             payload = COMPLIANCE_ENGINE.get_telemetry_payload()
             self._send_json_response(payload)
             return
 
-        elif self.path in ("/api/v1/mobile/status", "/api/mobile/status"):
+        elif canonical_path in ("/api/v1/mobile/status", "/api/mobile/status"):
             from src.ocr.edge_ai_mobile_suite import OfflineReceiptQueueGuard
             guard = OfflineReceiptQueueGuard()
             with open(guard.queue_file_path, "r", encoding="utf-8") as f:
@@ -113,8 +164,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             })
             return
 
-        # 3. Server-Sent Events (SSE) Stream Fallback
-        elif self.path in ("/api/compliance/stream", "/api/stream"):
+        # 5. Server-Sent Events (SSE) Stream Fallback
+        elif canonical_path in ("/api/compliance/stream", "/api/stream"):
             self.send_response(200)
             self.send_header("Content-Type", "text/event-stream")
             self.send_header("Cache-Control", "no-cache")
@@ -144,7 +195,20 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         except Exception:
             req_data = {}
 
-        if self.path in ("/api/v1/mobile/scan", "/api/mobile/scan"):
+        header_version = self.headers.get("X-API-Version")
+        canonical_path, api_ver = APIVersionRouter.resolve_version_and_route(self.path, header_version)
+
+        # OpenAPI Schema Validation Middleware
+        is_valid, validation_errors = OpenAPISchemaValidator.validate_request("POST", canonical_path, req_data)
+        if not is_valid:
+            self._send_json_response({
+                "error": "SCHEMA_VALIDATION_ERROR",
+                "message": validation_errors[0] if validation_errors else "Invalid request payload schema",
+                "details": validation_errors,
+            }, status=400)
+            return
+
+        if canonical_path in ("/api/v1/mobile/scan", "/api/mobile/scan"):
             from src.ocr.edge_ai_mobile_suite import (
                 EdgeAIReceiptScanner,
                 DeltaProReceiptAccountingMapper,
@@ -167,28 +231,28 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 self._send_json_response({"success": True, "offline": False, "receipt": receipt_dict, "journal_entry": entry})
             return
 
-        elif self.path in ("/api/v1/mobile/sync", "/api/mobile/sync"):
+        elif canonical_path in ("/api/v1/mobile/sync", "/api/mobile/sync"):
             from src.ocr.edge_ai_mobile_suite import OfflineReceiptQueueGuard
             guard = OfflineReceiptQueueGuard()
             res = guard.sync_offline_scans()
             self._send_json_response({"success": True, "sync_result": res})
             return
 
-        elif self.path in ("/api/compliance/correct", "/api/correct"):
+        elif canonical_path in ("/api/v1/compliance/correct", "/api/compliance/correct", "/api/correct"):
             res = COMPLIANCE_ENGINE.submit_correction(req_data)
             self._send_json_response(res, status=200 if res.get("success") else 400)
             if res.get("success"):
                 broadcast_telemetry_frame()
             return
 
-        elif self.path in ("/api/compliance/einvoice/submit", "/api/einvoice/submit"):
+        elif canonical_path in ("/api/v1/compliance/einvoice/submit", "/api/compliance/einvoice/submit", "/api/einvoice/submit"):
             res = COMPLIANCE_ENGINE.submit_nra_einvoice(req_data)
             self._send_json_response(res, status=200 if res.get("success") else 400)
             if res.get("success"):
                 broadcast_telemetry_frame()
             return
 
-        elif self.path in ("/api/compliance/mesh/sync", "/api/mesh/sync"):
+        elif canonical_path in ("/api/v1/compliance/mesh/sync", "/api/compliance/mesh/sync", "/api/mesh/sync"):
             node_id = req_data.get("node_id", "hetzner-fsn1-dc14")
             res = COMPLIANCE_ENGINE.sync_pqc_mesh_node(node_id)
             self._send_json_response(res, status=200 if res.get("success") else 400)
@@ -198,6 +262,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
 
         else:
             self.send_error(404, "Endpoint Not Found")
+
 
     def _send_json_response(self, data: Dict[str, Any], status: int = 200):
         self.send_response(status)
