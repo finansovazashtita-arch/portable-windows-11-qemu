@@ -16,7 +16,7 @@ Phase 25 introduces an enterprise-grade **Romania ANAF e-Factura Gateway & Cross
   - **Interactive Web UI ANAF Dashboard (`src/dashboard/web_ui/anaf.html`)**: Responsive executive workspace featuring invoice generation form, UBL 2.1 XML live code previewer, RO-CIUS validation feedback panel, ANAF Upload & Status Tracker table, ANAF VAT Registry (CIF Lookup) tool, and multi-format action buttons.
 - **Dependencies**: M12, M19, M41, M60, M77
 - **Target Deliverables**: `src/integration/anaf_efactura_gateway.py`, `src/integration/anaf_api.py`, `src/dashboard/web_ui/anaf.html`, `tests/integration/test_anaf_efactura_gateway.py`, `tests/integration/test_anaf_api.py`, `tests/dashboard/test_anaf_dashboard.py`
-- **Status**: In Progress
+- **Status**: DONE
 
 ---
 
