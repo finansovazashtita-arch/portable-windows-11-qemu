@@ -2,6 +2,7 @@
 Backup Package.
 """
 
+from src.backup.active_active_sql_sync import ActiveActiveSQLSyncGuard, DatabaseSyncPayload, DatabaseType, SyncStatus
 from src.backup.cold_storage_archiver import ArchiveFormat, AuditLogColdArchiver, ColdStorageArchive
 from src.backup.disaster_recovery_replication import DRReplicationManager, ReplicationTarget
 from src.backup.nightly_backup import NightlyBackupManager
@@ -13,4 +14,8 @@ __all__ = [
     "AuditLogColdArchiver",
     "ColdStorageArchive",
     "ArchiveFormat",
+    "ActiveActiveSQLSyncGuard",
+    "DatabaseSyncPayload",
+    "DatabaseType",
+    "SyncStatus",
 ]
