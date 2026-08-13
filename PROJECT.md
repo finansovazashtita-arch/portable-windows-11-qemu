@@ -139,6 +139,7 @@
 | 71 | Dynamic Cash Flow Optimization & Predictive Liquidity Engine | Monte Carlo stochastic liquidity simulations (VaR 95/99%), automated supplier payment scheduling maximizing cash discount yield vs cost of capital | M64 | DONE |
 | 72 | Autonomous Regulatory Compliance & E-Archiving Audit Vault | Full eIDAS 2.0 LTV compatibility, Qualified Electronic Signatures (КЕП), RFC 3161 timestamps & ZK tax audit proofs | M66 | DONE |
 | 74 | Integration Smoke Test Suite | Docker-based automated integration testing framework & CI/CD smoke test suite validating real bank statements & REST APIs | M68 | DONE |
+| 75 | Production Config & Secrets Hardening | Centralized config manager, startup secret validation layer, Infisical Vault key rotation & Docker Compose profiles | M69 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -212,8 +213,10 @@
 | M66 | `m66_e_archiving_compliance_vault` | Autonomous Regulatory Compliance & E-Archiving Audit Vault with eIDAS 2.0 LTV preservation, QES validation, RFC 3161 timestamps & ZK proofs for tax audits | M33, M36, M56, M60 | DONE |
 | M67 | `m67_edge_ai_mobile_suite` | Enterprise Edge AI & Mobile Receipt Scanner Suite with WebAssembly/On-Device OCR, NRA QR validation, offline HMAC queue sync & Delta Pro accounting | M23, M27, M54 | DONE |
 | M68 | `m68_integration_smoke_tests` | End-to-End Integration Smoke Test Suite & GitHub Actions CI/CD pipeline | M5, M12 | DONE |
+| M69 | `m69_config_hardening` | Production Configuration & Secrets Management Hardening (`src/config/config_hardening.py`) | M10, M13 | DONE |
 
 ## Code Layout
+- `src/config/`: Production Configuration & Secrets Management Hardening (`config_hardening.py`)
 - `src/intake/`: Open Banking PISP Aggregator (`open_banking_pisp.py`), Bank Feed Guard (`bank_feed_guard.py`), SEPA Instant / BISERA 6 Adapter (`sepa_bisera_instant.py`), Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)
 - `src/security/`: E-Archiving Compliance Vault (`e_archiving_compliance_vault.py`), Post-Quantum Mesh Signer (`pq_mesh_signer.py`), Audit Ledger Integrity Guard (`audit_ledger_guard.py`), Zero-Trust HSM Cryptographic Signer & PQC (`hsm_signer.py`), Multi-Tenant RBAC (`tenant_rbac.py`) & Infisical Vault client (`infisical_vault.py`)
 - `src/accounting/`: Travel Expense Manager (`travel_expense_manager.py`), Cash Desk Manager (`cash_desk_manager.py`), Corporate Consolidation Engine (`corporate_consolidation.py`), Fixed Assets & Depreciation Manager (`fixed_assets_depreciation.py`), Inventory Valuation Engine (`inventory_valuation.py`), EU OSS E-Commerce Invoicing Adapter (`eu_oss_accounting.py`), Customs & Excise Accounting Engine (`customs_excise_accounting.py`), Payroll Accounting Engine (`payroll_accounting.py`), FX Revaluation Engine (`fx_revaluation.py`), Bulgarian double-entry translation & XML generator (`translate_to_delta.py`)

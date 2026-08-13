@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  microinvest-ocr-service:
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+    restart: "no"

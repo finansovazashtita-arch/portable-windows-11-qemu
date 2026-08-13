@@ -1,0 +1,49 @@
+# Microinvest Bank Statement OCR & FinansProtect Platform Configuration
+# Production Configuration Hardening Manifest (Milestone M69)
+
+app:
+  name: "Microinvest Bank Statement OCR & FinansProtect Platform"
+  version: "1.0.0"
+  environment: "development" # Options: development, staging, production, test
+  log_level: "INFO"
+
+server:
+  host: "0.0.0.0"
+  port: 8090
+  dashboard_port: 8095
+  max_workers: 4
+
+security:
+  jwt_algorithm: "HS256"
+  jwt_expiration_minutes: 60
+  min_password_length: 12
+  require_pqc_signing: true
+  rbac_enabled: true
+
+infisical:
+  enabled: true
+  base_url: "http://100.83.83.8:8080"
+  environment: "dev"
+  timeout_seconds: 5
+
+qemu:
+  vnc_host: "127.0.0.1"
+  vnc_port: 5901
+  qcow2_path: "windows11_portable.qcow2"
+
+database:
+  mssql_host: "127.0.0.1"
+  mssql_port: 1433
+  mssql_user: "sa"
+  mssql_database: "DeltaPro"
+  supabase_url: "http://100.83.83.8:8002"
+
+nra:
+  api_url: "https://e-services.nap.bg/api/v1"
+  vat_refund_threshold_eur: 5000.00
+  vat_rate_standard: 0.20
+
+integrations:
+  n8n_webhook_url: "http://100.83.83.8:5679/webhook/microinvest-ocr"
+  openbalancer_url: "https://n8n.openbalancer.com"
+  obsidian_vault_path: "/Users/diokarabaz/Documents/Obsidian Vault"

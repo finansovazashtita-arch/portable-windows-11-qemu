@@ -1,29 +1,72 @@
 version: '3.8'
 
 services:
+  # Hardened Production Profile Service
   microinvest-ocr-service:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: microinvest-ocr-service
+    profiles:
+      - prod
+      - default
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    user: "1000:1000"
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
     ports:
       - "8090:8090"
     environment:
+      - ENVIRONMENT=production
       - INFISICAL_URL=http://100.83.83.8:8080
       - SUPABASE_URL=http://100.83.83.8:8002
       - N8N_WEBHOOK_URL=http://100.83.83.8:5679/webhook/microinvest-ocr
       - QEMU_VNC_HOST=127.0.0.1
       - QEMU_VNC_PORT=5901
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     volumes:
       - ./data:/app/data
-      - /tmp/microinvest_ocr:/tmp
       - /Users/diokarabaz/Documents/Obsidian Vault:/app/obsidian_vault
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8090/"]
       interval: 30s
       timeout: 5s
       retries: 3
+    networks:
+      - microinvest-net
+
+  # Development Profile Service with Live Reload & Debug Flags
+  microinvest-ocr-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: microinvest-ocr-dev
+    profiles:
+      - dev
+    restart: "no"
+    ports:
+      - "8091:8090"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - INFISICAL_URL=http://100.83.83.8:8080
+      - SUPABASE_URL=http://100.83.83.8:8002
+      - N8N_WEBHOOK_URL=http://100.83.83.8:5679/webhook/microinvest-ocr
+      - QEMU_VNC_HOST=127.0.0.1
+      - QEMU_VNC_PORT=5901
+    volumes:
+      - .:/app
+      - /tmp/microinvest_ocr:/tmp
     networks:
       - microinvest-net
 
