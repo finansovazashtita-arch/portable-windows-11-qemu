@@ -1,0 +1,19 @@
+{{- if .Values.monitoring.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "finansprotect.fullname" . }}-api
+  namespace: {{ .Values.global.namespace | default "finansprotect" }}
+  labels:
+    {{- include "finansprotect.labels" . | nindent 4 }}
+    release: prometheus # typical label for prometheus operator to pick up
+spec:
+  selector:
+    matchLabels:
+      {{- include "finansprotect.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
+  endpoints:
+    - port: metrics
+      interval: {{ .Values.monitoring.serviceMonitor.interval }}
+      path: {{ .Values.monitoring.serviceMonitor.path }}
+{{- end }}

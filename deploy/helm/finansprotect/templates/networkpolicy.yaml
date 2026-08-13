@@ -1,0 +1,23 @@
+{{- if .Values.security.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "finansprotect.fullname" . }}-default-deny
+  namespace: {{ .Values.global.namespace | default "finansprotect" }}
+  labels:
+    {{- include "finansprotect.labels" . | nindent 4 }}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: {{ .Values.global.namespace | default "finansprotect" }}
+    # Allow ingress controller to reach pods
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik
+{{- end }}

@@ -1,0 +1,88 @@
+# cert-manager Installation & Let's Encrypt ClusterIssuer for FinansProtect
+# Prerequisites: K3s cluster with kubectl access
+# Usage:
+#   kubectl apply -f cert-manager.yaml
+#   Wait for cert-manager pods to be ready, then the ClusterIssuer will auto-configure
+---
+# Step 1: Install cert-manager CRDs and components via Helm
+# Run this first (one-time):
+#   helm repo add jetstack https://charts.jetstack.io --force-update
+#   helm install cert-manager jetstack/cert-manager \
+#     --namespace cert-manager \
+#     --create-namespace \
+#     --version v1.15.1 \
+#     --set crds.enabled=true \
+#     --set webhook.timeoutSeconds=30
+
+---
+# Step 2: Let's Encrypt Staging Issuer (for testing — avoids rate limits)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    # Let's Encrypt staging server (no rate limits, issues untrusted certs)
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: admin@finansprotect.bg
+    privateKeySecretRef:
+      name: letsencrypt-staging-account-key
+    solvers:
+      # HTTP-01 challenge solver using Traefik ingress
+      - http01:
+          ingress:
+            ingressClassName: traefik
+
+---
+# Step 3: Let's Encrypt Production Issuer (trusted certificates)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    # Let's Encrypt production server (rate limited: 50 certs/week per domain)
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@finansprotect.bg
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    solvers:
+      # HTTP-01 challenge solver — works with Traefik IngressRoute
+      - http01:
+          ingress:
+            ingressClassName: traefik
+      # Optional: DNS-01 challenge for wildcard certificates
+      # Uncomment and configure for *.finansprotect.bg wildcard support
+      # - dns01:
+      #     cloudflare:
+      #       email: admin@finansprotect.bg
+      #       apiTokenSecretRef:
+      #         name: cloudflare-api-token
+      #         key: api-token
+
+---
+# Step 4: Certificate resource for FinansProtect domains
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: finansprotect-tls
+  namespace: finansprotect-prod
+spec:
+  secretName: finansprotect-tls-secret
+  duration: 2160h    # 90 days
+  renewBefore: 360h  # Renew 15 days before expiry
+  isCA: false
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - finansprotect.example.com
+    - api.finansprotect.example.com
+    - "*.finansprotect.example.com"
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+    group: cert-manager.io

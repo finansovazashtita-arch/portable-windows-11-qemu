@@ -1,0 +1,127 @@
+# Traefik IngressRoute Configuration for FinansProtect
+# Applied after K3s installation with embedded Traefik controller
+# Provides TLS termination, rate limiting, security headers, and HTTP→HTTPS redirect
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: finansprotect-rate-limit
+  namespace: finansprotect-prod
+spec:
+  rateLimit:
+    average: 100        # 100 requests per second average
+    burst: 200          # Allow burst up to 200
+    period: 1s
+    sourceCriterion:
+      ipStrategy:
+        depth: 1        # Use first X-Forwarded-For header
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: finansprotect-security-headers
+  namespace: finansprotect-prod
+spec:
+  headers:
+    frameDeny: true
+    contentTypeNosniff: true
+    browserXssFilter: true
+    referrerPolicy: "strict-origin-when-cross-origin"
+    customResponseHeaders:
+      X-Powered-By: ""
+      Server: ""
+    stsSeconds: 31536000
+    stsIncludeSubdomains: true
+    stsPreload: true
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: finansprotect-redirect-https
+  namespace: finansprotect-prod
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: finansprotect-compress
+  namespace: finansprotect-prod
+spec:
+  compress:
+    excludedContentTypes:
+      - text/event-stream    # Don't compress SSE streams
+
+---
+# HTTP → HTTPS redirect IngressRoute
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: finansprotect-http-redirect
+  namespace: finansprotect-prod
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`finansprotect.example.com`) || Host(`api.finansprotect.example.com`)
+      kind: Rule
+      middlewares:
+        - name: finansprotect-redirect-https
+      services:
+        - name: finansprotect-api
+          port: 8090
+
+---
+# Main HTTPS IngressRoute — API Server
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: finansprotect-api-route
+  namespace: finansprotect-prod
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`api.finansprotect.example.com`)
+      kind: Rule
+      middlewares:
+        - name: finansprotect-rate-limit
+        - name: finansprotect-security-headers
+        - name: finansprotect-compress
+      services:
+        - name: finansprotect-api
+          port: 8090
+  tls:
+    certResolver: letsencrypt
+    domains:
+      - main: api.finansprotect.example.com
+
+---
+# Dashboard IngressRoute
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: finansprotect-dashboard-route
+  namespace: finansprotect-prod
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`finansprotect.example.com`)
+      kind: Rule
+      middlewares:
+        - name: finansprotect-rate-limit
+        - name: finansprotect-security-headers
+        - name: finansprotect-compress
+      services:
+        - name: finansprotect-dashboard
+          port: 8095
+  tls:
+    certResolver: letsencrypt
+    domains:
+      - main: finansprotect.example.com

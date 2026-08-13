@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "finansprotect.fullname" . }}-config
+  namespace: {{ .Values.global.namespace | default "finansprotect" }}
+  labels:
+    {{- include "finansprotect.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    # Application configuration mapped from root config.yaml
+    app:
+      name: "FinansProtect Enterprise"
+      env: {{ .Values.global.environment }}
+    db:
+      host: "{{ include "finansprotect.fullname" . }}-db"
+      port: 5432
+      name: "finansprotect"
+    mssql:
+      host: "{{ include "finansprotect.fullname" . }}-mssql"
+      port: 1433

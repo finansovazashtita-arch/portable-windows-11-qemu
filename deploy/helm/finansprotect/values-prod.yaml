@@ -1,0 +1,34 @@
+global:
+  environment: prod
+
+api:
+  replicaCount: 3
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 15
+  env:
+    ENVIRONMENT: prod
+    LOG_LEVEL: warn
+
+dashboard:
+  replicaCount: 3
+
+ingress:
+  hosts:
+    - host: api.finansprotect.bg
+      paths:
+        - path: /
+          pathType: Prefix
+          service: api
+    - host: app.finansprotect.bg
+      paths:
+        - path: /
+          pathType: Prefix
+          service: dashboard
+
+persistence:
+  auditLogs:
+    size: 10Gi
+  qemuDisk:
+    size: 200Gi

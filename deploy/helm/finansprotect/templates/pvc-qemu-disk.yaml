@@ -1,0 +1,18 @@
+{{- if .Values.persistence.qemuDisk.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "finansprotect.fullname" . }}-qemu-disk
+  namespace: {{ .Values.global.namespace | default "finansprotect" }}
+  labels:
+    {{- include "finansprotect.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.qemuDisk.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.qemuDisk.size }}
+  {{- if .Values.persistence.storageClass }}
+  storageClassName: {{ .Values.persistence.storageClass | quote }}
+  {{- end }}
+{{- end }}

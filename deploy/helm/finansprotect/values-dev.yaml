@@ -1,0 +1,40 @@
+global:
+  environment: dev
+
+api:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  autoscaling:
+    enabled: false
+  env:
+    ENVIRONMENT: dev
+    LOG_LEVEL: debug
+
+dashboard:
+  replicaCount: 1
+
+ingress:
+  hosts:
+    - host: api.dev.finansprotect.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: api
+    - host: app.dev.finansprotect.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: dashboard
+  tls: []
+
+persistence:
+  auditLogs:
+    size: 1Gi
+  qemuDisk:
+    size: 20Gi
+
+infisical:
+  enabled: false
