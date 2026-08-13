@@ -6,6 +6,16 @@ Direct REST API integration with Bulgarian commercial banks:
 - UniCredit Bulbank (NextGenPSD2 API)
 - United Bulgarian Bank / ОББ (PSD2 API)
 - Postbank / Eurobank Bulgaria (Open Banking API)
+
+M83 CEE Expansion — additional providers:
+- PKO Bank Polski (Berlin Group NextGenPSD2)
+- Bank Pekao S.A. (Berlin Group NextGenPSD2)
+- Banca Comercială Română / BCR (Berlin Group NextGenPSD2)
+- Banca Transilvania / BT (Berlin Group NextGenPSD2)
+- Alpha Bank S.A. Greece (UK Open Banking v3.1)
+- Eurobank S.A. Greece (UK Open Banking v3.1)
+- Revolut Business (Revolut Business API v1)
+- Wise / TransferWise (Wise Platform API v3)
 """
 
 import enum
@@ -19,20 +29,46 @@ logger = logging.getLogger("psd2_openbanking")
 
 
 class PSD2BankProvider(str, enum.Enum):
-    DSK = "DSK"
+    # --- Bulgarian banks (M25) ---
+    DSK       = "DSK"
     UNICREDIT = "UNICREDIT"
-    UBB = "UBB"
-    POSTBANK = "POSTBANK"
+    UBB       = "UBB"
+    POSTBANK  = "POSTBANK"
+    # --- Polish banks (M83) ---
+    PKOBP     = "PKOBP"
+    PEKAO     = "PEKAO"
+    # --- Romanian banks (M83) ---
+    BCR       = "BCR"
+    BT        = "BT"
+    # --- Greek banks (M83) ---
+    ALPHABANK = "ALPHABANK"
+    EUROBANK  = "EUROBANK"
+    # --- Neo-banks EU-wide (M83) ---
+    REVOLUT   = "REVOLUT"
+    WISE      = "WISE"
 
 
 class PSD2OpenBankingClient:
     """Client for real-time PSD2 transaction stream ingestion from Bulgarian banks."""
 
     ENDPOINTS = {
-        PSD2BankProvider.DSK: "https://api.dskbank.bg/psd2/v1",
+        # Bulgarian banks (M25)
+        PSD2BankProvider.DSK:       "https://api.dskbank.bg/psd2/v1",
         PSD2BankProvider.UNICREDIT: "https://api.unicredit.bg/psd2/v1",
-        PSD2BankProvider.UBB: "https://api.ubb.bg/psd2/v1",
-        PSD2BankProvider.POSTBANK: "https://api.postbank.bg/psd2/v1",
+        PSD2BankProvider.UBB:       "https://api.ubb.bg/psd2/v1",
+        PSD2BankProvider.POSTBANK:  "https://api.postbank.bg/psd2/v1",
+        # Polish banks (M83)
+        PSD2BankProvider.PKOBP:     "https://sandbox.api.pkobp.pl/psd2/v1",
+        PSD2BankProvider.PEKAO:     "https://sandbox.api.pekao.com.pl/psd2/v1",
+        # Romanian banks (M83)
+        PSD2BankProvider.BCR:       "https://sandbox.openbanking.bcr.ro/v1",
+        PSD2BankProvider.BT:        "https://api.sandbox.bancatransilvania.ro/openbanking/v1",
+        # Greek banks (M83)
+        PSD2BankProvider.ALPHABANK: "https://openbanking-sandbox.alpha.gr/openbanking/v3.1",
+        PSD2BankProvider.EUROBANK:  "https://openbanking-sandbox.eurobank.gr/openbanking/v3.1",
+        # Neo-banks (M83)
+        PSD2BankProvider.REVOLUT:   "https://sandbox-b2b.revolut.com/api/1.0",
+        PSD2BankProvider.WISE:      "https://api.sandbox.transferwise.tech/v3",
     }
 
     @classmethod

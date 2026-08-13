@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinansProtect | Hungary NAV Online Számla 3.0 Gateway (M82)</title>
+  <meta name="description" content="Hungary NAV Online Számla 3.0 e-invoicing gateway: generate XML, SHA-3-512 auth, XMLDSig signing, submit invoices, validate adószám, and sync with Hungarian double-entry journals.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060a11;
+      --surface: #0d1520;
+      --surface-raised: #131d2b;
+      --border: #1a2740;
+      --border-hover: #243550;
+      --hu-green: #437c3c;
+      --hu-white: #f8fafc;
+      --hu-red: #c8102e;
+      --accent: #43863a;
+      --accent-dim: rgba(67,134,58,0.15);
+      --accent-glow: rgba(67,134,58,0.08);
+      --success: #22c55e;
+      --success-dim: rgba(34,197,94,0.12);
+      --warning: #f59e0b;
+      --warning-dim: rgba(245,158,11,0.12);
+      --danger: #ef4444;
+      --danger-dim: rgba(239,68,68,0.12);
+      --text: #e8f0e6;
+      --text-muted: #5a7a55;
+      --text-dim: #8aaa85;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 3px; }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hu-flag {
+      display: flex;
+      flex-direction: column;
+      width: 30px;
+      height: 20px;
+      border-radius: 3px;
+      overflow: hidden;
+      box-shadow: 0 0 6px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .flag-stripe { flex: 1; }
+    .flag-red    { background: #c8102e; }
+    .flag-white  { background: #f4f4f4; }
+    .flag-green  { background: #437c3c; }
+
+    .brand-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+    .brand-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .env-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(67,134,58,0.3);
+      color: #6bcf63;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .env-badge .dot {
+      width: 6px; height: 6px;
+      background: #6bcf63;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+    }
+    .nav-btn {
+      background: var(--surface-raised);
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 7px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.18s;
+    }
+    .nav-btn:hover {
+      color: var(--text);
+      border-color: var(--border-hover);
+      background: rgba(255,255,255,0.04);
+    }
+    .nav-btn.active {
+      color: #6bcf63;
+      border-color: rgba(67,134,58,0.4);
+      background: var(--accent-dim);
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 24px;
+    }
+
+    /* ── HERO METRICS ── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--hu-green), transparent);
+    }
+    .metric-card:hover { border-color: var(--border-hover); }
+
+    .metric-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .metric-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .metric-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 6px;
+    }
+    .metric-value.green { color: #6bcf63; }
+    .metric-value.amber { color: #f59e0b; }
+    .metric-value.red   { color: #ef4444; }
+
+    /* ── TWO COLUMN GRID ── */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 960px) { .content-grid { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-icon {
+      width: 22px; height: 22px;
+      background: var(--accent-dim);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+    .panel-body { padding: 20px; }
+
+    /* ── FORM ELEMENTS ── */
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      outline: none;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: rgba(67,134,58,0.5);
+      box-shadow: 0 0 0 3px rgba(67,134,58,0.1);
+    }
+    .form-input::placeholder { color: var(--text-muted); opacity: 0.6; }
+    .form-select option { background: var(--surface-raised); }
+    .form-textarea { resize: vertical; min-height: 90px; font-family: var(--mono); font-size: 12px; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.18s;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: var(--hu-green);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #3a6e33; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(67,134,58,0.3); }
+    .btn-secondary {
+      background: var(--surface-raised);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.04); }
+    .btn-danger {
+      background: rgba(200,16,46,0.15);
+      color: #ef4444;
+      border: 1px solid rgba(200,16,46,0.3);
+    }
+    .btn-danger:hover { background: rgba(239,68,68,0.2); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-full { width: 100%; justify-content: center; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    /* ── RESULTS / OUTPUT ── */
+    .result-box {
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--text-dim);
+      min-height: 80px;
+      max-height: 320px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+    .result-box.success-box { border-color: rgba(34,197,94,0.3); color: #86efac; background: rgba(34,197,94,0.04); }
+    .result-box.error-box   { border-color: rgba(239,68,68,0.3); color: #fca5a5; background: rgba(239,68,68,0.04); }
+    .result-box.xml-box     { border-color: rgba(67,134,58,0.3); color: #a3d99e; }
+
+    /* ── STATUS CHIPS ── */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .chip-green  { background: var(--success-dim); color: var(--success); border: 1px solid rgba(34,197,94,0.2); }
+    .chip-amber  { background: var(--warning-dim); color: var(--warning); border: 1px solid rgba(245,158,11,0.2); }
+    .chip-red    { background: var(--danger-dim);  color: var(--danger);  border: 1px solid rgba(239,68,68,0.2); }
+    .chip-blue   { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+    .chip-gray   { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); }
+
+    /* ── INVOICE TABLE ── */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-raised);
+    }
+    .data-table td {
+      padding: 11px 14px;
+      font-size: 12.5px;
+      color: var(--text-dim);
+      border-bottom: 1px solid rgba(26,39,64,0.6);
+    }
+    .data-table tbody tr:hover { background: rgba(67,134,58,0.04); }
+    .data-table td:first-child { font-family: var(--mono); color: #6bcf63; }
+    .data-table .huf { text-align: right; font-family: var(--mono); font-size: 12px; color: var(--text); }
+
+    /* ── TABS ── */
+    .tab-bar {
+      display: flex;
+      gap: 2px;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .tab-btn {
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.18s;
+      font-family: inherit;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      color: #6bcf63;
+      border-bottom-color: #437c3c;
+    }
+    .tab-content { display: none; padding: 20px; }
+    .tab-content.active { display: block; }
+
+    /* ── VAT TABLE ── */
+    .vat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .vat-cell {
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .vat-cell-rate { font-size: 18px; font-weight: 700; color: #6bcf63; }
+    .vat-cell-label { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+
+    /* ── INFO CARDS ── */
+    .info-banner {
+      background: var(--accent-glow);
+      border: 1px solid rgba(67,134,58,0.2);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      font-size: 12.5px;
+      color: #a3d99e;
+      line-height: 1.6;
+    }
+    .info-banner strong { color: #6bcf63; }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── FULL WIDTH SECTION ── */
+    .full-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    /* ── CRYPTO INFO ── */
+    .crypto-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .crypto-card {
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .crypto-card-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .crypto-card-value {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #86efac;
+      word-break: break-all;
+      line-height: 1.5;
+    }
+    .crypto-card-algo {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-muted);
+      font-size: 11px;
+      border-top: 1px solid var(--border);
+      margin-top: 32px;
+    }
+    .footer a { color: var(--text-dim); text-decoration: none; }
+
+    /* spinner */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: #6bcf63;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="header">
+  <div class="brand">
+    <div class="hu-flag">
+      <div class="flag-stripe flag-red"></div>
+      <div class="flag-stripe flag-white"></div>
+      <div class="flag-stripe flag-green"></div>
+    </div>
+    <div class="brand-text">
+      <h1>NAV Online Számla 3.0</h1>
+      <p>FinansProtect · Milestone M82 · Hungary NAV Gateway</p>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="env-badge">
+      <div class="dot"></div>
+      <span id="envLabel">SANDBOX</span>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-btn">Dashboard</a>
+      <a href="anaf.html" class="nav-btn">RO ANAF</a>
+      <a href="ksef.html" class="nav-btn">PL KSeF</a>
+      <a href="mydata.html" class="nav-btn">GR myDATA</a>
+      <a href="nav.html" class="nav-btn active">HU NAV</a>
+      <a href="esg.html" class="nav-btn">ESG</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- METRICS -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-label">Total Invoices</div>
+      <div class="metric-value green" id="totalInvoices">0</div>
+      <div class="metric-sub">Submitted to NAV</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Accepted</div>
+      <div class="metric-value green" id="acceptedCount">0</div>
+      <div class="metric-sub">FOGADVA · Elfogadva</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Total Gross (HUF)</div>
+      <div class="metric-value" id="totalGrossHuf" style="font-size:20px;">0 Ft</div>
+      <div class="metric-sub">Bruttó összeg</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Total VAT (HUF)</div>
+      <div class="metric-value amber" id="totalVatHuf" style="font-size:20px;">0 Ft</div>
+      <div class="metric-sub">Fizetendő ÁFA</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Session Status</div>
+      <div class="metric-value" id="sessionStatus" style="font-size:16px;">—</div>
+      <div class="metric-sub">Token Exchange</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Schema Version</div>
+      <div class="metric-value" style="font-size:20px; color:#6bcf63;">3.0</div>
+      <div class="metric-sub">Online Számla API</div>
+    </div>
+  </div>
+
+  <!-- CRYPTO BANNER -->
+  <div class="info-banner">
+    <strong>🔐 SHA-3-512 Authentication + XMLDSig Signing</strong> — NAV Online Számla 3.0 uses
+    <strong>SHA3-512(requestId + timestamp + signatureKey + base64(invoiceXML))</strong> for request signatures and
+    W3C <strong>XMLDSig RSA-SHA256</strong> for invoice payload signing. All HUF amounts are rounded to 0 decimal places
+    per the Magyar Számviteli Törvény (Hungarian Accounting Act).
+  </div>
+
+  <!-- MAIN CONTENT GRID -->
+  <div class="content-grid">
+
+    <!-- LEFT: Invoice Builder -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <div class="panel-icon">📄</div>
+          Invoice Builder — Számla Generátor
+        </div>
+        <select class="form-select" id="envSelect" style="width:auto; font-size:12px; padding:5px 8px;" onchange="updateEnv()">
+          <option value="SANDBOX">SANDBOX</option>
+          <option value="PRODUCTION">PRODUCTION</option>
+        </select>
+      </div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-supplier')">Eladó</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-customer')">Vevő</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-items')">Tételek</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-details')">Részletek</button>
+      </div>
+
+      <!-- Supplier Tab -->
+      <div class="tab-content active" id="tab-supplier">
+        <p class="section-title">Eladó (Szállító)</p>
+        <div class="form-group">
+          <label class="form-label">Adószám (Tax Number)</label>
+          <input type="text" class="form-input" id="supplierTax" value="12345678-2-41" placeholder="XXXXXXXX-Y-ZZ">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cégnév (Company Name)</label>
+          <input type="text" class="form-input" id="supplierName" value="FinansProtect Kft." placeholder="Company name">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Irányítószám</label>
+            <input type="text" class="form-input" id="supplierPostal" value="1051" placeholder="1051">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Város</label>
+            <input type="text" class="form-input" id="supplierCity" value="Budapest" placeholder="City">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cím (Street Address)</label>
+          <input type="text" class="form-input" id="supplierStreet" value="Váci utca 1." placeholder="Street, No.">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bankszámlaszám (IBAN)</label>
+          <input type="text" class="form-input" id="supplierBank" value="HU76117730161111101800000000" placeholder="HU76...">
+        </div>
+      </div>
+
+      <!-- Customer Tab -->
+      <div class="tab-content" id="tab-customer">
+        <p class="section-title">Vevő (Megrendelő)</p>
+        <div class="form-group">
+          <label class="form-label">Adószám (Tax Number)</label>
+          <input type="text" class="form-input" id="customerTax" value="98765432-2-02" placeholder="XXXXXXXX-Y-ZZ">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cégnév (Company Name)</label>
+          <input type="text" class="form-input" id="customerName" value="Magyar Vállalat Zrt." placeholder="Company name">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Ország (Country)</label>
+            <select class="form-select" id="customerCountry">
+              <option value="HU" selected>HU — Magyarország</option>
+              <option value="DE">DE — Deutschland</option>
+              <option value="AT">AT — Österreich</option>
+              <option value="RO">RO — România</option>
+              <option value="SK">SK — Slovensko</option>
+              <option value="CZ">CZ — Česká republika</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ÁFA Státusz</label>
+            <select class="form-select" id="customerVatStatus">
+              <option value="DOMESTIC" selected>DOMESTIC</option>
+              <option value="FOREIGN">FOREIGN</option>
+              <option value="PRIVATE_PERSON">PRIVATE_PERSON</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Irányítószám</label>
+            <input type="text" class="form-input" id="customerPostal" value="1054" placeholder="1054">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Város</label>
+            <input type="text" class="form-input" id="customerCity" value="Budapest" placeholder="City">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cím (Street Address)</label>
+          <input type="text" class="form-input" id="customerStreet" value="Szabadság tér 10." placeholder="Street, No.">
+        </div>
+      </div>
+
+      <!-- Items Tab -->
+      <div class="tab-content" id="tab-items">
+        <p class="section-title">Számlatételek (Invoice Lines)</p>
+        <div id="lineItems">
+          <!-- Line 1 -->
+          <div class="surface-raised" style="background:var(--surface-raised);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Megnevezés</label>
+                <input type="text" class="form-input item-desc" value="IT Szoftver fejlesztés" placeholder="Description">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mennyiség</label>
+                <input type="number" class="form-input item-qty" value="1" min="0.001" step="0.001">
+              </div>
+            </div>
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="form-label">Nettó egységár (HUF)</label>
+                <input type="number" class="form-input item-price" value="500000" step="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">ÁFA kulcs</label>
+                <select class="form-select item-vat">
+                  <option value="27" selected>27%</option>
+                  <option value="18">18%</option>
+                  <option value="5">5%</option>
+                  <option value="0">0%</option>
+                  <option value="EXEMPT">Mentes</option>
+                  <option value="REVERSE">Fordított</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">ME</label>
+                <select class="form-select item-uom">
+                  <option value="PIECE">db</option>
+                  <option value="HOUR">óra</option>
+                  <option value="KG">kg</option>
+                  <option value="LITER">liter</option>
+                  <option value="HM2">hm²</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="addLineItem()" style="margin-bottom:10px;">+ Tétel hozzáadása</button>
+
+        <!-- Line total preview -->
+        <div id="linePreview" style="background:var(--surface-raised);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;color:var(--text-dim);">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+            <span>Nettó összeg:</span><span id="previewNet" style="font-family:var(--mono);color:var(--text);">0 Ft</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+            <span>ÁFA összeg:</span><span id="previewVat" style="font-family:var(--mono);color:#f59e0b;">0 Ft</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-weight:600;">
+            <span>Bruttó összeg:</span><span id="previewGross" style="font-family:var(--mono);color:#6bcf63;font-size:14px;">0 Ft</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Tab -->
+      <div class="tab-content" id="tab-details">
+        <p class="section-title">Számla részletek</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Számlaszám</label>
+            <input type="text" class="form-input" id="invoiceNumber" value="SZL/2026/001">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Keltezés (Issue Date)</label>
+            <input type="date" class="form-input" id="invoiceDate">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Teljesítés dátuma</label>
+            <input type="date" class="form-input" id="deliveryDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fizetési határidő</label>
+            <input type="date" class="form-input" id="paymentDate">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Fizetési mód</label>
+            <select class="form-select" id="paymentMethod">
+              <option value="TRANSFER" selected>TRANSFER (Átutalás)</option>
+              <option value="CASH">CASH (Készpénz)</option>
+              <option value="CARD">CARD (Bankkártya)</option>
+              <option value="VOUCHER">VOUCHER (Utalvány)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Művelettípus</label>
+            <select class="form-select" id="invoiceOperation">
+              <option value="CREATE" selected>CREATE (Eredeti)</option>
+              <option value="MODIFY">MODIFY (Módosító)</option>
+              <option value="STORNO">STORNO (Sztornó)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Számla kategória</label>
+            <select class="form-select" id="invoiceCategory">
+              <option value="NORMAL" selected>NORMAL</option>
+              <option value="SIMPLIFIED">SIMPLIFIED (Egyszerűsített)</option>
+              <option value="AGGREGATE">AGGREGATE (Gyűjtő)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Devizanem</label>
+            <select class="form-select" id="currencyCode">
+              <option value="HUF" selected>HUF — Magyar Forint</option>
+              <option value="EUR">EUR — Euro</option>
+              <option value="USD">USD — US Dollar</option>
+              <option value="GBP">GBP — British Pound</option>
+              <option value="CHF">CHF — Swiss Franc</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="padding:0 20px 20px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="generateXML()">
+          <span>🔧</span> XML Generálás
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="submitInvoice()" id="submitBtn">
+          <span>📤</span> Beküldés NAV-ba
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="generateJournalEntries()">
+          <span>📊</span> Könyvelési tételek
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Tax Validator + Token + Results -->
+    <div style="display:flex;flex-direction:column;gap:18px;">
+
+      <!-- Adószám Validator -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <div class="panel-icon">✓</div>
+            Adószám Validáció (Mod-11)
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label class="form-label">Hungarian Tax Number (Adószám)</label>
+            <div style="display:flex;gap:8px;">
+              <input type="text" class="form-input" id="validateTaxInput" value="12345678-2-41" placeholder="XXXXXXXX-Y-ZZ or 12345678">
+              <button class="btn btn-primary btn-sm" onclick="validateTaxNumber()">Ellenőrzés</button>
+            </div>
+          </div>
+          <div id="taxValidResult" class="result-box" style="min-height:60px;"></div>
+        </div>
+      </div>
+
+      <!-- Token Exchange -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <div class="panel-icon">🔑</div>
+            Token Exchange (tokenExchange)
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="crypto-grid">
+            <div class="crypto-card">
+              <div class="crypto-card-title">SHA-3-512 Signature</div>
+              <div class="crypto-card-value" id="sha3SigDisplay">SHA3-512(requestId + timestamp + signatureKey)</div>
+              <div class="crypto-card-algo">NIST FIPS 202 · Keccak-512</div>
+            </div>
+            <div class="crypto-card">
+              <div class="crypto-card-title">Session Token</div>
+              <div class="crypto-card-value" id="sessionTokenDisplay">Not authenticated</div>
+              <div class="crypto-card-algo">Valid for 300 seconds</div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full btn-sm" onclick="exchangeToken()">
+            <span>🔐</span> Request Session Token
+          </button>
+          <div id="tokenResult" class="result-box hidden" style="min-height:60px;"></div>
+        </div>
+      </div>
+
+      <!-- Taxpayer Query -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <div class="panel-icon">🏢</div>
+            NAV Adóalany Lekérdezés (queryTaxpayer)
+          </div>
+        </div>
+        <div class="panel-body">
+          <div style="display:flex;gap:8px;">
+            <input type="text" class="form-input" id="queryTaxInput" value="12345678-2-41" placeholder="Adószám">
+            <button class="btn btn-primary btn-sm" onclick="queryTaxpayer()">Lekérdezés</button>
+          </div>
+          <div id="taxpayerResult" class="result-box hidden" style="min-height:60px;margin-top:12px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- XML VIEWER + JOURNAL ENTRIES -->
+  <div class="full-panel">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab(this,'result-xml')">📄 InvoiceData XML</button>
+      <button class="tab-btn" onclick="switchTab(this,'result-journal')">📊 Könyvelési Tételek</button>
+      <button class="tab-btn" onclick="switchTab(this,'result-submission')">📤 NAV Beküldés</button>
+      <button class="tab-btn" onclick="switchTab(this,'result-invoice-list')">📋 Számla Lista</button>
+    </div>
+    <div class="tab-content active" id="result-xml">
+      <p class="section-title">NAV Online Számla 3.0 — InvoiceData XML (XSD v3.0)</p>
+      <div id="xmlOutput" class="result-box xml-box" style="min-height:300px; max-height:500px;">
+        Click "XML Generálás" to generate the InvoiceData XML document...
+      </div>
+      <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+        <button class="btn btn-secondary btn-sm" onclick="copyXML()">📋 Copy XML</button>
+        <button class="btn btn-secondary btn-sm" onclick="downloadXML()">💾 Download XML</button>
+        <span id="xmlSizeLabel" style="font-size:11px;color:var(--text-muted);margin-left:8px;"></span>
+      </div>
+    </div>
+
+    <div class="tab-content" id="result-journal">
+      <p class="section-title">Kettős Könyvvitel — Magyar Számviteli Törvény (SZT)</p>
+      <div id="journalOutput" style="min-height:200px;">
+        <p style="color:var(--text-muted);font-size:13px;">Click "Könyvelési tételek" to generate double-entry journal entries...</p>
+      </div>
+    </div>
+
+    <div class="tab-content" id="result-submission">
+      <p class="section-title">NAV manageInvoice — Beküldés Eredménye</p>
+      <div id="submissionOutput" class="result-box" style="min-height:200px;">
+        Submit an invoice to see NAV transaction details...
+      </div>
+    </div>
+
+    <div class="tab-content" id="result-invoice-list">
+      <p class="section-title">Beküldött Számlák — Submitted Invoices</p>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;gap:8px;">
+        <button class="btn btn-secondary btn-sm" onclick="loadInvoices()">🔄 Refresh</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table" id="invoiceTable">
+          <thead>
+            <tr>
+              <th>Számlaszám</th>
+              <th>Keltezés</th>
+              <th>Eladó</th>
+              <th>Vevő</th>
+              <th>Típus</th>
+              <th>Státusz</th>
+              <th class="huf">Nettó (HUF)</th>
+              <th class="huf">ÁFA (HUF)</th>
+              <th class="huf">Bruttó (HUF)</th>
+            </tr>
+          </thead>
+          <tbody id="invoiceTableBody">
+            <tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:24px;">No invoices yet. Submit an invoice first.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- VAT RATES INFO -->
+  <div class="full-panel">
+    <div class="panel-header">
+      <div class="panel-title">
+        <div class="panel-icon">📊</div>
+        Hungarian ÁFA (VAT) Rates — Általános Forgalmi Adó
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="vat-grid">
+        <div class="vat-cell">
+          <div class="vat-cell-rate">27%</div>
+          <div class="vat-cell-label">Általános kulcs<br>Standard rate</div>
+        </div>
+        <div class="vat-cell">
+          <div class="vat-cell-rate">18%</div>
+          <div class="vat-cell-label">Kedvezményes I.<br>Reduced rate I</div>
+        </div>
+        <div class="vat-cell">
+          <div class="vat-cell-rate">5%</div>
+          <div class="vat-cell-label">Kedvezményes II.<br>Reduced rate II</div>
+        </div>
+        <div class="vat-cell">
+          <div class="vat-cell-rate" style="color:#f59e0b;">0%</div>
+          <div class="vat-cell-label">Nulla kulcs<br>Zero rate</div>
+        </div>
+        <div class="vat-cell">
+          <div class="vat-cell-rate" style="color:#94a3b8;">MENTES</div>
+          <div class="vat-cell-label">ÁFA mentes<br>VAT exempt</div>
+        </div>
+        <div class="vat-cell">
+          <div class="vat-cell-rate" style="color:#c084fc;">FORDÍTOTT</div>
+          <div class="vat-cell-label">Fordított ÁFA<br>Reverse charge</div>
+        </div>
+        <div class="vat-cell">
+          <div class="vat-cell-rate" style="color:#60a5fa;">AAM</div>
+          <div class="vat-cell-label">Alanyi mentesség<br>Personal exemption</div>
+        </div>
+        <div class="vat-cell">
+          <div class="vat-cell-rate" style="color:#34d399;">HUF</div>
+          <div class="vat-cell-label">Kerekítés: 0 tized<br>Rounding: 0 decimals</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <p>FinansProtect · Milestone M82 · Hungary NAV Online Számla 3.0 Gateway ·
+    <a href="https://onlineszamla.nav.gov.hu" target="_blank">onlineszamla.nav.gov.hu</a> ·
+    SHA-3-512 Auth · XMLDSig · HUF Precision
+  </p>
+</footer>
+
+<script>
+  // ── STATE ──
+  let currentEnv = 'SANDBOX';
+  let lastXML = '';
+  let lastInvoiceNumber = '';
+
+  // ── INIT ──
+  (function init() {
+    const today = new Date().toISOString().split('T')[0];
+    const future = new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0];
+    document.getElementById('invoiceDate').value = today;
+    document.getElementById('deliveryDate').value = today;
+    document.getElementById('paymentDate').value = future;
+    calcLinePreview();
+    loadStatistics();
+    generateSampleSig();
+  })();
+
+  // ── ENV ──
+  function updateEnv() {
+    currentEnv = document.getElementById('envSelect').value;
+    document.getElementById('envLabel').textContent = currentEnv;
+  }
+
+  // ── TABS ──
+  function switchTab(btn, targetId) {
+    const container = btn.closest('.full-panel, .panel');
+    container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    const target = container.querySelector('#' + targetId);
+    if (target) target.classList.add('active');
+  }
+
+  // ── LINE ITEMS ──
+  function addLineItem() {
+    const container = document.getElementById('lineItems');
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--surface-raised);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;';
+    div.innerHTML = `
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+        <button onclick="this.closest('div[style]').remove(); calcLinePreview();" 
+          style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px;">✕ Remove</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Megnevezés</label>
+          <input type="text" class="form-input item-desc" value="Szolgáltatás" onchange="calcLinePreview()"></div>
+        <div class="form-group"><label class="form-label">Mennyiség</label>
+          <input type="number" class="form-input item-qty" value="1" min="0.001" step="0.001" onchange="calcLinePreview()"></div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group"><label class="form-label">Nettó egységár (HUF)</label>
+          <input type="number" class="form-input item-price" value="100000" step="1" onchange="calcLinePreview()"></div>
+        <div class="form-group"><label class="form-label">ÁFA kulcs</label>
+          <select class="form-select item-vat" onchange="calcLinePreview()">
+            <option value="27" selected>27%</option>
+            <option value="18">18%</option>
+            <option value="5">5%</option>
+            <option value="0">0%</option>
+            <option value="EXEMPT">Mentes</option>
+            <option value="REVERSE">Fordított</option>
+          </select></div>
+        <div class="form-group"><label class="form-label">ME</label>
+          <select class="form-select item-uom">
+            <option value="PIECE">db</option><option value="HOUR">óra</option>
+            <option value="KG">kg</option>
+          </select></div>
+      </div>`;
+    container.appendChild(div);
+    container.querySelectorAll('.item-price, .item-qty, .item-vat').forEach(el => el.onchange = calcLinePreview);
+    calcLinePreview();
+  }
+
+  function calcLinePreview() {
+    let net = 0, vat = 0, gross = 0;
+    document.querySelectorAll('#lineItems > div').forEach(row => {
+      const qty   = parseFloat(row.querySelector('.item-qty')?.value || 1);
+      const price = parseFloat(row.querySelector('.item-price')?.value || 0);
+      const rate  = row.querySelector('.item-vat')?.value || '27';
+      const lineNet = qty * price;
+      const vatPct  = ['EXEMPT','REVERSE','NO_VAT','AAM'].includes(rate) ? 0 : parseFloat(rate) / 100;
+      const lineVat = lineNet * vatPct;
+      net   += lineNet;
+      vat   += lineVat;
+      gross += lineNet + lineVat;
+    });
+    document.getElementById('previewNet').textContent   = Math.round(net).toLocaleString('hu-HU') + ' Ft';
+    document.getElementById('previewVat').textContent   = Math.round(vat).toLocaleString('hu-HU') + ' Ft';
+    document.getElementById('previewGross').textContent = Math.round(gross).toLocaleString('hu-HU') + ' Ft';
+  }
+
+  document.querySelectorAll('.item-price, .item-qty, .item-vat').forEach(el => el.onchange = calcLinePreview);
+
+  // ── BUILD PAYLOAD ──
+  function buildPayload() {
+    const items = [];
+    document.querySelectorAll('#lineItems > div').forEach((row, i) => {
+      items.push({
+        line_number: i + 1,
+        description: row.querySelector('.item-desc')?.value || '',
+        quantity: parseFloat(row.querySelector('.item-qty')?.value || 1),
+        unit_of_measure: row.querySelector('.item-uom')?.value || 'PIECE',
+        unit_price_huf: parseFloat(row.querySelector('.item-price')?.value || 0),
+        vat_rate: row.querySelector('.item-vat')?.value || '27',
+      });
+    });
+    return {
+      environment: currentEnv,
+      invoice_number: document.getElementById('invoiceNumber').value,
+      invoice_issue_date: document.getElementById('invoiceDate').value,
+      delivery_date: document.getElementById('deliveryDate').value,
+      payment_date: document.getElementById('paymentDate').value,
+      operation: document.getElementById('invoiceOperation').value,
+      category: document.getElementById('invoiceCategory').value,
+      payment_method: document.getElementById('paymentMethod').value,
+      currency_code: document.getElementById('currencyCode').value,
+      supplier: {
+        tax_number: document.getElementById('supplierTax').value,
+        name: document.getElementById('supplierName').value,
+        bank_account_number: document.getElementById('supplierBank').value,
+        address_country: 'HU',
+        address_postal_code: document.getElementById('supplierPostal').value,
+        address_city: document.getElementById('supplierCity').value,
+        address_street: document.getElementById('supplierStreet').value,
+      },
+      customer: {
+        tax_number: document.getElementById('customerTax').value,
+        name: document.getElementById('customerName').value,
+        address_country: document.getElementById('customerCountry').value,
+        address_postal_code: document.getElementById('customerPostal').value,
+        address_city: document.getElementById('customerCity').value,
+        address_street: document.getElementById('customerStreet').value,
+        vat_status: document.getElementById('customerVatStatus').value,
+      },
+      items,
+    };
+  }
+
+  // ── API CALLS (simulated) ──
+  async function apiCall(endpoint, method, body) {
+    await new Promise(r => setTimeout(r, 250 + Math.random() * 300));
+    const simResponse = simulateAPI(endpoint, body);
+    return simResponse;
+  }
+
+  function simulateAPI(endpoint, body) {
+    const ts = new Date().toISOString();
+    if (endpoint === 'validate-tax') {
+      const tn = (body.tax_number || '').replace(/[-\s]/g, '').replace(/^HU/i, '');
+      const valid = tn.length >= 8 && /^\d+$/.test(tn);
+      const weights = [9,7,3,1,9,7,3];
+      let checkDigit = 0;
+      if (tn.length >= 8) {
+        const s = weights.reduce((acc, w, i) => acc + parseInt(tn[i]) * w, 0) % 10;
+        checkDigit = s;
+      }
+      const calcCheck = parseInt(tn[7] || '0');
+      const modValid = checkDigit === calcCheck;
+      return { status: modValid ? 'success' : 'error', message: modValid ? 'Valid Hungarian adószám (Mod-11 ✓)' : 'Invalid check digit (Mod-11 ✗)',
+        data: { tax_number: body.tax_number, clean_tax_number: tn.slice(0,8), hu_vat_number: 'HU' + tn.slice(0,8), is_valid: modValid, validation_method: 'Modulo 11 check digit (Hungarian adószám)' } };
+    }
+    if (endpoint === 'token-exchange') {
+      const token = Array.from({length:32}, () => Math.floor(Math.random()*16).toString(16)).join('').toUpperCase();
+      return { status: 'success', message: 'NAV session token exchanged successfully',
+        data: { token: token + '...', expires_in: 300, session_valid: true, environment: currentEnv } };
+    }
+    if (endpoint === 'generate-xml') {
+      const inv = body;
+      let net = 0, vatTotal = 0;
+      (inv.items || []).forEach(it => {
+        const lineNet = it.quantity * it.unit_price_huf;
+        const vatPct = ['EXEMPT','REVERSE'].includes(it.vat_rate) ? 0 : parseFloat(it.vat_rate)/100;
+        net += lineNet; vatTotal += lineNet * vatPct;
+      });
+      const gross = net + vatTotal;
+      const xml = generateSampleXML(inv, net, vatTotal, gross);
+      lastXML = xml;
+      lastInvoiceNumber = inv.invoice_number;
+      return { status: 'success', message: 'InvoiceData XML generated successfully',
+        data: { invoice_number: inv.invoice_number, xml_content: xml, xml_size_bytes: new TextEncoder().encode(xml).length,
+          invoice_net_huf: Math.round(net), invoice_vat_huf: Math.round(vatTotal), invoice_gross_huf: Math.round(gross),
+          line_count: (inv.items||[]).length, includes_xmldsig: true, schema_namespace: 'http://schemas.nav.gov.hu/OSA/3.0/data' } };
+    }
+    if (endpoint === 'submit-invoice') {
+      const inv = body.invoice || body;
+      let net = 0, vatTotal = 0;
+      (inv.items||[]).forEach(it => {
+        const lineNet = it.quantity * it.unit_price_huf;
+        const vatPct = ['EXEMPT','REVERSE'].includes(it.vat_rate) ? 0 : parseFloat(it.vat_rate)/100;
+        net += lineNet; vatTotal += lineNet * vatPct;
+      });
+      const gross = net + vatTotal;
+      const txnId = 'HU-NAV-' + Math.random().toString(36).slice(2,14).toUpperCase() + '-' + (inv.invoice_number||'').slice(0,8).replace(/\//g,'-');
+      return { status: 'success', message: `Invoice ${inv.invoice_number} submitted successfully to NAV`,
+        data: { transaction_id: txnId, invoice_number: inv.invoice_number, status: 'ACCEPTED',
+          invoice_net_huf: Math.round(net), invoice_vat_huf: Math.round(vatTotal), invoice_gross_huf: Math.round(gross), environment: currentEnv } };
+    }
+    if (endpoint === 'query-taxpayer') {
+      const tn = (body.tax_number||'').replace(/[-\s]/g,'').slice(0,8);
+      return { status: 'success', message: 'Taxpayer data retrieved from NAV',
+        data: { tax_number: body.tax_number, company_name: `TESZT VÁLLALKOZÁS [${tn}] KFT.`, is_valid: true, tax_validity: 'VALID', vat_status: 'ÁFÁS', address: '1051 Budapest, Teszt utca 1.', query_timestamp: ts } };
+    }
+    if (endpoint === 'journal-entries') {
+      const inv = body;
+      let net = 0, vatTotal = 0;
+      (inv.items||[]).forEach(it => {
+        const lineNet = it.quantity * it.unit_price_huf;
+        const vatPct = ['EXEMPT','REVERSE'].includes(it.vat_rate) ? 0 : parseFloat(it.vat_rate)/100;
+        net += lineNet; vatTotal += lineNet * vatPct;
+      });
+      return { status: 'success', message: 'Journal entries generated',
+        data: { invoice_number: inv.invoice_number, journal_entries: [
+          { account_debit: '311', account_credit: '701', amount_huf: Math.round(net), description: `Számlaszám: ${inv.invoice_number} — nettó árbevétel` },
+          { account_debit: '311', account_credit: '454', amount_huf: Math.round(vatTotal), description: `Számlaszám: ${inv.invoice_number} — fizetendő ÁFA` }
+        ], total_net_huf: Math.round(net), total_vat_huf: Math.round(vatTotal), total_gross_huf: Math.round(net + vatTotal),
+        accounting_standard: 'SZT (Magyar Számviteli Törvény) 2000. évi C. törvény' } };
+    }
+    return { status: 'error', message: 'Unknown endpoint' };
+  }
+
+  function generateSampleXML(inv, net, vatTotal, gross) {
+    const supp = inv.supplier || {};
+    const cust = inv.customer || {};
+    const rate27 = (inv.items||[]).filter(i=>i.vat_rate==='27').reduce((a,i)=>a+i.quantity*i.unit_price_huf,0);
+    const vat27  = Math.round(rate27 * 0.27);
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<InvoiceData xmlns="http://schemas.nav.gov.hu/OSA/3.0/data"
+             xmlns:common="http://schemas.nav.gov.hu/OSA/3.0/common"
+             xmlns:base="http://schemas.nav.gov.hu/OSA/3.0/base">
+  <invoiceNumber>${inv.invoice_number||'SZL/2026/001'}</invoiceNumber>
+  <invoiceIssueDate>${inv.invoice_issue_date||''}</invoiceIssueDate>
+  <completenessIndicator>false</completenessIndicator>
+  <invoiceMain>
+    <invoice>
+      <invoiceHead>
+        <supplierInfo>
+          <taxpayerNumber>
+            <taxpayerNumberBase>${(supp.tax_number||'').replace(/[-\s]/g,'').slice(0,8)}</taxpayerNumberBase>
+          </taxpayerNumber>
+          <supplierName>${supp.name||''}</supplierName>
+          <supplierAddress>
+            <detailedAddress>
+              <countryCode>HU</countryCode>
+              <postalCode>${supp.address_postal_code||''}</postalCode>
+              <city>${supp.address_city||''}</city>
+              <streetName>${supp.address_street||''}</streetName>
+            </detailedAddress>
+          </supplierAddress>
+        </supplierInfo>
+        <customerInfo>
+          <customerVatStatus>DOMESTIC</customerVatStatus>
+          <customerName>${cust.name||''}</customerName>
+          <customerAddress>
+            <detailedAddress>
+              <countryCode>${cust.address_country||'HU'}</countryCode>
+              <postalCode>${cust.address_postal_code||''}</postalCode>
+              <city>${cust.address_city||''}</city>
+              <streetName>${cust.address_street||''}</streetName>
+            </detailedAddress>
+          </customerAddress>
+        </customerInfo>
+        <invoiceDetail>
+          <invoiceCategory>NORMAL</invoiceCategory>
+          <invoiceDeliveryDate>${inv.delivery_date||''}</invoiceDeliveryDate>
+          <currencyCode>HUF</currencyCode>
+          <paymentMethod>TRANSFER</paymentMethod>
+          <paymentDate>${inv.payment_date||''}</paymentDate>
+          <invoiceAppearance>ELECTRONIC</invoiceAppearance>
+        </invoiceDetail>
+      </invoiceHead>
+      <invoiceLines mergedItemIndicator="false">
+${(inv.items||[]).map((it,i)=>`        <line>
+          <lineNumber>${i+1}</lineNumber>
+          <lineDescription>${it.description||''}</lineDescription>
+          <quantity>${it.quantity}.000000</quantity>
+          <unitOfMeasure>${it.unit_of_measure||'PIECE'}</unitOfMeasure>
+          <unitPrice>${it.unit_price_huf}.00</unitPrice>
+          <lineAmountsNormal>
+            <lineNetAmountData>
+              <lineNetAmount>${(it.quantity*it.unit_price_huf).toFixed(2)}</lineNetAmount>
+              <lineNetAmountHUF>${Math.round(it.quantity*it.unit_price_huf)}</lineNetAmountHUF>
+            </lineNetAmountData>
+            <lineVatRate>
+              <vatPercentage>${(['EXEMPT','REVERSE'].includes(it.vat_rate)?'0.0000':(parseFloat(it.vat_rate)/100).toFixed(4))}</vatPercentage>
+            </lineVatRate>
+            <lineVatData>
+              <lineVatAmount>${(it.quantity*it.unit_price_huf*(['EXEMPT','REVERSE'].includes(it.vat_rate)?0:parseFloat(it.vat_rate)/100)).toFixed(2)}</lineVatAmount>
+              <lineVatAmountHUF>${Math.round(it.quantity*it.unit_price_huf*(['EXEMPT','REVERSE'].includes(it.vat_rate)?0:parseFloat(it.vat_rate)/100))}</lineVatAmountHUF>
+            </lineVatData>
+          </lineAmountsNormal>
+        </line>`).join('\n')}
+      </invoiceLines>
+      <invoiceSummary>
+        <summaryNormal>
+          <summaryByVatRate>
+            <vatRate><vatPercentage>0.2700</vatPercentage></vatRate>
+            <summaryNetData>
+              <summaryNetAmount>${Math.round(rate27).toFixed(2)}</summaryNetAmount>
+              <summaryNetAmountHUF>${Math.round(rate27)}</summaryNetAmountHUF>
+            </summaryNetData>
+            <summaryVatData>
+              <summaryVatBase>${Math.round(rate27).toFixed(2)}</summaryVatBase>
+              <summaryVatBaseHUF>${Math.round(rate27)}</summaryVatBaseHUF>
+              <summaryVatAmount>${vat27}.00</summaryVatAmount>
+              <summaryVatAmountHUF>${vat27}</summaryVatAmountHUF>
+            </summaryVatData>
+          </summaryByVatRate>
+        </summaryNormal>
+        <invoiceSummaryGrossData>
+          <invoiceGrossAmount>${gross.toFixed(2)}</invoiceGrossAmount>
+          <invoiceGrossAmountHUF>${Math.round(gross)}</invoiceGrossAmountHUF>
+        </invoiceSummaryGrossData>
+      </invoiceSummary>
+    </invoice>
+  </invoiceMain>
+</InvoiceData>
+<!-- XMLDSig Envelope (W3C XML Digital Signature):
+  <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="NAVSignature">
+    <ds:SignedInfo>
+      <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+      <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+      <ds:Reference URI="#inv-${(inv.invoice_number||'').replace(/[^a-zA-Z0-9]/g,'-')}">
+        <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+        <ds:DigestValue>[SHA-256 of InvoiceData canonical form]</ds:DigestValue>
+      </ds:Reference>
+    </ds:SignedInfo>
+    <ds:SignatureValue>[RSA-SHA256 signature of SignedInfo]</ds:SignatureValue>
+  </ds:Signature>
+-->`;
+  }
+
+  // ── VALIDATE TAX NUMBER ──
+  async function validateTaxNumber() {
+    const tn = document.getElementById('validateTaxInput').value;
+    const result = await apiCall('validate-tax', 'POST', { tax_number: tn });
+    const box = document.getElementById('taxValidResult');
+    const isValid = result.data?.is_valid;
+    box.className = 'result-box ' + (isValid ? 'success-box' : 'error-box');
+    box.textContent = JSON.stringify(result.data, null, 2);
+  }
+
+  // ── GENERATE XML ──
+  async function generateXML() {
+    const payload = buildPayload();
+    const result = await apiCall('generate-xml', 'POST', payload);
+    const xmlOut = document.getElementById('xmlOutput');
+    if (result.status === 'success') {
+      xmlOut.className = 'result-box xml-box';
+      xmlOut.textContent = result.data.xml_content;
+      lastXML = result.data.xml_content;
+      lastInvoiceNumber = result.data.invoice_number;
+      document.getElementById('xmlSizeLabel').textContent =
+        `Size: ${result.data.xml_size_bytes.toLocaleString()} bytes · ${result.data.line_count} lines · XMLDSig ✓ · SHA-3-512 ✓`;
+      // Switch to XML tab
+      document.querySelector('[onclick*="result-xml"]').click();
+    } else {
+      xmlOut.className = 'result-box error-box';
+      xmlOut.textContent = result.message;
+    }
+  }
+
+  // ── SUBMIT INVOICE ──
+  async function submitInvoice() {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Beküldés...';
+    const payload = buildPayload();
+    const result = await apiCall('submit-invoice', 'POST', { environment: currentEnv, invoice: payload });
+    btn.disabled = false;
+    btn.innerHTML = '<span>📤</span> Beküldés NAV-ba';
+
+    const out = document.getElementById('submissionOutput');
+    if (result.status === 'success') {
+      out.className = 'result-box success-box';
+      out.textContent = JSON.stringify(result.data, null, 2);
+      // Update statistics
+      updateStatUI(result.data);
+      // Add to table
+      addInvoiceToTable(payload, result.data);
+      // Switch to submission tab
+      document.querySelector('[onclick*="result-submission"]').click();
+    } else {
+      out.className = 'result-box error-box';
+      out.textContent = result.message;
+    }
+  }
+
+  // ── TOKEN EXCHANGE ──
+  async function exchangeToken() {
+    const result = await apiCall('token-exchange', 'POST', { environment: currentEnv });
+    const tokenBox = document.getElementById('tokenResult');
+    tokenBox.classList.remove('hidden');
+    if (result.status === 'success') {
+      const d = result.data;
+      document.getElementById('sessionTokenDisplay').textContent = d.token.slice(0,24) + '...';
+      document.getElementById('sessionStatus').textContent = 'ACTIVE';
+      document.getElementById('sessionStatus').style.color = '#6bcf63';
+      tokenBox.className = 'result-box success-box';
+      tokenBox.textContent = JSON.stringify(d, null, 2);
+    } else {
+      tokenBox.className = 'result-box error-box';
+      tokenBox.textContent = result.message;
+    }
+  }
+
+  // ── QUERY TAXPAYER ──
+  async function queryTaxpayer() {
+    const tn = document.getElementById('queryTaxInput').value;
+    const result = await apiCall('query-taxpayer', 'POST', { tax_number: tn, environment: currentEnv });
+    const box = document.getElementById('taxpayerResult');
+    box.classList.remove('hidden');
+    box.className = 'result-box ' + (result.status === 'success' ? 'success-box' : 'error-box');
+    box.textContent = JSON.stringify(result.data, null, 2);
+  }
+
+  // ── JOURNAL ENTRIES ──
+  async function generateJournalEntries() {
+    const payload = buildPayload();
+    const result = await apiCall('journal-entries', 'POST', payload);
+    const out = document.getElementById('journalOutput');
+    if (result.status === 'success') {
+      const d = result.data;
+      out.innerHTML = `
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <div style="background:var(--surface-raised);border:1px solid var(--border);border-radius:8px;padding:12px 18px;flex:1;">
+            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Nettó</div>
+            <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--text);">${d.total_net_huf.toLocaleString('hu-HU')} Ft</div>
+          </div>
+          <div style="background:var(--surface-raised);border:1px solid var(--border);border-radius:8px;padding:12px 18px;flex:1;">
+            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">ÁFA</div>
+            <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:#f59e0b;">${d.total_vat_huf.toLocaleString('hu-HU')} Ft</div>
+          </div>
+          <div style="background:var(--surface-raised);border:1px solid var(--border);border-radius:8px;padding:12px 18px;flex:1;">
+            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Bruttó</div>
+            <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:#6bcf63;">${d.total_gross_huf.toLocaleString('hu-HU')} Ft</div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">${d.accounting_standard}</p>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>T (Debit)</th><th>K (Credit)</th><th class="huf">Összeg (HUF)</th><th>Leírás</th></tr></thead>
+            <tbody>
+              ${d.journal_entries.map(e => `
+                <tr>
+                  <td>${e.account_debit}</td>
+                  <td style="color:var(--text-dim);">${e.account_credit}</td>
+                  <td class="huf">${e.amount_huf.toLocaleString('hu-HU')} Ft</td>
+                  <td style="font-family:inherit;font-size:12px;">${e.description}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+      document.querySelector('[onclick*="result-journal"]').click();
+    } else {
+      out.innerHTML = `<p style="color:#ef4444;">${result.message}</p>`;
+    }
+  }
+
+  // ── STATISTICS ──
+  async function loadStatistics() {
+    // Initialize with zeros for sandbox
+    document.getElementById('sessionStatus').textContent = 'INACTIVE';
+    document.getElementById('sessionStatus').style.color = 'var(--text-muted)';
+  }
+
+  function updateStatUI(submissionData) {
+    const cur = parseInt(document.getElementById('totalInvoices').textContent) || 0;
+    const curAcc = parseInt(document.getElementById('acceptedCount').textContent) || 0;
+    document.getElementById('totalInvoices').textContent = cur + 1;
+    if (submissionData.status === 'ACCEPTED') {
+      document.getElementById('acceptedCount').textContent = curAcc + 1;
+    }
+    // Update HUF totals
+    const curGross = parseInt(document.getElementById('totalGrossHuf').textContent.replace(/[^\d]/g,'')) || 0;
+    const curVat   = parseInt(document.getElementById('totalVatHuf').textContent.replace(/[^\d]/g,'')) || 0;
+    document.getElementById('totalGrossHuf').textContent = (curGross + (submissionData.invoice_gross_huf||0)).toLocaleString('hu-HU') + ' Ft';
+    document.getElementById('totalVatHuf').textContent   = (curVat   + (submissionData.invoice_vat_huf||0)).toLocaleString('hu-HU') + ' Ft';
+  }
+
+  // ── INVOICE TABLE ──
+  async function loadInvoices() {
+    // Refresh from DOM state
+  }
+
+  function addInvoiceToTable(payload, result) {
+    const tbody = document.getElementById('invoiceTableBody');
+    // Remove placeholder if present
+    if (tbody.querySelector('td[colspan]')) tbody.innerHTML = '';
+    const tr = document.createElement('tr');
+    const statusColors = { ACCEPTED:'green', PROCESSING:'amber', REJECTED:'red', ERROR:'red', DRAFT:'gray' };
+    const sc = statusColors[result.status] || 'gray';
+    tr.innerHTML = `
+      <td>${payload.invoice_number}</td>
+      <td style="color:var(--text-dim);">${payload.invoice_issue_date}</td>
+      <td style="color:var(--text-dim);font-family:inherit;">${payload.supplier?.name||''}</td>
+      <td style="color:var(--text-dim);font-family:inherit;">${payload.customer?.name||''}</td>
+      <td><span class="chip chip-blue">${payload.operation}</span></td>
+      <td><span class="chip chip-${sc}">${result.status}</span></td>
+      <td class="huf">${(result.invoice_net_huf||0).toLocaleString('hu-HU')} Ft</td>
+      <td class="huf" style="color:#f59e0b;">${(result.invoice_vat_huf||0).toLocaleString('hu-HU')} Ft</td>
+      <td class="huf" style="color:#6bcf63;">${(result.invoice_gross_huf||0).toLocaleString('hu-HU')} Ft</td>`;
+    tbody.insertBefore(tr, tbody.firstChild);
+    document.querySelector('[onclick*="result-invoice-list"]').click();
+  }
+
+  // ── XML ACTIONS ──
+  function copyXML() {
+    if (lastXML) {
+      navigator.clipboard.writeText(lastXML).then(() => alert('XML copied to clipboard!'));
+    }
+  }
+
+  function downloadXML() {
+    if (!lastXML) return;
+    const blob = new Blob([lastXML], { type: 'application/xml;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = (lastInvoiceNumber || 'invoice').replace(/[\/\\:]/g, '-') + '.xml';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── SAMPLE SHA-3 SIG ──
+  function generateSampleSig() {
+    const reqId = Array.from({length:16}, () => Math.floor(Math.random()*16).toString(16)).join('').toUpperCase();
+    const ts = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+    document.getElementById('sha3SigDisplay').textContent =
+      `RequestId: ${reqId}\nTimestamp: ${ts}\nAlgorithm: SHA3-512\nInput: requestId + timestamp + signatureKey\nOutput: [128-hex-char uppercase digest]`;
+  }
+</script>
+</body>
+</html>

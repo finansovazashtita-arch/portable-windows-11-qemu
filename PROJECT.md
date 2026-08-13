@@ -2,7 +2,7 @@
 
 ## Architecture
 - **OCR Engine Layer**: PyMuPDF (`fitz`), Pillow (`PIL`), and Tesseract 5 (`-l bul+eng --psm 6`) extracting 100% of transactions from PDF statements with PyMuPDF direct text fallback.
-- **Autonomous Open Banking Payment Initiation & Multi-Bank AISP Aggregator**: `src/intake/open_banking_pisp.py` providing PSD2 PISP automated vendor invoice payments (401/503) and multi-bank balance aggregation across DSK, UniCredit, UBB, and Postbank.
+- **Autonomous Open Banking Payment Initiation & Multi-Bank AISP Aggregator**: `src/intake/open_banking_pisp.py` and `src/intake/cee_open_banking_aggregator.py` providing PSD2 PISP automated vendor invoice payments (401/503) and multi-bank balance aggregation across DSK, UniCredit, UBB, Postbank (Bulgaria), PKO BP & Pekao (Poland), BCR & Banca Transilvania (Romania), Alpha Bank & Eurobank (Greece), and Revolut Business & Wise (neo-bank EU).
 - **Automated Financial Audit Trail & Tamper-Evident Blockchain Ledger Integration**: `src/security/audit_ledger_guard.py` providing tamper-evident cryptographic hash chaining (SHA-256) of every accounting operation for 100% protection against retroactive alteration.
 - **Autonomous Business Travel Expenses & Per Diem Allowance Manager**: `src/accounting/travel_expense_manager.py` computing domestic/international per diem allowances under Bulgarian Travel Regulations, generating travel expense journal entries (609/422).
 - **Autonomous Cash Desk & Petty Cash Management Engine**: `src/accounting/cash_desk_manager.py` processing Cash Receipt Orders (ПКО / 501/411) and Cash Expense Orders (РКО / 401/501), monitoring cash limits, and daily cash book reconciliation.
@@ -154,6 +154,7 @@
 | 86 | Poland KSeF e-Fakturowanie Gateway | FA(2)/FA(3) structured XML invoice generator, Modulo 11 NIP validation, KSeF Session Token auth, XAdES digital signature wrapper, invoice submission, status tracking, UPO receipt archiving, GUS BIR1.1 API company lookup & web UI | M79 | DONE |
 | 87 | Greece myDATA Compliance Gateway | AADE myDATA XML document validation, Greek AFM tax ID verification, REST API transmission to AADE, MARK registration tracking & double-entry journal sync | M80 | DONE |
 | 88 | Enterprise ESG & Carbon Tax Accounting Engine | GHG Protocol Scope 1-3 carbon footprint calculation, EU CBAM carbon tax accounting, double-entry carbon liabilities & CSRD reporting | M81 | DONE |
+| 89 | CEE & EU Open Banking PISP/AISP Expansion | Berlin Group NextGenPSD2 PISP/AISP expansion to PKO BP & Pekao (PL), BCR & Banca Transilvania (RO), Alpha Bank & Eurobank (GR), Revolut Business & Wise (neo-bank EU-wide); multi-currency balance aggregation (PLN/RON/EUR); ISO 20022 pain.001 payment initiation; NIP/CIF/AFM/IBAN validators; 161-test suite | M83 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -241,12 +242,13 @@
 | M79 | `m79_poland_ksef_gateway` | Poland KSeF (Krajowy System e-Faktur) Gateway with FA(2)/FA(3) XML invoice generation, Modulo 11 NIP validation, KSeF Session Token auth, XAdES digital signature wrapper, submission/status/UPO receipt archiving, GUS BIR1.1 API, REST API router & web UI dashboard | M12, M19, M41, M60, M77, M78 | DONE |
 | M80 | `m80_greece_mydata_gateway` | Greece myDATA Compliance Gateway with AADE myDATA XML document validation, Greek AFM tax ID verification, REST API transmission to AADE, MARK registration tracking & double-entry journal sync | M12, M19, M41, M60, M77, M78 | DONE |
 | M81 | `m81_esg_carbon_accounting` | Enterprise ESG & Carbon Tax Accounting Engine with GHG Protocol Scope 1-3 carbon footprint calculation, EU CBAM carbon tax accounting, double-entry carbon liabilities & CSRD reporting | M12, M19, M41, M48, M76, M77 | DONE |
+| M83 | `m83_open_banking_cee_expansion` | CEE & EU Open Banking PISP/AISP Expansion — Berlin Group NextGenPSD2 integration for PKO BP & Pekao (Poland), BCR & Banca Transilvania (Romania), Alpha Bank & Eurobank (Greece), Revolut Business & Wise (neo-bank EU); multi-currency PLN/RON/EUR balance aggregation; ISO 20022 pain.001 payment initiation; NIP / CIF / AFM / IBAN validators; backward-compat M57 bridge; 161-test suite (161/161 passed) | M25, M57, M78, M79, M80 | DONE |
 
 ## Code Layout
 - `src/config/`: Production Configuration & Secrets Management Hardening (`config_hardening.py`)
 - `src/analytics/`: BI Analytics Engine (`bi_engine.py`), Financial & Operational KPI Calculator (`kpi_calculator.py`), OLAP Query Builder (`query_builder.py`), Threshold Alert Manager (`bi_alerts.py`), Report Exporter (`exporter.py`), REST API Router (`bi_api.py`)
 - `src/billing/`: Multi-Tenant SaaS Billing System (`tenant_manager.py`, `stripe_client.py`, `metering_engine.py`, `schema_manager.py`, `gdpr_compliance.py`, `webhook_handler.py`, `tenant_api.py`)
-- `src/intake/`: Open Banking PISP Aggregator (`open_banking_pisp.py`), Bank Feed Guard (`bank_feed_guard.py`), SEPA Instant / BISERA 6 Adapter (`sepa_bisera_instant.py`), Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)
+- `src/intake/`: Open Banking PISP Aggregator (`open_banking_pisp.py`), CEE Open Banking Aggregator (`cee_open_banking_aggregator.py`), Bank Feed Guard (`bank_feed_guard.py`), SEPA Instant / BISERA 6 Adapter (`sepa_bisera_instant.py`), Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)
 - `src/security/`: E-Archiving Compliance Vault (`e_archiving_compliance_vault.py`), Post-Quantum Mesh Signer (`pq_mesh_signer.py`), Audit Ledger Integrity Guard (`audit_ledger_guard.py`), Zero-Trust HSM Cryptographic Signer & PQC (`hsm_signer.py`), Multi-Tenant RBAC (`tenant_rbac.py`) & Infisical Vault client (`infisical_vault.py`)
 - `src/accounting/`: GFO Generator (`gfo_generator.py`), Travel Expense Manager (`travel_expense_manager.py`), Cash Desk Manager (`cash_desk_manager.py`), Corporate Consolidation Engine (`corporate_consolidation.py`), Fixed Assets & Depreciation Manager (`fixed_assets_depreciation.py`), Inventory Valuation Engine (`inventory_valuation.py`), EU OSS E-Commerce Invoicing Adapter (`eu_oss_accounting.py`), Customs & Excise Accounting Engine (`customs_excise_accounting.py`), Payroll Accounting Engine (`payroll_accounting.py`), FX Revaluation Engine (`fx_revaluation.py`), Bulgarian double-entry translation & XML generator (`translate_to_delta.py`)
 - `src/audit/`: Global Multi-Entity Tax Engine (`global_tax_engine.py`), Swiss ESTV VAT Engine (`swiss_estv_tax_engine.py`), US Sales Tax Engine (`us_sales_tax_engine.py`), Dividend Tax Manager (`dividend_tax_manager.py`), Autonomous Corporate Income Tax Return Generator (`corporate_tax_return.py`), Autonomous Tax Policy Ingestion Engine (`tax_policy_ingestor.py`), Autonomous Tax Audit Defense Engine (`tax_audit_defense.py`), NRA VAT E-Reporting Adapter (`nra_vat_reporter.py`), OECD SAF-T Exporter (`saft_exporter.py`), SQL verification & TRANSFER.LOG exporter (`generate_transfer_log.py`)
@@ -262,5 +264,5 @@
 - `deploy/helm/`: Production Helm chart for Kubernetes/K3s deployment (`Chart.yaml`, `values.yaml`, 15 templates)
 - `deploy/k3s/`: K3s cluster installation scripts, Traefik IngressRoute & cert-manager configuration
 - `docs/site/`: Bilingual MkDocs Material documentation site (BG/EN) with admin guide, user manual & API reference
-- `tests/`: Unit and E2E test suites (573/573 passed)
+- `tests/`: Unit and E2E test suites (734/734 passed)
 
