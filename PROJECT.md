@@ -145,6 +145,8 @@
 | 77 | OpenAPI 3.1 Spec & Swagger UI Dashboard | Comprehensive OpenAPI 3.1 YAML/JSON specification, embedded Swagger UI at `/api/docs`, validator middleware & API v1/v2 routing | M70 | DONE |
 | 78 | Enterprise Edge AI & Mobile Receipt Scanner | WebAssembly/On-Device OCR, NRA QR parsing, offline HMAC queue sync & Delta Pro accounting export | M67 | DONE |
 | 79 | AI Smart Invoice Matching & Auto-Reconciliation | AI-powered vector embeddings, Cyrillic/Latin transliteration, fuzzy amount tolerance & 1-click UI confirmation | M71 | DONE |
+| 80 | Production Kubernetes Helm Chart & Deploy Pipeline | Complete Helm chart with 15 templates, K3s manifests, Traefik IngressRoute, cert-manager, GitHub Actions CI/CD deploy workflow | M73 | DONE |
+| 81 | Comprehensive Bilingual User Documentation | MkDocs Material site with 42 pages (BG/EN), admin guide, user manual, API reference, Postman collection | M74 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -222,6 +224,8 @@
 | M70 | `m70_openapi_docs` | Comprehensive OpenAPI 3.1 YAML/JSON specification, Swagger UI Dashboard at `/api/docs`, validator middleware & API v1/v2 routing | M12, M68 | DONE |
 | M71 | `m71_smart_invoice_matcher` | AI-Powered Smart Invoice Matching & Auto-Reconciliation Engine with vector embeddings, fuzzy amount matching & 1-click UI confirmation | M27, M65 | DONE |
 | M72 | `m72_gfo_generator` | Autonomous Bulgarian Annual Financial Statement (ГФО) Generation, Validation & Multi-Format Regulatory Export | M51, M56, M65 | DONE |
+| M73 | `m73_k8s_helm_deployment` | Production Kubernetes Helm Chart, K3s manifests, Traefik IngressRoute, cert-manager ClusterIssuer & GitHub Actions deploy pipeline | M10, M18, M34, M63, M69 | DONE |
+| M74 | `m74_user_documentation` | Comprehensive bilingual (BG/EN) MkDocs Material user documentation, admin guide, API reference & Postman collection | M12, M70 | DONE |
 
 ## Code Layout
 - `src/config/`: Production Configuration & Secrets Management Hardening (`config_hardening.py`)
@@ -238,4 +242,7 @@
 - `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `scripts/`: Microinvest n8n service, DR replication runner, HA cluster deployer, nightly backup scheduler (`microinvest_n8n_service.py`, `run_dr_replication.sh`, `deploy_ha_cluster.sh`, `schedule_nightly_backup.sh`, `deploy_production_stack.sh`)
-- `tests/`: Unit and E2E test suites (433/433 passed)
+- `deploy/helm/`: Production Helm chart for Kubernetes/K3s deployment (`Chart.yaml`, `values.yaml`, 15 templates)
+- `deploy/k3s/`: K3s cluster installation scripts, Traefik IngressRoute & cert-manager configuration
+- `docs/site/`: Bilingual MkDocs Material documentation site (BG/EN) with admin guide, user manual & API reference
+- `tests/`: Unit and E2E test suites (450/450 passed)
