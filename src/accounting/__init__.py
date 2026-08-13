@@ -5,6 +5,7 @@ Accounting Package.
 from src.accounting.customs_excise_accounting import CustomsDeclaration, CustomsExciseProcessor
 from src.accounting.eu_oss_accounting import EUOSSAccountingAdapter, OSSDeclarationQuarter, OSSSaleTransaction
 from src.accounting.fx_revaluation import FXRateProvider, FXRevaluationCalculator, FXRevaluationResult
+from src.accounting.inventory_valuation import InventoryItemBatch, InventoryValuationEngine, ValuationMethod
 from src.accounting.payroll_accounting import PayrollProcessor, PayrollSummary
 from src.accounting.translate_to_delta import (
     generate_csv,
@@ -46,4 +47,7 @@ __all__ = [
     "EUOSSAccountingAdapter",
     "OSSSaleTransaction",
     "OSSDeclarationQuarter",
+    "InventoryValuationEngine",
+    "InventoryItemBatch",
+    "ValuationMethod",
 ]

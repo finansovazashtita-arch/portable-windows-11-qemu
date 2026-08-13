@@ -2,6 +2,7 @@
 
 ## Architecture
 - **OCR Engine Layer**: PyMuPDF (`fitz`), Pillow (`PIL`), and Tesseract 5 (`-l bul+eng --psm 6`) extracting 100% of transactions from PDF statements with PyMuPDF direct text fallback.
+- **Autonomous Enterprise Inventory & Stock Valuation Engine**: `src/accounting/inventory_valuation.py` managing inventory receipts (304/401), sales COGS write-offs (702/304 via FIFO & Weighted Average), and scrap write-offs (601/304).
 - **Autonomous Cross-Border EU Tax & OSS E-Commerce Invoicing Adapter**: `src/accounting/eu_oss_accounting.py` computing multi-country EU VAT rates, double-entry OSS sales mapping, and quarterly VAT declaration summaries.
 - **Intelligent AI Voice Assistant & Hands-Free Accounting Query Interface**: `src/ai/voice_accounting_assistant.py` processing speech-to-text (STT) queries in Bulgarian for hands-free lookups of balances, turnover, and missing invoices.
 - **Autonomous Tax Policy & Regulatory Update Ingestion Engine**: `src/audit/tax_policy_ingestor.py` monitoring State Gazette (Държавен вестник) and NRA (НАП) tax amendments for dynamic account mapping rule adjustments.
@@ -63,7 +64,7 @@
 | 9 | Database SQL Verification | Query SQLEXPRESS tables (Partners, Operations, OperationDetails) via sqlcmd | M4 | DONE |
 | 10 | Persistent Audit Log Export | Export validated C:\TRANSFER.LOG on persistent Windows 11 QEMU VM storage | M4 | DONE |
 | 11 | E2E Test Suite Creation | Create requirement-driven opaque-box E2E test infra (Tiers 1-4) and publish TEST_READY.md | E2E Track | DONE |
-| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (264/264 passed) and complete Tier 5 coverage | M5 | DONE |
+| 12 | E2E Verification & Hardening | Pass 100% of E2E tests (267/267 passed) and complete Tier 5 coverage | M5 | DONE |
 | 13 | Self-Hosted Ecosystem Integration | Connect Infisical, n8n, Supabase, Obsidian Vault, Unsloth AI, OpenBalancer Telemetry | M6 | DONE |
 | 14 | Multi-PDF Batch Queue & ZIP Processing | Directory scanner, ZIP archive ingestion, fault-tolerant batch execution (`POST /process-batch`) | M7 | DONE |
 | 15 | Automated Email Intake Pipeline | IMAP/Gmail fetcher, MIME parser, Cloudflare Email Routing Worker (`POST /email-intake`) | M8 | DONE |
@@ -106,6 +107,7 @@
 | 52 | Autonomous Tax Policy Ingestion Engine | State Gazette & NRA tax regulation update monitoring for dynamic account rule updates | M45 | DONE |
 | 53 | Intelligent AI Voice Accounting Assistant | Speech-to-text (STT) Bulgarian voice query processing for balances, turnover & missing invoices | M46 | DONE |
 | 54 | EU OSS E-Commerce Invoicing Adapter | Multi-country EU VAT rate calculation, double-entry OSS sales mapping (702/4535) & quarterly reports | M47 | DONE |
+| 55 | Enterprise Inventory & Stock Valuation | Stock receipts (304/401), FIFO & Weighted Average sales COGS write-offs (702/304), scrap (601/304) | M48 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -115,7 +117,7 @@
 | M3 | `m3_vm_vnc_sql_automation` | Delta Pro Chart of Accounts UI setup, VNC & PowerShell Base64 automated import into SQLEXPRESS | M2 | DONE |
 | M4 | `m4_audit_log_export` | 3-way reconciliation (PDF ↔ Journal ↔ SQL DB), persistent C:\TRANSFER.LOG export on Windows 11 VM | M3 | DONE |
 | E2E | `m_e2e_testing` | E2E Test infrastructure, Tiers 1-4 test suite creation, publish TEST_READY.md | none | DONE |
-| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (264/264 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
+| M5 | `m5_final_e2e_verification` | Pass 100% of E2E test suite (267/267 passed) and RAM optimization on QEMU Apple Silicon | M4, E2E | DONE |
 | M6 | `m6_full_ecosystem_integration` | Integrate Infisical Vault, Obsidian Vault Sync, Unsloth AI Classifier, Supabase, OpenBalancer | M5 | DONE |
 | M7 | `m7_multi_pdf_batch_queue` | Batch processing queue for processing multiple bank PDF statements, ZIP archives, and multi-page statements | M6 | DONE |
 | M8 | `m8_automated_email_intake` | IMAP/Gmail/Cloudflare Worker email intake parser to automatically ingest PDF attachments into n8n webhook | M7 | DONE |
@@ -158,9 +160,10 @@
 | M45 | `m45_tax_policy_ingestor` | State Gazette & NRA tax regulation update monitoring for dynamic account rule updates | M44 | DONE |
 | M46 | `m46_voice_accounting_assistant` | Speech-to-text (STT) Bulgarian voice query processing for balances, turnover & missing invoices | M45 | DONE |
 | M47 | `m47_eu_oss_accounting` | Multi-country EU VAT rate calculation, double-entry OSS sales mapping (702/4535) & quarterly reports | M46 | DONE |
+| M48 | `m48_inventory_valuation` | Stock receipts (304/401), FIFO & Weighted Average sales COGS write-offs (702/304), scrap (601/304) | M47 | DONE |
 
 ## Code Layout
-- `src/accounting/`: EU OSS E-Commerce Invoicing Adapter (`eu_oss_accounting.py`), Customs & Excise Accounting Engine (`customs_excise_accounting.py`), Payroll Accounting Engine (`payroll_accounting.py`), FX Revaluation Engine (`fx_revaluation.py`), Bulgarian double-entry translation & XML generator (`translate_to_delta.py`)
+- `src/accounting/`: Inventory Valuation Engine (`inventory_valuation.py`), EU OSS E-Commerce Invoicing Adapter (`eu_oss_accounting.py`), Customs & Excise Accounting Engine (`customs_excise_accounting.py`), Payroll Accounting Engine (`payroll_accounting.py`), FX Revaluation Engine (`fx_revaluation.py`), Bulgarian double-entry translation & XML generator (`translate_to_delta.py`)
 - `src/ai/`: Voice Accounting Assistant (`voice_accounting_assistant.py`), Financial Solvency Analyzer (`financial_solvency_analyzer.py`), Distributed GPU Cluster Orchestrator (`gpu_cluster_orchestrator.py`), Synthetic Dataset Generator & Stress Harness (`synthetic_stress_harness.py`), Autonomous Agent Swarm (`autonomous_agent_swarm.py`), Multi-Modal Document Reconciler (`multimodal_reconciler.py`), Cash Flow Forecaster (`cashflow_forecaster.py`), Fraud Detector (`fraud_detector.py`), Active Learning Loop (`active_learning_loop.py`), Unsloth AI classifier & fine-tuner (`unsloth_classifier.py`, `unsloth_finetune.py`)
 - `src/audit/`: Autonomous Tax Policy Ingestion Engine (`tax_policy_ingestor.py`), Autonomous Tax Audit Defense Engine (`tax_audit_defense.py`), NRA VAT E-Reporting Adapter (`nra_vat_reporter.py`), OECD SAF-T Exporter (`saft_exporter.py`), SQL verification & TRANSFER.LOG exporter (`generate_transfer_log.py`)
 - `src/dashboard/`: Executive Briefing Generator (`executive_briefing.py`), Prometheus Telemetry Exporter (`prometheus_exporter.py`), Web UI Dashboard server & OpenBalancer client (`dashboard_server.py`, `openbalancer_client.py`)
@@ -173,4 +176,4 @@
 - `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `scripts/`: Microinvest n8n service, DR replication runner, HA cluster deployer, nightly backup scheduler (`microinvest_n8n_service.py`, `run_dr_replication.sh`, `deploy_ha_cluster.sh`, `schedule_nightly_backup.sh`, `deploy_production_stack.sh`)
-- `tests/`: Unit and E2E test suites (264/264 passed)
+- `tests/`: Unit and E2E test suites (267/267 passed)
