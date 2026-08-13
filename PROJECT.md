@@ -132,6 +132,8 @@
 | 66 | Zero-Trust DR Failover & Instant Recovery Orchestrator | Automated scheduled disaster recovery failover testing, sub-5s RTO switchover | M59 | DONE |
 | 67 | Autonomous NRA E-Invoicing & Portal Gateway | Direct integration with NRA portal (НАП Е-Фактура API) for real-time submission, verification & QES signing | M60 | DONE |
 | 68 | Autonomous Voice & NLU Command Executor | Autonomous execution of bookkeeping entries, payment generation & NRA VAT declaration filings via voice & text | M61 | DONE |
+| 69 | Global Multi-Entity Tax & VAT Engine | Multi-entity tax & VAT engine supporting BG (NRA), EU (VIES/OSS), UK (HMRC MTD), US (Sales Tax), and CH (ESTV) | M62 | DONE |
+| 70 | Quantum-Safe Active-Active DR Mesh | Unifying post-quantum signing (M36) and DR orchestrator (M59) into an active multi-cloud K3s mesh (AWS + Hetzner + On-premise Mac Mini) | M63 | DONE |
 
 ## Milestones & Status
 | # | Name | Scope | Dependencies | Status |
@@ -199,21 +201,23 @@
 | M60 | `m60_nra_einvoice_portal_gateway` | Direct integration with NRA portal (НАП Е-Фактура API) for real-time submission, verification & QES signing | M59 | DONE |
 | M61 | `m61_nlu_voice_command_executor` | Autonomous voice & NLU command executor for bookkeeping entries, payment generation & NRA VAT filings | M46, M57, M39 | DONE |
 | M62 | `m62_global_multinational_tax_engine` | Global multi-entity tax & VAT engine supporting BG (NRA), EU (VIES/OSS), UK (HMRC MTD), US (Sales Tax), and CH (ESTV) | M47, M50, M51 | DONE |
+| M63 | `m63_quantum_safe_dr_mesh` | Quantum-Safe Active-Active DR Mesh orchestrator unifying PQC signing (M36) & DR orchestrator (M59) across AWS, Hetzner, and On-premise Mac Mini | M36, M59 | DONE |
 
 ## Code Layout
 - `src/intake/`: Open Banking PISP Aggregator (`open_banking_pisp.py`), Bank Feed Guard (`bank_feed_guard.py`), SEPA Instant / BISERA 6 Adapter (`sepa_bisera_instant.py`), Open Banking PSD2 client (`psd2_openbanking.py`), Automated Email Intake & Cloudflare Email Worker (`email_parser.py`, `cloudflare_worker.js`)
-- `src/security/`: Audit Ledger Integrity Guard (`audit_ledger_guard.py`), Zero-Trust HSM Cryptographic Signer & PQC (`hsm_signer.py`), Multi-Tenant RBAC (`tenant_rbac.py`) & Infisical Vault client (`infisical_vault.py`)
+- `src/security/`: Post-Quantum Mesh Signer (`pq_mesh_signer.py`), Audit Ledger Integrity Guard (`audit_ledger_guard.py`), Zero-Trust HSM Cryptographic Signer & PQC (`hsm_signer.py`), Multi-Tenant RBAC (`tenant_rbac.py`) & Infisical Vault client (`infisical_vault.py`)
 - `src/accounting/`: Travel Expense Manager (`travel_expense_manager.py`), Cash Desk Manager (`cash_desk_manager.py`), Corporate Consolidation Engine (`corporate_consolidation.py`), Fixed Assets & Depreciation Manager (`fixed_assets_depreciation.py`), Inventory Valuation Engine (`inventory_valuation.py`), EU OSS E-Commerce Invoicing Adapter (`eu_oss_accounting.py`), Customs & Excise Accounting Engine (`customs_excise_accounting.py`), Payroll Accounting Engine (`payroll_accounting.py`), FX Revaluation Engine (`fx_revaluation.py`), Bulgarian double-entry translation & XML generator (`translate_to_delta.py`)
 - `src/audit/`: Global Multi-Entity Tax Engine (`global_tax_engine.py`), Swiss ESTV VAT Engine (`swiss_estv_tax_engine.py`), US Sales Tax Engine (`us_sales_tax_engine.py`), Dividend Tax Manager (`dividend_tax_manager.py`), Autonomous Corporate Income Tax Return Generator (`corporate_tax_return.py`), Autonomous Tax Policy Ingestion Engine (`tax_policy_ingestor.py`), Autonomous Tax Audit Defense Engine (`tax_audit_defense.py`), NRA VAT E-Reporting Adapter (`nra_vat_reporter.py`), OECD SAF-T Exporter (`saft_exporter.py`), SQL verification & TRANSFER.LOG exporter (`generate_transfer_log.py`)
 - `src/ai/`: Autonomous Voice & NLU Command Executor (`nlu_voice_command_executor.py`), Neural Trial Balance Sentinel (`neural_trial_balance_sentinel.py`), Voice Accounting Assistant (`voice_accounting_assistant.py`), Financial Solvency Analyzer (`financial_solvency_analyzer.py`), Distributed GPU Cluster Orchestrator (`gpu_cluster_orchestrator.py`), Synthetic Dataset Generator & Stress Harness (`synthetic_stress_harness.py`), Autonomous Agent Swarm (`autonomous_agent_swarm.py`), Multi-Modal Document Reconciler (`multimodal_reconciler.py`), Cash Flow Forecaster (`cashflow_forecaster.py`), Fraud Detector (`fraud_detector.py`), Active Learning Loop (`active_learning_loop.py`), Unsloth AI classifier & fine-tuner (`unsloth_classifier.py`, `unsloth_finetune.py`)
 - `src/dashboard/`: Executive Briefing Generator (`executive_briefing.py`), Prometheus Telemetry Exporter (`prometheus_exporter.py`), Web UI Dashboard server & OpenBalancer client (`dashboard_server.py`, `openbalancer_client.py`)
 - `src/backup/`: Active-Active SQL Sync Guard (`active_active_sql_sync.py`), Autonomous Audit Log Cold Storage Archiver (`cold_storage_archiver.py`), DR Multi-Region Replication Manager (`disaster_recovery_replication.py`), Automated Nightly Backup Manager (`nightly_backup.py`)
-- `src/cluster/`: Zero-Trust DR Failover Orchestrator (`dr_failover_orchestrator.py`), Rolling Upgrade Controller (`rolling_upgrade_controller.py`), High Availability Cluster Manager (`ha_failover.py`)
+- `src/cluster/`: Quantum-Safe Active-Active DR Mesh (`quantum_safe_dr_mesh.py`), Zero-Trust DR Failover Orchestrator (`dr_failover_orchestrator.py`), Rolling Upgrade Controller (`rolling_upgrade_controller.py`), High Availability Cluster Manager (`ha_failover.py`)
 - `src/integration/`: UK HMRC MTD VAT Adapter (`hmrc_mtd_adapter.py`), Autonomous NRA E-Invoicing Gateway (`nra_einvoice_gateway.py`), Native Mobile Push Gateway (`mobile_push_gateway.py`), Peppol EU E-Invoicing Engine (`peppol_einvoicing.py`), Telegram Bot Guard (`telegram_notifier.py`), VIES VAT Checker (`vies_vat_checker.py`), Obsidian Vault exporter (`obsidian_exporter.py`) & Supabase logger (`supabase_logger.py`)
 - `src/ocr/`: Image Preprocessor (`image_preprocessor.py`), PDF OCR, multi-bank extractors & batch processing (`extract_dsk_statement.py`, `multi_bank_extractor.py`, `batch_processor.py`)
 - `src/dashboard/web_ui/`: FinansProtect Web UI Dashboard static assets (`index.html`, `styles.css`, `app.js`)
 - `src/vm_automation/`: VNC & PowerShell Base64 QEMU automation scripts (`import_to_deltapro.py`)
 - `scripts/`: Microinvest n8n service, DR replication runner, HA cluster deployer, nightly backup scheduler (`microinvest_n8n_service.py`, `run_dr_replication.sh`, `deploy_ha_cluster.sh`, `schedule_nightly_backup.sh`, `deploy_production_stack.sh`)
-- `tests/`: Unit and E2E test suites (324/324 passed)
+- `tests/`: Unit and E2E test suites (385/385 passed)
+
 
 
