@@ -237,6 +237,12 @@ Place your official Windows 11 ISO in the project directory renamed to `Win11_x6
 ./start_qemu_linux.sh
 ```
 
+**On Tails OS (from USB):**
+```bash
+# Read TAILS_OS_TROUBLESHOOTING.md for prerequisites (Admin password, KVM)
+bash start_qemu_tails.sh
+```
+
 ### ⚙️ Detailed Step-by-Step Technical Guide
 
 #### Step 1: Generating the Unattend Hardware Bypass ISO
